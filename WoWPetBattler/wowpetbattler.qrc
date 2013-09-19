@@ -1,4 +1,6 @@
 <RCC>
-    <qresource prefix="WoWPetBattler">
-    </qresource>
+  <qresource prefix="WoWPetBattler">
+    <file>Stop Icon.png</file>
+    <file>Play Icon.png</file>
+  </qresource>
 </RCC>

@@ -67,4 +67,12 @@
       <Filter>Generated Files</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="Play Icon.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Stop Icon.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
 </Project>

@@ -1,0 +1,30 @@
+﻿Build started 18/09/2013 9:49:35 PM.
+     1>Project "D:\Users\Shane\Documents\Visual Studio 2012\Projects\WoWPetBattler\WoWPetBattler\WoWPetBattler.vcxproj" on node 2 (Build target(s)).
+     1>InitializeBuildStatus:
+         Touching "Debug\WoWPetBattler.unsuccessfulbuild".
+       CustomBuild:
+         Moc'ing wowpetbattler.h...
+         Uic'ing wowpetbattler.ui...
+         Rcc'ing wowpetbattler.qrc...
+       ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /I.\GeneratedFiles /I. /IC:\Qt\Qt5.1.1\5.1.1\msvc2012\include /I.\GeneratedFiles\Debug /IC:\Qt\Qt5.1.1\5.1.1\msvc2012\include\QtCore /IC:\Qt\Qt5.1.1\5.1.1\msvc2012\include\QtGui /IC:\Qt\Qt5.1.1\5.1.1\msvc2012\include\QtWidgets /Zi /nologo /W1 /WX- /Od /Oy- /D UNICODE /D WIN32 /D WIN64 /D QT_DLL /D QT_CORE_LIB /D QT_GUI_LIB /D QT_WIDGETS_LIB /Gm- /EHsc /MDd /GS /fp:precise /Zc:wchar_t- /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc110.pdb" /Gd /TP /analyze- /errorReport:prompt GeneratedFiles\Debug\moc_wowpetbattler.cpp main.cpp wowpetbattler.cpp
+         moc_wowpetbattler.cpp
+         main.cpp
+         wowpetbattler.cpp
+         Generating Code...
+         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /I.\GeneratedFiles /I. /IC:\Qt\Qt5.1.1\5.1.1\msvc2012\include /I.\GeneratedFiles\Debug /IC:\Qt\Qt5.1.1\5.1.1\msvc2012\include\QtCore /IC:\Qt\Qt5.1.1\5.1.1\msvc2012\include\QtGui /IC:\Qt\Qt5.1.1\5.1.1\msvc2012\include\QtWidgets /Zi /nologo /W1 /WX- /Od /Oy- /D UNICODE /D WIN32 /D WIN64 /D QT_DLL /D QT_CORE_LIB /D QT_GUI_LIB /D QT_WIDGETS_LIB /Gm- /EHsc /MDd /GS /fp:precise /Zc:wchar_t- /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc110.pdb" /Gd /TP /analyze- /errorReport:prompt GeneratedFiles\qrc_wowpetbattler.cpp
+         qrc_wowpetbattler.cpp
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"D:\Users\Shane\Documents\Visual Studio 2012\Projects\WoWPetBattler\Win32\Debug\\WoWPetBattler.exe" /NOLOGO /LIBPATH:C:\Qt\Qt5.1.1\5.1.1\msvc2012\lib qtmaind.lib Qt5Cored.lib Qt5Guid.lib Qt5Widgetsd.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"D:\Users\Shane\Documents\Visual Studio 2012\Projects\WoWPetBattler\Win32\Debug\WoWPetBattler.pdb" /SUBSYSTEM:WINDOWS /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"D:\Users\Shane\Documents\Visual Studio 2012\Projects\WoWPetBattler\Win32\Debug\WoWPetBattler.lib" /MACHINE:X86 /SAFESEH Debug\moc_wowpetbattler.obj
+         Debug\qrc_wowpetbattler.obj
+         Debug\main.obj
+         Debug\wowpetbattler.obj
+         WoWPetBattler.vcxproj -> D:\Users\Shane\Documents\Visual Studio 2012\Projects\WoWPetBattler\Win32\Debug\WoWPetBattler.exe
+       FinalizeBuildStatus:
+         Deleting file "Debug\WoWPetBattler.unsuccessfulbuild".
+         Touching "Debug\WoWPetBattler.lastbuildstate".
+     1>Done Building Project "D:\Users\Shane\Documents\Visual Studio 2012\Projects\WoWPetBattler\WoWPetBattler\WoWPetBattler.vcxproj" (Build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:07.74
