@@ -31,6 +31,7 @@ public slots:
 
 private slots:
 	void Interpret();
+	void Testing();
 
 private:
 	bool Locate();

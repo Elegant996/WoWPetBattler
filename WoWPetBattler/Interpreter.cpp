@@ -35,7 +35,8 @@ void Interpreter::Start()
 	running = true;
 	//emit running;
 	emit OutputToGUI("", "Starting...");
-	Interpret();
+	Testing();
+	//Interpret();
 }
 
 void Interpreter::Stop()
@@ -120,6 +121,40 @@ void Interpreter::Interpret()
 
 	//Queue this function again at the bottom of the event list so we can continue to update from the WoW client.
 	QMetaObject::invokeMethod(this, "Interpret", Qt::QueuedConnection);
+}
+
+void Interpreter::Testing()
+{
+	PetTeam* myTeam = petStage->GetPetTeam(1);
+	myTeam->AddPet(23);
+	myTeam->AddPet(57);
+	Pet* myFirstPet = myTeam->GetPet(1);
+	Pet* mySecondPet = myTeam->GetPet(2);
+	myFirstPet->AddAbility(45, 0, true);
+	myFirstPet->AddAbility(53, 0, true);
+	mySecondPet->AddAbility(42, 0, true);
+	mySecondPet->AddAbility(51, 0, true);
+	PetAbility* myFirstPetFirstAbility = myFirstPet->GetPetAbility(1);
+	PetAbility* myFirstPetSecondAbility = myFirstPet->GetPetAbility(2);
+	PetAbility* mySecondPetFirstAbility = mySecondPet->GetPetAbility(1);
+	PetAbility* mySecondPetSecondAbility = mySecondPet->GetPetAbility(2);
+
+	qDebug() << &myTeam << " " << &mySecondPet << " " << &myFirstPetFirstAbility << " " << &mySecondPetSecondAbility;
+
+	PetStage* newPetStage(petStage);
+
+	myTeam = newPetStage->GetPetTeam(1);
+	myFirstPet = myTeam->GetPet(1);
+	mySecondPet = myTeam->GetPet(2);
+	myFirstPetFirstAbility = myFirstPet->GetPetAbility(1);
+	myFirstPetSecondAbility = myFirstPet->GetPetAbility(2);
+	mySecondPetFirstAbility = mySecondPet->GetPetAbility(1);
+	mySecondPetSecondAbility = mySecondPet->GetPetAbility(2);
+
+	qDebug() << mySecondPetSecondAbility->GetCooldown();mySecondPetSecondAbility->SetCooldown(2);
+	qDebug() << &myTeam << " " << &mySecondPet << " " << &myFirstPetFirstAbility << " " << &mySecondPetSecondAbility;
+	qDebug() << mySecondPetSecondAbility->GetCooldown();
+	qDebug() << myTeam->GetPet(2)->GetPetAbility(2)->GetCooldown();
 }
 
 bool Interpreter::Locate()

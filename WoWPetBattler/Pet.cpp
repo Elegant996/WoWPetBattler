@@ -4,6 +4,7 @@
 Pet::Pet(int speciesID)
 {
 	this->speciesID = speciesID;
+	this->petAbility.reserve(3);
 }
 
 //Deconstructor
@@ -13,42 +14,38 @@ Pet::~Pet(void)
 	petAbility.clear();
 }
 
+//Copy Constructor
+Pet::Pet(const Pet& other)
+{
+	speciesID = other.speciesID;
+	health = other.health;
+	power = other.power;
+	speed = other.speed;
+	petAbility = other.petAbility;
+}
+
+//Operator Overload for '='
+Pet& Pet::operator=(const Pet &rhs)
+{
+	speciesID = rhs.speciesID;
+	health = rhs.health;
+	power = rhs.power;
+	speed = rhs.speed;
+	petAbility = rhs.petAbility;
+
+	return *this;
+}
+
 //Add an ability to the current pet.
 void Pet::AddAbility(int abilityID, int cooldown, bool verification)
 {
 	petAbility.append(new PetAbility(abilityID, cooldown, verification));
 }
 
-//Update the cooldown of a pet's ability.
-void Pet::UpdateCooldown(int abilityID, int cooldown)
+//Return the desired ability at the specified index.
+PetAbility* Pet::GetPetAbility(int index)
 {
-	QVector<PetAbility*>::iterator i = petAbility.begin();
-	while (i != petAbility.end())
-	{
-		if ((*i)->GetAbilityID() == abilityID)
-		{
-			(*i)->SetCooldown(cooldown);
-			break;
-		}
-
-		++i;
-	}
-}
-
-//Confirm that the pet knows this ability.
-void Pet::VerifyAbility(int abilityID, bool verification)
-{
-	QVector<PetAbility*>::iterator i = petAbility.begin();
-	while (i != petAbility.end())
-	{
-		if ((*i)->GetAbilityID() == abilityID)
-		{
-			(*i)->IsVerified(verification);
-			break;
-		}
-
-		++i;
-	}
+	return petAbility.at(index-1);
 }
 
 //Return pet's species ID.

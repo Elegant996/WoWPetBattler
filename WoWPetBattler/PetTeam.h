@@ -10,10 +10,13 @@ class PetTeam
 public:
 	PetTeam(void);
 	~PetTeam(void);
+	PetTeam(const PetTeam&);
+	PetTeam& operator=(const PetTeam&);
 
 	void AddPet(int);
+	Pet* GetPet(int);
 
-protected:
+private:
 	QVector<Pet*> pet;
 };
 

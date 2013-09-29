@@ -10,10 +10,11 @@ class Pet
 public:
 	Pet(int);
 	~Pet(void);
+	Pet(const Pet&);
+	Pet& operator=(const Pet&);
 
 	void AddAbility(int, int, bool);
-	void UpdateCooldown(int, int);
-	void VerifyAbility(int, bool);
+	PetAbility* GetPetAbility(int);
 
 	int GetSpeciesID();
 	int GetHealth();

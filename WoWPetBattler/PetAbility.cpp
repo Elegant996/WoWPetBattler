@@ -14,6 +14,24 @@ PetAbility::~PetAbility(void)
 
 }
 
+//Copy Constructor
+PetAbility::PetAbility(const PetAbility& other)
+{
+	abilityID = other.abilityID;
+	cooldown = other.cooldown;
+	isVerified = other.isVerified;
+}
+
+//Operator Overload for '='
+PetAbility& PetAbility::operator=(const PetAbility &rhs)
+{
+	abilityID = rhs.abilityID;
+	cooldown = rhs.cooldown;
+	isVerified = rhs.isVerified;
+
+	return *this;
+}
+
 //Update the cooldown of the ability.
 void PetAbility::SetCooldown(int CD)
 {

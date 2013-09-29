@@ -6,6 +6,8 @@ class PetAbility
 public:
 	PetAbility(int, int, bool);
 	~PetAbility(void);
+	PetAbility(const PetAbility&);
+	PetAbility& operator=(const PetAbility&);
 
 	void SetCooldown(int);
 	void IsVerified(bool);
