@@ -50,6 +50,27 @@
     <ClCompile Include="GeneratedFiles\qrc_wowpetbattler.cpp">
       <Filter>Generated Files</Filter>
     </ClCompile>
+    <ClCompile Include="PetStage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Interpreter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_Interpreter.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_Interpreter.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="PetTeam.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Pet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PetAbility.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="wowpetbattler.h">
@@ -61,17 +82,32 @@
     <CustomBuild Include="wowpetbattler.qrc">
       <Filter>Resource Files</Filter>
     </CustomBuild>
+    <CustomBuild Include="Interpreter.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GeneratedFiles\ui_wowpetbattler.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
+    <ClInclude Include="PetStage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PetTeam.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Pet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PetAbility.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="Play Icon.png">
+    <Image Include="Resources\Play Icon.png">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="Stop Icon.png">
+    <Image Include="Resources\Stop Icon.png">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

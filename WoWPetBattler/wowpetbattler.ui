@@ -11,10 +11,13 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>WoWPetBattler</string>
+   <string>WoW Pet Battler</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <widget class="QPushButton" name="pushButton">
+   <widget class="QPushButton" name="playButton">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>50</x>
@@ -25,13 +28,20 @@
     </property>
     <property name="icon">
      <iconset resource="wowpetbattler.qrc">
-      <normaloff>:/WoWPetBattler/Play Icon.png</normaloff>:/WoWPetBattler/Play Icon.png</iconset>
+      <normaloff>:/WoWPetBattler/Resources/Play Icon.png</normaloff>
+      <normalon>Resources/Stop Icon.png</normalon>:/WoWPetBattler/Resources/Play Icon.png</iconset>
     </property>
     <property name="iconSize">
      <size>
       <width>48</width>
       <height>48</height>
      </size>
+    </property>
+    <property name="checkable">
+     <bool>true</bool>
+    </property>
+    <property name="checked">
+     <bool>false</bool>
     </property>
    </widget>
    <widget class="QTextBrowser" name="outputBrowser">
@@ -40,16 +50,16 @@
       <x>20</x>
       <y>160</y>
       <width>421</width>
-      <height>331</height>
+      <height>361</height>
      </rect>
     </property>
    </widget>
    <widget class="QLabel" name="statusLabel">
     <property name="geometry">
      <rect>
-      <x>180</x>
+      <x>150</x>
       <y>50</y>
-      <width>261</width>
+      <width>291</width>
       <height>51</height>
      </rect>
     </property>
@@ -61,7 +71,7 @@
      </font>
     </property>
     <property name="text">
-     <string>Finding Addon</string>
+     <string>Not Running</string>
     </property>
    </widget>
   </widget>
@@ -74,14 +84,6 @@
      <height>21</height>
     </rect>
    </property>
-  </widget>
-  <widget class="QToolBar" name="mainToolBar">
-   <attribute name="toolBarArea">
-    <enum>TopToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
-    <bool>true</bool>
-   </attribute>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
  </widget>
