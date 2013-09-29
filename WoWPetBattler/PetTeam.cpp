@@ -3,6 +3,7 @@
 //Constructors
 PetTeam::PetTeam(void)
 {
+	this->activePet = 0;
 	this->pet.reserve(3);
 }
 
@@ -31,6 +32,18 @@ PetTeam& PetTeam::operator=(const PetTeam &rhs)
 void PetTeam::AddPet(int speciesID)
 {
 	pet.append(new Pet(speciesID));
+}
+
+//Set the index of the active pet.
+void PetTeam::SetActivePet(int index)
+{
+	activePet = index;
+}
+
+//Return the index of the active pet.
+int PetTeam::GetActivePet()
+{
+	return activePet;
 }
 
 //Get the pet at the current index.

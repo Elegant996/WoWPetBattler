@@ -22,7 +22,7 @@ public:
 	int GetSpeed();
 
 private:
-	int speciesID, health, power, speed;
+	int speciesID, type, health, power, speed;
 	QVector<PetAbility*> petAbility;
 };
 

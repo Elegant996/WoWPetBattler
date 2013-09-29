@@ -14,9 +14,12 @@ public:
 	PetTeam& operator=(const PetTeam&);
 
 	void AddPet(int);
+	void SetActivePet(int);
+	int GetActivePet();
 	Pet* GetPet(int);
 
 private:
+	int activePet;
 	QVector<Pet*> pet;
 };
 
