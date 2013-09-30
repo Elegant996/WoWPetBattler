@@ -18,21 +18,8 @@ PetStage::~PetStage(void)
 //Copy Constructor
 PetStage::PetStage(const PetStage& other)
 {
-	//petTeam = other.petTeam;
-
 	for (int i=0; i < other.petTeam.size(); i++)
-		petTeam.append(new PetTeam(*other.petTeam[i]));
-}
-
-//Operator Overload for '='
-PetStage& PetStage::operator=(const PetStage &rhs)
-{
-	//petTeam = rhs.petTeam;
-
-	for (int i=0; i < rhs.petTeam.size(); i++)
-		petTeam.append(new PetTeam(*rhs.petTeam[i]));
-
-	return *this;
+		this->petTeam.append(new PetTeam(*other.petTeam.at(i)));
 }
 
 //Return the desired pet team; 1 for player, 2 for opponent;

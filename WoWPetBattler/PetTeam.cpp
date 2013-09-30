@@ -17,15 +17,9 @@ PetTeam::~PetTeam(void)
 //Copy Constructor
 PetTeam::PetTeam(const PetTeam& other)
 {
-	pet = other.pet;
-}
-
-//Operator Overload for '='
-PetTeam& PetTeam::operator=(const PetTeam &rhs)
-{
-	pet = rhs.pet;
-
-	return *this;
+	this->activePet = other.activePet;
+	for (int i=0; i < other.pet.size(); i++)
+		this->pet.append(new Pet(*other.pet.at(i)));
 }
 
 //Add a pet to the current team.

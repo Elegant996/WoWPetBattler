@@ -2,8 +2,8 @@
 #define PETSTAGE_H
 
 #include <QVector>
-#include <QVectorIterator>
 #include <QtAlgorithms>
+#include <QDebug>
 #include "PetTeam.h"
 
 class PetStage
@@ -12,7 +12,6 @@ public:
 	PetStage(void);
 	~PetStage(void);
 	PetStage(const PetStage&);
-	PetStage& operator=(const PetStage&);
 
 	PetTeam* GetPetTeam(int);
 

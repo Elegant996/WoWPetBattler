@@ -4,36 +4,30 @@
 Pet::Pet(int speciesID)
 {
 	this->speciesID = speciesID;
+	this->type = 0;
+	this->health = 0;
+	this->power = 0;
+	this->speed = 0;
 	this->petAbility.reserve(3);
 }
 
 //Deconstructor
 Pet::~Pet(void)
 {
-	qDeleteAll(petAbility);
-	petAbility.clear();
+	qDeleteAll(this->petAbility);
+	this->petAbility.clear();
 }
 
 //Copy Constructor
 Pet::Pet(const Pet& other)
 {
-	speciesID = other.speciesID;
-	health = other.health;
-	power = other.power;
-	speed = other.speed;
-	petAbility = other.petAbility;
-}
-
-//Operator Overload for '='
-Pet& Pet::operator=(const Pet &rhs)
-{
-	speciesID = rhs.speciesID;
-	health = rhs.health;
-	power = rhs.power;
-	speed = rhs.speed;
-	petAbility = rhs.petAbility;
-
-	return *this;
+	this->speciesID = other.speciesID;
+	this->type = other.type;
+	this->health = other.health;
+	this->power = other.power;
+	this->speed = other.speed;
+	for (int i=0; i < other.petAbility.size(); i++)
+		this->petAbility.append(new PetAbility(*other.petAbility.at(i)));
 }
 
 //Add an ability to the current pet.

@@ -3,6 +3,7 @@
 
 #include <QVector>
 #include <QtAlgorithms>
+#include <QDebug>
 #include "PetAbility.h"
 
 class Pet
@@ -11,7 +12,6 @@ public:
 	Pet(int);
 	~Pet(void);
 	Pet(const Pet&);
-	Pet& operator=(const Pet&);
 
 	void AddAbility(int, int, bool);
 	PetAbility* GetPetAbility(int);

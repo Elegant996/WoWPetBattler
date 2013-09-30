@@ -35,8 +35,8 @@ void Interpreter::Start()
 	running = true;
 	//emit running;
 	emit OutputToGUI("", "Starting...");
-	Testing();
-	//Interpret();
+	//Testing();
+	Interpret();
 }
 
 void Interpreter::Stop()
@@ -125,6 +125,7 @@ void Interpreter::Interpret()
 
 void Interpreter::Testing()
 {
+	mutex.lock();
 	PetTeam* myTeam = petStage->GetPetTeam(1);
 	myTeam->AddPet(23);
 	myTeam->AddPet(57);
@@ -139,9 +140,7 @@ void Interpreter::Testing()
 	PetAbility* mySecondPetFirstAbility = mySecondPet->GetPetAbility(1);
 	PetAbility* mySecondPetSecondAbility = mySecondPet->GetPetAbility(2);
 
-	qDebug() << &myTeam << " " << &mySecondPet << " " << &myFirstPetFirstAbility << " " << &mySecondPetSecondAbility;
-
-	PetStage* newPetStage(petStage);
+	PetStage *newPetStage(new PetStage(*petStage));
 
 	myTeam = newPetStage->GetPetTeam(1);
 	myFirstPet = myTeam->GetPet(1);
@@ -151,10 +150,12 @@ void Interpreter::Testing()
 	mySecondPetFirstAbility = mySecondPet->GetPetAbility(1);
 	mySecondPetSecondAbility = mySecondPet->GetPetAbility(2);
 
-	qDebug() << mySecondPetSecondAbility->GetCooldown();mySecondPetSecondAbility->SetCooldown(2);
-	qDebug() << &myTeam << " " << &mySecondPet << " " << &myFirstPetFirstAbility << " " << &mySecondPetSecondAbility;
-	qDebug() << mySecondPetSecondAbility->GetCooldown();
-	qDebug() << myTeam->GetPet(2)->GetPetAbility(2)->GetCooldown();
+	qDebug() << "newPetStage: mySecondPetSecondAbility =" << mySecondPetSecondAbility->GetCooldown();
+	mySecondPetSecondAbility->SetCooldown(2);
+	qDebug() << "newPetStage: mySecondPetSecondAbility + 2";
+	qDebug() << "newPetStage: mySecondPetSecondAbility =" << mySecondPetSecondAbility->GetCooldown();
+	qDebug() << "petStage: mySecondPetSecondAbility = " << petStage->GetPetTeam(1)->GetPet(2)->GetPetAbility(2)->GetCooldown();
+	mutex.unlock();
 }
 
 bool Interpreter::Locate()
