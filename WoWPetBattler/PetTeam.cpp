@@ -10,8 +10,8 @@ PetTeam::PetTeam(void)
 //Destructor
 PetTeam::~PetTeam(void)
 {
-	qDeleteAll(pet);
-	pet.clear();
+	qDeleteAll(this->pet);
+	this->pet.clear();
 }
 
 //Copy Constructor
@@ -23,25 +23,25 @@ PetTeam::PetTeam(const PetTeam& other)
 }
 
 //Add a pet to the current team.
-void PetTeam::AddPet(int speciesID)
+void PetTeam::AddPet(int speciesID, int breed, int quality, int level)
 {
-	pet.append(new Pet(speciesID));
+	this->pet.append(new Pet(speciesID, breed, quality, level));
 }
 
 //Set the index of the active pet.
 void PetTeam::SetActivePet(int index)
 {
-	activePet = index;
+	this->activePet = index;
 }
 
 //Return the index of the active pet.
 int PetTeam::GetActivePet()
 {
-	return activePet;
+	return this->activePet;
 }
 
 //Get the pet at the current index.
 Pet* PetTeam::GetPet(int index)
 {
-	return pet.at(index-1);
+	return this->pet.at(index-1);
 }

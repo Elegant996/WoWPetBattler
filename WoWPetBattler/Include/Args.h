@@ -14,7 +14,7 @@
 #ifndef ROBOT_ARGS_H
 #define ROBOT_ARGS_H
 
-#include "Common.h"
+#include "Global.h"
 #include <memory>
 namespace Robot {
 
@@ -26,7 +26,6 @@ namespace Robot {
 
 ////////////////////////////////////////////////////////////////////////////////
 /// <summary> </summary>
-/// <copying> Shared </copying>
 
 class ROBOT_EXPORT Args
 {
@@ -41,7 +40,7 @@ public:
 	bool			Create			(const char*  args);
 	bool			Create			(const char** argv);
 	void			Destroy			(void);
-
+	
 	uint32			GetLength		(void) const;
 	uint32			GetHeight		(void) const;
 	uint32			GetWidth		(void) const;

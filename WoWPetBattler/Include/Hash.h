@@ -14,7 +14,7 @@
 #ifndef ROBOT_HASH_H
 #define ROBOT_HASH_H
 
-#include "Common.h"
+#include "Global.h"
 namespace Robot {
 
 
@@ -25,20 +25,19 @@ namespace Robot {
 
 ////////////////////////////////////////////////////////////////////////////////
 /// <summary> </summary>
-/// <copying> Atomic </copying>
 
 class ROBOT_EXPORT Hash
 {
 public:
 	// Constructors
 	explicit Hash				(const uint8* data,
-								 uint32 dataLength);
-	explicit Hash				(const char* file = NULL);
+								 uintptr dataLength);
+	explicit Hash				(const char* file = nullptr);
 
 public:
 	// Functions
 	void		Append			(const uint8* data,
-								 uint32 dataLength);
+								 uintptr dataLength);
 	bool		Append			(const char* file);
 
 public:

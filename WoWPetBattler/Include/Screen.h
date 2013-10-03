@@ -14,7 +14,7 @@
 #ifndef ROBOT_SCREEN_H
 #define ROBOT_SCREEN_H
 
-#include "Global.h"
+#include "Common.h"
 namespace Robot {
 	class Window;
 
@@ -26,7 +26,6 @@ namespace Robot {
 
 ////////////////////////////////////////////////////////////////////////////////
 /// <summary> </summary>
-/// <copying> Static </copying>
 
 class ROBOT_EXPORT Screen
 {
@@ -40,17 +39,22 @@ private:
 public:
 	// Functions
 	static Size		GetResolution	(void);
-	static void		EnableAero		(bool state);
+	static void		EnableAero		(bool enable);
 
-	static Color	GrabPixel		(Window window, const Point& point);
-	static Color	GrabPixel		(Window window, uint16 x, uint16 y);
+	static Color	GrabPixel		(const Window& window,
+									 const Point& point);
 
-	static bool		GrabScreen		(Window window, Image* image,
+	static Color	GrabPixel		(const Window& window,
+									 int16  x, int16  y);
+
+	static bool		GrabScreen		(const Window& window,
+									 Image* image,
 									 const Bounds& bounds);
 
-	static bool		GrabScreen		(Window window, Image* image,
-									 int32 x =  0, int32 y =  0,
-									 int32 w = -1, int32 h = -1);
+	static bool		GrabScreen		(const Window& window,
+									 Image* image,
+									 int16 x =  0, int16 y =  0,
+									 int16 w = -1, int16 h = -1);
 };
 
 } // namespace Robot

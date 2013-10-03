@@ -25,29 +25,29 @@ PetAbility::PetAbility(const PetAbility& other)
 //Update the cooldown of the ability.
 void PetAbility::SetCooldown(int CD)
 {
-	cooldown = CD;
+	this->cooldown = CD;
 }
 
 //Confirm whether we know this ability is known.
 void PetAbility::IsVerified(bool verification)
 {
-	isVerified = verification;
+	this->isVerified = verification;
 }
 
 //Return ability ID.
 int PetAbility::GetAbilityID()
 {
-	return abilityID;
+	return this->abilityID;
 }
 
 //Return cooldown status.
 int PetAbility::GetCooldown()
 {
-	return cooldown;
+	return this->cooldown;
 }
 
 //Return whether or not the ability is verified.
 bool PetAbility::IsVerified()
 {
-	return isVerified;
+	return this->isVerified;
 }

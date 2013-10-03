@@ -5,7 +5,6 @@
 #include <QElapsedTimer>
 #include <QWaitCondition>
 #include <QDebug> //To be removed.
-#include <QThread> //To be removed.
 #include <Robot.h>
 #include "PetStage.h"
 
@@ -23,7 +22,8 @@ public:
 
 signals:
 	void OutputToGUI(QString, QString);
-	void StopTimeout(QString);
+	void RunAI();
+	void Stop(QString);
 
 public slots:
 	void Start();
@@ -31,7 +31,6 @@ public slots:
 
 private slots:
 	void Interpret();
-	void Testing();
 
 private:
 	bool Locate();

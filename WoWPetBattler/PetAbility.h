@@ -3,7 +3,6 @@
 
 #include <QVector>
 #include <QtAlgorithms>
-#include <QDebug>
 
 class PetAbility
 {

@@ -14,7 +14,7 @@
 #ifndef ROBOT_MEMORY_H
 #define ROBOT_MEMORY_H
 
-#include "Global.h"
+#include "Common.h"
 #include "Process.h"
 namespace Robot {
 
@@ -26,7 +26,6 @@ namespace Robot {
 
 ////////////////////////////////////////////////////////////////////////////////
 /// <summary> </summary>
-/// <copying> Atomic </copying>
 
 class ROBOT_EXPORT Memory
 {
@@ -36,41 +35,25 @@ public:
 	// Functions
 	Process			GetProcess		(void) const;
 
-	uint64			Read			(const void* address,
+	bool			IsReadable		(uintptr address) const;
+	bool			IsWritable		(uintptr address) const;
+	bool			IsGuarded		(uintptr address) const;
+
+	uintptr			ReadData		(uintptr address,
 									 void* result,
-									 uint64 length) const;
+									 uintptr length) const;
 
-	uint64			Read			(const void* address,
-									 uint8 indirection,
-									 const void** offsets,
-									 void* result,
-									 uint64 length) const;
-
-	uint64			Write			(const void* address,
+	uintptr			WriteData		(uintptr address,
 									 const void* data,
-									 uint64 length) const;
+									 uintptr length) const;
 
-	uint64			Write			(const void* address,
-									 uint8 indirection,
-									 const void** offsets,
-									 const void* data,
-									 uint64 length) const;
+	uint32			ProtectRegion	(uintptr address,
+									 uint32 protect) const;
 
-	bool			IsReadable		(const void* address) const;
-	bool			IsWritable		(const void* address) const;
-	bool			IsGuarded		(const void* address) const;
-
-	bool			IsReadable		(const void* address,
-									 uint8 indirection,
-									 const void** offsets) const;
-
-	bool			IsWritable		(const void* address,
-									 uint8 indirection,
-									 const void** offsets) const;
-
-	bool			IsGuarded		(const void* address,
-									 uint8 indirection,
-									 const void** offsets) const;
+public:
+	// Operators
+	bool			operator ==		(const Memory& memory) const;
+	bool			operator !=		(const Memory& memory) const;
 
 private:
 	// Fields

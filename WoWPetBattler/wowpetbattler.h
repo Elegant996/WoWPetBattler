@@ -12,6 +12,7 @@
 #include "ui_wowpetbattler.h"
 #include "PetStage.h"
 #include "Interpreter.h"
+#include "AI.h"
 
 class WoWPetBattler : public QMainWindow
 {
@@ -36,13 +37,16 @@ private slots:
 private:
 	Ui::WoWPetBattlerClass ui;
 
-	Robot::Window window;
+	Robot::Window GUIWindow, WoWWindow;
 	Robot::Process process;
 
 	PetStage *petStage;
 
 	Interpreter *interpreter;
 	QThread *interpreterThread;
+
+	AI *ai;
+	QThread *aiThread;
 };
 
 #endif // WOWPETBATTLER_H

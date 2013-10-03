@@ -14,7 +14,7 @@
 #ifndef ROBOT_KEYBOARD_H
 #define ROBOT_KEYBOARD_H
 
-#include "Global.h"
+#include "Common.h"
 namespace Robot {
 
 
@@ -28,7 +28,7 @@ namespace Robot {
 
 enum Keycode
 {
-#ifdef ROBOT_OS_LINUX32
+#ifdef ROBOT_OS_LINUX
 
 	KeySpace			= 65,
 	KeyEscape			= 9,
@@ -140,8 +140,8 @@ enum Keycode
 	KeyScrollLock		= 78,
 	KeyNumLock			= 77,
 
-#endif // ROBOT_OS_LINUX32
-#ifdef ROBOT_OS_MAC32
+#endif // ROBOT_OS_LINUX
+#ifdef ROBOT_OS_MAC
 
 	KeySpace			= 0x31,			// kVK_Space
 	KeyEscape			= 0x35,			// kVK_Escape
@@ -253,8 +253,8 @@ enum Keycode
 	KeyScrollLock		= 0x71,			// kVK_F15
 	KeyNumLock			= 0x47,			// kVK_ANSI_KeypadClear
 
-#endif // ROBOT_OS_MAC32
-#ifdef ROBOT_OS_WIN32
+#endif // ROBOT_OS_MAC
+#ifdef ROBOT_OS_WIN
 
 	KeySpace			= 0x20,			// VK_SPACE
 	KeyEscape			= 0x1B,			// VK_ESCAPE
@@ -366,12 +366,11 @@ enum Keycode
 	KeyScrollLock		= 0x91,			// VK_SCROLL
 	KeyNumLock			= 0x90,			// VK_NUMLOCK
 
-#endif // ROBOT_OS_WIN32
+#endif // ROBOT_OS_WIN
 };
 
 ////////////////////////////////////////////////////////////////////////////////
 /// <summary> </summary>
-/// <copying> Atomic </copying>
 
 class ROBOT_EXPORT Keyboard
 {
@@ -390,6 +389,7 @@ public:
 	void				Release			(Keycode key) const;
 
 	// TODO: Key state
+	// TODO: Send Keys
 
 public:
 	// Properties

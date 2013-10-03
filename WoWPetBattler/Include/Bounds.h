@@ -14,7 +14,7 @@
 #ifndef ROBOT_BOUNDS_H
 #define ROBOT_BOUNDS_H
 
-#include "Common.h"
+#include "Global.h"
 namespace Robot {
 	class Size;
 	class Point;
@@ -27,7 +27,6 @@ namespace Robot {
 
 ////////////////////////////////////////////////////////////////////////////////
 /// <summary> </summary>
-/// <copying> Atomic </copying>
 
 class ROBOT_EXPORT Bounds
 {

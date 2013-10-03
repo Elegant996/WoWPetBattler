@@ -14,7 +14,7 @@
 #ifndef ROBOT_MOUSE_H
 #define ROBOT_MOUSE_H
 
-#include "Global.h"
+#include "Common.h"
 namespace Robot {
 
 
@@ -37,7 +37,6 @@ enum Button
 
 ////////////////////////////////////////////////////////////////////////////////
 /// <summary> </summary>
-/// <copying> Atomic </copying>
 
 class ROBOT_EXPORT Mouse
 {

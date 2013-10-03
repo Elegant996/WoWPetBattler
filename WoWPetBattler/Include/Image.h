@@ -14,7 +14,7 @@
 #ifndef ROBOT_IMAGE_H
 #define ROBOT_IMAGE_H
 
-#include "Common.h"
+#include "Global.h"
 #include <memory>
 namespace Robot {
 
@@ -30,7 +30,6 @@ namespace Robot {
 
 ////////////////////////////////////////////////////////////////////////////////
 /// <summary> </summary>
-/// <copying> Shared </copying>
 
 class ROBOT_EXPORT Image
 {

@@ -14,7 +14,7 @@
 #ifndef ROBOT_ENUM_H
 #define ROBOT_ENUM_H
 
-#include "Common.h"
+#include "Global.h"
 #include <map>
 #include <cstring>
 namespace Robot {
@@ -39,7 +39,6 @@ namespace Robot {
 
 ////////////////////////////////////////////////////////////////////////////////
 /// <summary> </summary>
-/// <copying> Static </copying>
 
 template <typename T> class Enum
 {
@@ -66,7 +65,7 @@ public:
 	static T Parse (const char* key)
 	{
 		// Check if key value is null
-		if (key == NULL) return (T) -1;
+		if (key == nullptr) return (T) -1;
 
 		// Initialize static parser
 		if (mMap.empty()) Enum<T>();

@@ -3,7 +3,6 @@
 
 #include <QVector>
 #include <QtAlgorithms>
-#include <QDebug>
 #include "Pet.h"
 
 class PetTeam
@@ -13,7 +12,7 @@ public:
 	~PetTeam(void);
 	PetTeam(const PetTeam&);
 
-	void AddPet(int);
+	void AddPet(int, int, int, int);
 	void SetActivePet(int);
 	int GetActivePet();
 	Pet* GetPet(int);

@@ -14,7 +14,7 @@
 #ifndef ROBOT_TASKBAR_H
 #define ROBOT_TASKBAR_H
 
-#include "Global.h"
+#include "Common.h"
 namespace Robot {
 
 
@@ -25,7 +25,6 @@ namespace Robot {
 
 ////////////////////////////////////////////////////////////////////////////////
 /// <summary> </summary>
-/// <copying> Atomic </copying>
 
 class ROBOT_EXPORT Taskbar
 {
@@ -44,9 +43,6 @@ public:
 	bool		Synchronize		(void);
 
 	Bounds		GetBounds		(void) const;
-	Size		GetSize			(void) const;
-	Point		GetPosition		(void) const;
-
 	Location	GetLocation		(void) const;
 	bool		IsTopMost		(void) const;
 	bool		IsAutoHide		(void) const;

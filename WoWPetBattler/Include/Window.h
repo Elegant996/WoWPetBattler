@@ -14,7 +14,7 @@
 #ifndef ROBOT_WINDOW_H
 #define ROBOT_WINDOW_H
 
-#include "Global.h"
+#include "Common.h"
 #include <string>
 namespace Robot {
 	class Process;
@@ -27,13 +27,12 @@ namespace Robot {
 
 ////////////////////////////////////////////////////////////////////////////////
 /// <summary> </summary>
-/// <copying> Atomic </copying>
 
 class ROBOT_EXPORT Window
 {
 public:
 	// Constructors
-	Window							(void* handle = NULL);
+	Window							(uintptr handle = 0);
 
 public:
 	// Functions
@@ -45,7 +44,7 @@ public:
 	void			SetTopMost		(bool state);
 	void			SetBorderless	(bool state);
 
-	void*			GetHandle		(void) const;
+	uintptr			GetHandle		(void) const;
 	Process			GetProcess		(void) const;
 
 	std::string		GetTitle		(void) const;
@@ -54,11 +53,11 @@ public:
 	Bounds			GetBounds		(void) const;
 	void			SetBounds		(const Bounds& bounds);
 
-	Point			MapToWindow		(const Point& point);
-	Point			MapToScreen		(const Point& point);
+	Point			MapToWindow		(const Point& point) const;
+	Point			MapToScreen		(const Point& point) const;
 
-	Bounds			MapToWindow		(const Bounds& bounds);
-	Bounds			MapToScreen		(const Bounds& bounds);
+	Bounds			MapToWindow		(const Bounds& bounds) const;
+	Bounds			MapToScreen		(const Bounds& bounds) const;
 
 	void			Close			(void) const;
 	void			Minimize		(void) const;
@@ -74,15 +73,15 @@ public:
 
 public:
 	// Operators
-	bool			operator ==		(void* handle);
-	bool			operator !=		(void* handle);
+	bool			operator ==		(uintptr handle) const;
+	bool			operator !=		(uintptr handle) const;
 
-	bool			operator ==		(const Window& window);
-	bool			operator !=		(const Window& window);
+	bool			operator ==		(const Window& window) const;
+	bool			operator !=		(const Window& window) const;
 
 private:
 	// Fields
-	void*			mHandle;		// Handle to the window
+	uintptr			mHandle;		// Handle to the window
 };
 
 } // namespace Robot

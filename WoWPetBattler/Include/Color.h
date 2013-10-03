@@ -14,7 +14,7 @@
 #ifndef ROBOT_COLOR_H
 #define ROBOT_COLOR_H
 
-#include "Common.h"
+#include "Global.h"
 namespace Robot {
 
 
@@ -25,7 +25,6 @@ namespace Robot {
 
 ////////////////////////////////////////////////////////////////////////////////
 /// <summary> </summary>
-/// <copying> Atomic </copying>
 
 class ROBOT_EXPORT Color
 {

@@ -14,7 +14,7 @@
 #ifndef ROBOT_PROCESS_H
 #define ROBOT_PROCESS_H
 
-#include "Global.h"
+#include "Common.h"
 #include <memory>
 #include <string>
 namespace Robot {
@@ -31,7 +31,6 @@ namespace Robot {
 
 ////////////////////////////////////////////////////////////////////////////////
 /// <summary> </summary>
-/// <copying> Shared </copying>
 
 class ROBOT_EXPORT Process
 {
@@ -42,19 +41,18 @@ public:
 public:
 	// Functions
 	bool			IsValid			(void) const;
+	bool			Is64Bit			(void) const;
 
 	int32			GetID			(void) const;
-	void*			GetHandle		(void) const;
+	uintptr			GetHandle		(void) const;
 	Memory			GetMemory		(void) const;
-
+	
 	std::string		GetName			(void) const;
 	std::string		GetPath			(void) const;
 
 	void			Exit			(void);
 	void			Kill			(void);
 	bool			HasExited		(void) const;
-
-	bool			IsWoW64			(void) const;
 
 	uint32			GetModules		(const char* name,
 									 Module* results,
@@ -72,11 +70,11 @@ public:
 
 public:
 	// Operators
-	bool			operator ==		(int32 pid);
-	bool			operator !=		(int32 pid);
+	bool			operator ==		(int32 pid) const;
+	bool			operator !=		(int32 pid) const;
 
-	bool			operator ==		(const Process& process);
-	bool			operator !=		(const Process& process);
+	bool			operator ==		(const Process& process) const;
+	bool			operator !=		(const Process& process) const;
 
 private:
 	// Fields

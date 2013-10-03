@@ -14,7 +14,7 @@
 #ifndef ROBOT_SOUND_H
 #define ROBOT_SOUND_H
 
-#include "Global.h"
+#include "Common.h"
 #include <memory>
 #include <string>
 namespace Robot {
@@ -27,7 +27,6 @@ namespace Robot {
 
 ////////////////////////////////////////////////////////////////////////////////
 /// <summary> </summary>
-/// <copying> Shared </copying>
 
 class ROBOT_EXPORT Sound
 {
@@ -38,7 +37,7 @@ public:
 public:
 	// Functions
 	std::string		GetName			(void) const;
-	void*			GetHandle		(void) const;
+	uintptr			GetHandle		(void) const;
 
 	real32			GetVolume		(void) const;
 	void			SetVolume		(real32 vol);

@@ -14,7 +14,7 @@
 #ifndef ROBOT_MODULE_H
 #define ROBOT_MODULE_H
 
-#include "Global.h"
+#include "Common.h"
 #include "Process.h"
 #include <string>
 namespace Robot {
@@ -27,7 +27,6 @@ namespace Robot {
 
 ////////////////////////////////////////////////////////////////////////////////
 /// <summary> </summary>
-/// <copying> Atomic </copying>
 
 class ROBOT_EXPORT Module
 {
@@ -39,27 +38,27 @@ public:
 
 private:
 	Module							(Process process,
-									 void* address);
+									 uintptr address);
 
 public:
 	// Functions
 	std::string		GetName			(void) const;
 	std::string		GetPath			(void) const;
-	uint32			GetSize			(void) const;
+	uintptr			GetSize			(void) const;
 
-	const void*		GetEntry		(void) const;
-	const void*		GetAddress		(void) const;
+	uintptr			GetEntry		(void) const;
 	Process			GetProcess		(void) const;
+	uintptr			GetAddress		(void) const;
 
 public:
 	// Operators
-	bool			operator ==		(const Module& module);
-	bool			operator !=		(const Module& module);
+	bool			operator ==		(const Module& module) const;
+	bool			operator !=		(const Module& module) const;
 
 private:
 	// Fields
-	void*			mAddress;		// Module address
 	Process			mProcess;		// Parent process
+	uintptr			mAddress;		// Module address
 };
 
 } // namespace Robot

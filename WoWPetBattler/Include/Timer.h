@@ -14,7 +14,7 @@
 #ifndef ROBOT_TIMER_H
 #define ROBOT_TIMER_H
 
-#include "Global.h"
+#include "Common.h"
 namespace Robot {
 
 
@@ -25,7 +25,6 @@ namespace Robot {
 
 ////////////////////////////////////////////////////////////////////////////////
 /// <summary> Measures elapsed time with micro-second accuracy. </summary>
-/// <copying> Atomic </copying>
 
 class ROBOT_EXPORT Timer
 {
@@ -35,17 +34,21 @@ public:
 
 public:
 	// Functions
-	uint64		GetElapsedSec	(void) const;
-	uint64		GetElapsedMil	(void) const;
-	uint64		GetElapsedMic	(void) const;
-
 	void		Start			(void);
 	void		Stop			(void);
 	void		Reset			(void);
 
-	int64		GetSecsTo		(const Timer& timer) const;
-	int64		GetMilsTo		(const Timer& timer) const;
-	int64		GetMicsTo		(const Timer& timer) const;
+	uint64		GetElapsedSec	(void) const;
+	uint64		GetElapsedMil	(void) const;
+	uint64		GetElapsedMic	(void) const;
+
+	uint64		GetStartedSec	(void) const;
+	uint64		GetStartedMil	(void) const;
+	uint64		GetStartedMic	(void) const;
+
+	uint64		GetStoppedSec	(void) const;
+	uint64		GetStoppedMil	(void) const;
+	uint64		GetStoppedMic	(void) const;
 
 	static void	Sleep			(const Range& mil);
 
@@ -56,8 +59,8 @@ public:
 
 private:
 	// Fields
-	uint64		mT1;			// Time started (micro)
-	uint64		mT2;			// Time stopped (micro)
+	uint64		mStarted;		// Time started (micro)
+	uint64		mStopped;		// Time stopped (micro)
 };
 
 } // namespace Robot
