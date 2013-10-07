@@ -1,6 +1,6 @@
 #include "PetAbility.h"
 
-//Constructors
+//Constructor
 PetAbility::PetAbility(int abilityID, int cooldown, bool isVerified)
 {
 	this->abilityID = abilityID;

@@ -80,14 +80,11 @@
     <ClCompile Include="GeneratedFiles\Release\moc_AI.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
-    <ClCompile Include="InterpreterThread.cpp">
+    <ClCompile Include="PetBreed.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_InterpreterThread.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_InterpreterThread.cpp">
-      <Filter>Generated Files\Release</Filter>
+    <ClCompile Include="PetHelper.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -106,9 +103,6 @@
     <CustomBuild Include="AI.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="InterpreterThread.h">
-      <Filter>Header Files</Filter>
-    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GeneratedFiles\ui_wowpetbattler.h">
@@ -124,6 +118,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="PetAbility.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PetBreed.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PetHelper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

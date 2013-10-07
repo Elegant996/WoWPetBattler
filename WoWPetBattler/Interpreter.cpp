@@ -1,13 +1,8 @@
 #include "Interpreter.h"
 
-Interpreter::Interpreter(QObject *parent) :
-  QObject(parent), /*stopped(false),*/ BUILD(56), running(false)
-{
-	
-}
 
-Interpreter::Interpreter(PetStage *petStage, Robot::Window *window) :
-	/*stopped(false),*/ BUILD(56), running(false)
+Interpreter::Interpreter(PetStage* petStage, Robot::Window *window) :
+	BUILD(56), running(true)
 {
 	this->petStage = petStage;
 	this->window = window;
@@ -19,274 +14,260 @@ Interpreter::Interpreter(PetStage *petStage, Robot::Window *window) :
 	this->timeoutCount = 0;
 }
 
-Interpreter::~Interpreter()
+
+Interpreter::~Interpreter(void)
 {
 	delete[] pixels;
 	delete[] points;
 	delete image;
 	delete window;
-	delete petStage;
 }
 
-void Interpreter::Start()
+void Interpreter::Exit()
 {
-	//Robot::Screen::EnableAero(false);
-	//stopped = false;
-	running = true;
-	//emit running;
-	emit OutputToGUI("", "Starting...");
-	Robot::Window::SetActive(*window);
-	Interpret();
-}
-
-void Interpreter::Stop()
-{
-	//Robot::Screen::EnableAero(true);
-	//stopped = true;
 	running = false;
-	//emit stopped;
-	emit OutputToGUI("Not Running", "Stopped.");
+	if (!wait(2000))
+		terminate();
+	running = true;
 }
 
-void Interpreter::Interpret()
+void Interpreter::run()
 {
-	//if (!running || stopped) return;
-	if (!running) return;
-
-	timer.start();
-
-	// do important work here
-	if (!readSuccess)
+	while (running)
 	{
-		//Emit message once!
-		if (!oneTimeNotifier)
-		{
-			emit OutputToGUI("Locating Addon", "Locating addon...");
-			oneTimeNotifier = true;
-		}
+		timer.start();
 
-		if (!Locate())
+		// do important work here
+		if (!readSuccess)
 		{
-			timeoutCount++;
-			if (timeoutCount >= 450)
-				emit Stop("Addon could not be located. Stopping...");
+			//Emit message once!
+			if (!oneTimeNotifier)
+			{
+				emit OutputToGUI("Locating Addon", "Locating addon...");
+				oneTimeNotifier = true;
+			}
+
+			if (!Locate())
+			{
+				timeoutCount++;
+				if (timeoutCount >= 450)
+					emit Stop("Addon could not be located. Stopping...");
 			
-			mutex.lock();
-			int elapsed = timer.elapsed();
-			if (33 - elapsed > 0)
-				waitCondition.wait(&mutex, 33 - elapsed);
-			timer.restart();
-			mutex.unlock();
+				mutex.lock();
+				int elapsed = timer.elapsed();
+				if (33 - elapsed > 0)
+					msleep(33 - elapsed);
+				timer.restart();
+				mutex.unlock();
 
-			QMetaObject::invokeMethod(this, "Interpret", Qt::QueuedConnection);
+				continue;
+			}
 
-			return;
+			emit OutputToGUI("Running", "Addon located.");
+			readSuccess = true;
+			timeoutCount = 0;
 		}
 
-		emit OutputToGUI("Running", "Addon located.");
-		readSuccess = true;
-		timeoutCount = 0;
+		//Addon location already known, grab pixels.	
+		Robot::Screen::GrabScreen(*window, image, addonBar1);
+		for (int i=0; i < 20; i+=1)
+			pixels[i] = image->GetPixel(points[i]);
+
+		Robot::Screen::GrabScreen(*window, image, addonBar2);
+		for (int i=20; i < 40; i+=1)
+			pixels[i] = image->GetPixel(points[i]);
+
+		//Run checksums again to be sure it didn't move.
+		if (pixels[0].B != BUILD || pixels[11].R != pixels[9].B || pixels[11].G != pixels[2].R || pixels[11].B != pixels[6].G
+				|| pixels[19].R != pixels[16].G || pixels[19].G != pixels[12].B || pixels[19].B != pixels[14].R
+				|| pixels[22].R != BUILD || pixels[22].G != pixels[20].R || pixels[22].B != pixels[21].G
+				|| pixels[28].R != pixels[3].G || pixels[28].G != BUILD || pixels[28].B != pixels[12].R
+				|| pixels[36].R != BUILD || pixels[36].G != pixels[0].R || pixels[36].B != pixels[9].G)
+		{
+			readSuccess = false;
+			oneTimeNotifier = false;
+			continue;
+		}
+
+		//Lock the access so only this thread can access petStage to update it.
+		mutex.lock();
+
+		//Setup pet teams if we are now initialized.
+		if ((!petStage->Initialized() && (pixels[0].G & 64) != 0))
+		{
+			int myPetSpecies1 = ((((pixels[1].R << 3) + (pixels[1].G >> 5))) & 2047);
+			if (myPetSpecies1 != 0)
+			{
+				petStage->GetPetTeam(1)->AddPet(myPetSpecies1, (pixels[1].G & 31), ((pixels[1].B >> 5) & 7),
+												((((pixels[1].B & 31) << 1) + ((pixels[2].R >> 7) & 1)) & 63));
+
+				petStage->GetPetTeam(1)->GetPet(1)->AddAbility(((pixels[2].R & 1) != 0),
+																(((pixels[2].R >> 5) & 1) + 1),
+																((pixels[2].R >> 1) & 15));
+
+				petStage->GetPetTeam(1)->GetPet(1)->AddAbility(((pixels[2].R & 64) != 0),
+																(((pixels[2].G >> 7) & 1) + 1),
+																((pixels[2].G >> 3) & 15));
+
+				petStage->GetPetTeam(1)->GetPet(1)->AddAbility(((pixels[2].G & 4) != 0),
+																(((pixels[2].G >> 1) & 1) + 1),
+																(((pixels[2].G << 3) + (pixels[2].B >> 5)) & 15));
+			}
+
+			int myPetSpecies2 = ((((pixels[3].R << 3) + (pixels[3].G >> 5))) & 2047);
+			if (myPetSpecies2 != 0)
+			{
+				petStage->GetPetTeam(1)->AddPet(myPetSpecies2, (pixels[3].G & 31), ((pixels[3].B >> 5) & 7),
+												((((pixels[3].B & 31) << 1) + ((pixels[4].R >> 7) & 1)) & 63));
+
+				petStage->GetPetTeam(1)->GetPet(2)->AddAbility(((pixels[4].R & 1) != 0),
+																(((pixels[4].R >> 5) & 1) + 1),
+																((pixels[4].R >> 1) & 15));
+
+				petStage->GetPetTeam(1)->GetPet(2)->AddAbility(((pixels[4].R & 64) != 0),
+																(((pixels[4].G >> 7) & 1) + 1),
+																((pixels[4].G >> 3) & 15));
+
+				petStage->GetPetTeam(1)->GetPet(2)->AddAbility(((pixels[4].G & 4) != 0),
+																(((pixels[4].G >> 1) & 1) + 1),
+																(((pixels[4].G << 3) + (pixels[4].B >> 5)) & 15));
+			}
+
+			int myPetSpecies3 = ((((pixels[5].R << 3) + (pixels[5].G >> 5))) & 2047);
+			if (myPetSpecies3 != 0)
+			{
+				petStage->GetPetTeam(1)->AddPet(myPetSpecies3, (pixels[5].G & 31), ((pixels[5].B >> 5) & 7),
+												((((pixels[5].B & 31) << 1) + ((pixels[6].R >> 7) & 1)) & 63));
+
+				petStage->GetPetTeam(1)->GetPet(3)->AddAbility(((pixels[6].R & 1) != 0),
+																(((pixels[6].R >> 5) & 1) + 1),
+																((pixels[6].R >> 1) & 15));
+
+				petStage->GetPetTeam(1)->GetPet(3)->AddAbility(((pixels[6].R & 64) != 0),
+																(((pixels[6].G >> 7) & 1) + 1),
+																((pixels[6].G >> 3) & 15));
+
+				petStage->GetPetTeam(1)->GetPet(3)->AddAbility(((pixels[6].G & 4) != 0),
+																(((pixels[6].G >> 1) & 1) + 1),
+																(((pixels[6].G << 3) + (pixels[6].B >> 5)) & 15));
+			}
+
+			int enemyPetSpecies1 = ((((pixels[7].R << 3) + (pixels[7].G >> 5))) & 2047);
+			if (enemyPetSpecies1 != 0)
+			{
+				petStage->GetPetTeam(2)->AddPet(enemyPetSpecies1, (pixels[7].G & 31), ((pixels[7].B >> 5) & 7),
+												((((pixels[7].B & 31) << 1) + ((pixels[8].R >> 7) & 1)) & 63));
+
+				petStage->GetPetTeam(2)->GetPet(1)->AddAbility(((pixels[8].R & 1) != 0),
+																(((pixels[8].R >> 5) & 1) + 1),
+																((pixels[8].R >> 1) & 15));
+
+				petStage->GetPetTeam(2)->GetPet(1)->AddAbility(((pixels[8].R & 64) != 0),
+																(((pixels[8].G >> 7) & 1) + 1),
+																((pixels[8].G >> 3) & 15));
+
+				petStage->GetPetTeam(2)->GetPet(1)->AddAbility(((pixels[8].G & 4) != 0),
+																(((pixels[8].G >> 1) & 1) + 1),
+																(((pixels[8].G << 3) + (pixels[8].B >> 5)) & 15));
+			}
+
+			int enemyPetSpecies2 = ((((pixels[9].R << 3) + (pixels[9].G >> 5))) & 2047);
+			if (enemyPetSpecies2 != 0)
+			{
+				petStage->GetPetTeam(2)->AddPet(enemyPetSpecies2, (pixels[9].G & 31), ((pixels[9].B >> 5) & 7),
+												((((pixels[9].B & 31) << 1) + ((pixels[10].R >> 7) & 1)) & 63));
+
+				petStage->GetPetTeam(2)->GetPet(2)->AddAbility(((pixels[10].R & 1) != 0),
+																(((pixels[10].R >> 5) & 1) + 1),
+																((pixels[10].R >> 1) & 15));
+
+				petStage->GetPetTeam(2)->GetPet(2)->AddAbility(((pixels[10].R & 64) != 0),
+																(((pixels[10].G >> 7) & 1) + 1),
+																((pixels[10].G >> 3) & 15));
+
+				petStage->GetPetTeam(2)->GetPet(2)->AddAbility(((pixels[10].G & 4) != 0),
+																(((pixels[10].G >> 1) & 1) + 1),
+																(((pixels[10].G << 3) + (pixels[10].B >> 5)) & 15));
+			}
+
+			int enemyPetSpecies3 = ((((pixels[12].R << 3) + (pixels[12].G >> 5))) & 2047);
+			if (enemyPetSpecies3 != 0)
+			{
+				petStage->GetPetTeam(2)->AddPet(enemyPetSpecies3, (pixels[12].G & 31), ((pixels[12].B >> 5) & 7),
+												((((pixels[12].B & 31) << 1) + ((pixels[13].R >> 7) & 1)) & 63));
+
+				petStage->GetPetTeam(2)->GetPet(3)->AddAbility(((pixels[13].R & 1) != 0),
+																(((pixels[13].R >> 5) & 1) + 1),
+																((pixels[13].R >> 1) & 15));
+
+				petStage->GetPetTeam(2)->GetPet(3)->AddAbility(((pixels[13].R & 64) != 0),
+																(((pixels[13].G >> 7) & 1) + 1),
+																((pixels[13].G >> 3) & 15));
+
+				petStage->GetPetTeam(2)->GetPet(3)->AddAbility(((pixels[13].G & 4) != 0),
+																(((pixels[13].G >> 1) & 1) + 1),
+																(((pixels[13].G << 3) + (pixels[13].B >> 5)) & 15));
+			}			
+		}
+
+		//When the game has initialized.
+		if (petStage->Initialized())
+		{
+			//Update health pools.
+			int healthBlock1 = (pixels[14].R << 16) + (pixels[14].G << 8) + pixels[14].B;
+			int healthBlock2 = (pixels[15].R << 16) + (pixels[15].G << 8) + pixels[15].B;
+			int healthBlock3 = (pixels[16].R << 16) + (pixels[16].G << 8) + pixels[16].B;
+			petStage->GetPetTeam(1)->GetPet(1)->SetHealth(((healthBlock1 >> 12) & 4095));
+			petStage->GetPetTeam(1)->GetPet(2)->SetHealth((healthBlock1 & 4095));
+			petStage->GetPetTeam(1)->GetPet(3)->SetHealth(((healthBlock2 >> 12) & 4095));
+			petStage->GetPetTeam(2)->GetPet(1)->SetHealth((healthBlock2 & 4095));
+			petStage->GetPetTeam(2)->GetPet(2)->SetHealth(((healthBlock3 >> 12) & 4095));
+			petStage->GetPetTeam(2)->GetPet(3)->SetHealth((healthBlock3 & 4095));
+
+			//Update ability CDs.
+
+			//Update auras on pets.
+			//Delete all auras.
+		}
+
+		//Send a signal to AI if we...
+		/*if ((!petStage->SelectAbility() && (pixels[0].G & 16) != 0)			//Need to select ability.
+				|| (!petStage->SelectPet() && (pixels[0].G & 32) != 0)		//Need to select pet.
+				|| (petStage->QueueState() != 3 && (pixels[0].R & 3) == 3)	//Need to accept queue.
+				|| (petStage->QueueState() == 0 && (pixels[0].R & 3) == 0))	//Need to queue.
+			emit RunAI();*/
+
+		//Update petStage.
+		petStage->InPetBattle((pixels[0].R & 128) != 0);
+		petStage->TeamIsAlive((pixels[0].R & 64) != 0);
+		petStage->PlayerIsGhost((pixels[0].R & 32) != 0);
+		petStage->PlayerIsDead((pixels[0].R & 16) != 0);
+		petStage->PlayerAffectingCombat((pixels[0].R & 8) != 0);
+		petStage->QueueEnabled((pixels[0].R & 4) != 0);
+		petStage->QueueState((pixels[0].R & 3) != 0);
+		petStage->CanAccept((pixels[0].G & 128) != 0);
+		petStage->Initialized((pixels[0].G & 64) != 0);
+		petStage->SelectPet((pixels[0].G & 32) != 0);
+		petStage->SelectAbility((pixels[0].G & 16) != 0);
+		petStage->WonLastBattle((pixels[0].G & 8) != 0);
+
+		//Stop if conditions are met.
+		if (!petStage->InPetBattle())
+		{
+			if (!petStage->TeamIsAlive()) { emit Stop("A pet on your team has fainted. Stopping..."); continue; }
+			if (petStage->PlayerIsGhost()) { emit Stop("Cannot queue while a ghost. Stopping..."); continue; }
+			if (petStage->PlayerIsDead()) { emit Stop("Cannot queue while dead. Stopping..."); continue; }
+			if (petStage->PlayerAffectingCombat()) { emit Stop("Cannot queue while in combat. Stopping..."); continue; }
+			if (!petStage->QueueEnabled()) { emit Stop("Queue system not enabled. Stopping..."); continue; }
+		}
+
+		//Stop timer, sleep if needed and then reset the timer.
+		int elapsed = timer.elapsed();
+		if (33 - elapsed > 0)
+			msleep(33 - elapsed);
+		timer.restart();
+		mutex.unlock();
 	}
-
-	//Addon location already known, grab pixels.	
-	Robot::Screen::GrabScreen(*window, image, addonBar1);
-	for (int i=0; i < 20; i+=1)
-		pixels[i] = image->GetPixel(points[i]);
-
-	Robot::Screen::GrabScreen(*window, image, addonBar2);
-	for (int i=20; i < 40; i+=1)
-		pixels[i] = image->GetPixel(points[i]);
-
-	//Run checksums again to be sure it didn't move.
-	if (pixels[0].B != BUILD || pixels[11].R != pixels[9].B || pixels[11].G != pixels[2].R || pixels[11].B != pixels[6].G
-			|| pixels[19].R != pixels[16].G || pixels[19].G != pixels[12].B || pixels[19].B != pixels[14].R
-			|| pixels[22].R != BUILD || pixels[22].G != pixels[20].R || pixels[22].B != pixels[21].G
-			|| pixels[28].R != pixels[3].G || pixels[28].G != BUILD || pixels[28].B != pixels[12].R
-			|| pixels[36].R != BUILD || pixels[36].G != pixels[0].R || pixels[36].B != pixels[9].G)
-	{
-		readSuccess = false;
-		oneTimeNotifier = false;
-		return;
-	}
-
-	//Lock the access so only this thread can access petStage to update it.
-	mutex.lock();
-
-	//Setup pet teams if we are now initialized.
-	if (!petStage->Initialized() && (pixels[0].G & 64) != 0)
-	{
-		int myPetSpecies1 = ((((pixels[1].R << 3) + (pixels[1].G >> 5))) & 2047);
-		if (myPetSpecies1 != 0)
-		{
-			petStage->GetPetTeam(1)->AddPet(myPetSpecies1, (pixels[1].G & 31), ((pixels[1].B >> 5) & 7),
-											((((pixels[1].B & 31) << 1) + ((pixels[2].R >> 7) & 1)) & 63));
-
-			petStage->GetPetTeam(1)->GetPet(1)->AddAbility(((pixels[2].R & 1) != 0),
-															(((pixels[2].R >> 5) & 1) + 1),
-															((pixels[2].R >> 1) & 15));
-
-			petStage->GetPetTeam(1)->GetPet(1)->AddAbility(((pixels[2].R & 64) != 0),
-															(((pixels[2].G >> 7) & 1) + 1),
-															((pixels[2].G >> 3) & 15));
-
-			petStage->GetPetTeam(1)->GetPet(1)->AddAbility(((pixels[2].G & 4) != 0),
-															(((pixels[2].G >> 1) & 1) + 1),
-															(((pixels[2].G << 3) + (pixels[2].B >> 5)) & 15));
-		}
-
-		int myPetSpecies2 = ((((pixels[3].R << 3) + (pixels[3].G >> 5))) & 2047);
-		if (myPetSpecies2 != 0)
-		{
-			petStage->GetPetTeam(1)->AddPet(myPetSpecies2, (pixels[3].G & 31), ((pixels[3].B >> 5) & 7),
-											((((pixels[3].B & 31) << 1) + ((pixels[4].R >> 7) & 1)) & 63));
-
-			petStage->GetPetTeam(1)->GetPet(2)->AddAbility(((pixels[4].R & 1) != 0),
-															(((pixels[4].R >> 5) & 1) + 1),
-															((pixels[4].R >> 1) & 15));
-
-			petStage->GetPetTeam(1)->GetPet(2)->AddAbility(((pixels[4].R & 64) != 0),
-															(((pixels[4].G >> 7) & 1) + 1),
-															((pixels[4].G >> 3) & 15));
-
-			petStage->GetPetTeam(1)->GetPet(2)->AddAbility(((pixels[4].G & 4) != 0),
-															(((pixels[4].G >> 1) & 1) + 1),
-															(((pixels[4].G << 3) + (pixels[4].B >> 5)) & 15));
-		}
-
-		int myPetSpecies3 = ((((pixels[5].R << 3) + (pixels[5].G >> 5))) & 2047);
-		if (myPetSpecies3 != 0)
-		{
-			petStage->GetPetTeam(1)->AddPet(myPetSpecies3, (pixels[5].G & 31), ((pixels[5].B >> 5) & 7),
-											((((pixels[5].B & 31) << 1) + ((pixels[6].R >> 7) & 1)) & 63));
-
-			petStage->GetPetTeam(1)->GetPet(3)->AddAbility(((pixels[6].R & 1) != 0),
-															(((pixels[6].R >> 5) & 1) + 1),
-															((pixels[6].R >> 1) & 15));
-
-			petStage->GetPetTeam(1)->GetPet(3)->AddAbility(((pixels[6].R & 64) != 0),
-															(((pixels[6].G >> 7) & 1) + 1),
-															((pixels[6].G >> 3) & 15));
-
-			petStage->GetPetTeam(1)->GetPet(3)->AddAbility(((pixels[6].G & 4) != 0),
-															(((pixels[6].G >> 1) & 1) + 1),
-															(((pixels[6].G << 3) + (pixels[6].B >> 5)) & 15));
-		}
-
-		int enemyPetSpecies1 = ((((pixels[7].R << 3) + (pixels[7].G >> 5))) & 2047);
-		if (enemyPetSpecies1 != 0)
-		{
-			petStage->GetPetTeam(2)->AddPet(enemyPetSpecies1, (pixels[7].G & 31), ((pixels[7].B >> 5) & 7),
-											((((pixels[7].B & 31) << 1) + ((pixels[8].R >> 7) & 1)) & 63));
-
-			petStage->GetPetTeam(2)->GetPet(1)->AddAbility(((pixels[8].R & 1) != 0),
-															(((pixels[8].R >> 5) & 1) + 1),
-															((pixels[8].R >> 1) & 15));
-
-			petStage->GetPetTeam(2)->GetPet(1)->AddAbility(((pixels[8].R & 64) != 0),
-															(((pixels[8].G >> 7) & 1) + 1),
-															((pixels[8].G >> 3) & 15));
-
-			petStage->GetPetTeam(2)->GetPet(1)->AddAbility(((pixels[8].G & 4) != 0),
-															(((pixels[8].G >> 1) & 1) + 1),
-															(((pixels[8].G << 3) + (pixels[8].B >> 5)) & 15));
-		}
-
-		int enemyPetSpecies2 = ((((pixels[9].R << 3) + (pixels[9].G >> 5))) & 2047);
-		if (enemyPetSpecies2 != 0)
-		{
-			petStage->GetPetTeam(2)->AddPet(enemyPetSpecies2, (pixels[9].G & 31), ((pixels[9].B >> 5) & 7),
-											((((pixels[9].B & 31) << 1) + ((pixels[10].R >> 7) & 1)) & 63));
-
-			petStage->GetPetTeam(2)->GetPet(2)->AddAbility(((pixels[10].R & 1) != 0),
-															(((pixels[10].R >> 5) & 1) + 1),
-															((pixels[10].R >> 1) & 15));
-
-			petStage->GetPetTeam(2)->GetPet(2)->AddAbility(((pixels[10].R & 64) != 0),
-															(((pixels[10].G >> 7) & 1) + 1),
-															((pixels[10].G >> 3) & 15));
-
-			petStage->GetPetTeam(2)->GetPet(2)->AddAbility(((pixels[10].G & 4) != 0),
-															(((pixels[10].G >> 1) & 1) + 1),
-															(((pixels[10].G << 3) + (pixels[10].B >> 5)) & 15));
-		}
-
-		int enemyPetSpecies3 = ((((pixels[12].R << 3) + (pixels[12].G >> 5))) & 2047);
-		if (enemyPetSpecies3 != 0)
-		{
-			petStage->GetPetTeam(2)->AddPet(enemyPetSpecies3, (pixels[12].G & 31), ((pixels[12].B >> 5) & 7),
-											((((pixels[12].B & 31) << 1) + ((pixels[13].R >> 7) & 1)) & 63));
-
-			petStage->GetPetTeam(2)->GetPet(3)->AddAbility(((pixels[13].R & 1) != 0),
-															(((pixels[13].R >> 5) & 1) + 1),
-															((pixels[13].R >> 1) & 15));
-
-			petStage->GetPetTeam(2)->GetPet(3)->AddAbility(((pixels[13].R & 64) != 0),
-															(((pixels[13].G >> 7) & 1) + 1),
-															((pixels[13].G >> 3) & 15));
-
-			petStage->GetPetTeam(2)->GetPet(3)->AddAbility(((pixels[13].G & 4) != 0),
-															(((pixels[13].G >> 1) & 1) + 1),
-															(((pixels[13].G << 3) + (pixels[13].B >> 5)) & 15));
-		}			
-	}
-
-	//Send a signal to AI if we...
-	if ((!petStage->SelectAbility() && (pixels[0].G & 16) != 0)			//Need to select ability.
-			|| (!petStage->SelectPet() && (pixels[0].G & 32) != 0)		//Need to select pet.
-			|| (petStage->QueueState() != 3 && (pixels[0].R & 3) == 3)	//Need to accept queue.
-			|| (petStage->QueueState() == 0 && (pixels[0].R & 3) == 0))	//Need to queue.
-		emit RunAI();
-
-	//Update petStage.
-	petStage->InPetBattle((pixels[0].R & 128) != 0);
-	petStage->TeamIsAlive((pixels[0].R & 64) != 0);
-	petStage->PlayerIsGhost((pixels[0].R & 32) != 0);
-	petStage->PlayerIsDead((pixels[0].R & 16) != 0);
-	petStage->PlayerAffectingCombat((pixels[0].R & 8) != 0);
-	petStage->QueueEnabled((pixels[0].R & 4) != 0);
-	petStage->QueueState((pixels[0].R & 3) != 0);
-	petStage->CanAccept((pixels[0].G & 128) != 0);
-	petStage->Initialized((pixels[0].G & 64) != 0);
-	petStage->SelectPet((pixels[0].G & 32) != 0);
-	petStage->SelectAbility((pixels[0].G & 16) != 0);
-	petStage->WonLastBattle((pixels[0].G & 8) != 0);
-
-	//Stop if conditions are met.
-	if (!petStage->InPetBattle())
-	{
-		if (!petStage->TeamIsAlive()) { emit Stop("A pet on your team has fainted. Stopping..."); return; }
-		if (petStage->PlayerIsGhost()) { emit Stop("Cannot queue while a ghost. Stopping..."); return; }
-		if (petStage->PlayerIsDead()) { emit Stop("Cannot queue while dead. Stopping..."); return; }
-		if (petStage->PlayerAffectingCombat()) { emit Stop("Cannot queue while in combat. Stopping..."); return; }
-		if (!petStage->QueueEnabled()) { emit Stop("Queue system not enabled. Stopping..."); return; }
-	}
-
-	//When the game has initialized.
-	if (petStage->Initialized())
-	{
-		//Update health pools.
-		int healthBlock1 = (pixels[14].R << 16) + (pixels[14].G << 8) + pixels[14].B;
-		int healthBlock2 = (pixels[15].R << 16) + (pixels[15].G << 8) + pixels[15].B;
-		int healthBlock3 = (pixels[16].R << 16) + (pixels[16].G << 8) + pixels[16].B;
-		petStage->GetPetTeam(1)->GetPet(1)->SetHealth(((healthBlock1 >> 12) & 4095));
-		petStage->GetPetTeam(1)->GetPet(2)->SetHealth((healthBlock1 & 4095));
-		petStage->GetPetTeam(1)->GetPet(3)->SetHealth(((healthBlock2 >> 12) & 4095));
-		petStage->GetPetTeam(2)->GetPet(1)->SetHealth((healthBlock2 & 4095));
-		petStage->GetPetTeam(2)->GetPet(2)->SetHealth(((healthBlock3 >> 12) & 4095));
-		petStage->GetPetTeam(2)->GetPet(3)->SetHealth((healthBlock3 & 4095));
-
-		//Update auras on pets.
-	}
-
-	//Stop timer, sleep if needed and then reset the timer.
-	int elapsed = timer.elapsed();
-	if (33 - elapsed > 0)
-		waitCondition.wait(&mutex, 33 - elapsed);
-	timer.restart();
-	mutex.unlock();
-
-	//Queue this function again at the bottom of the event list so we can continue to update from the WoW client.
-	QMetaObject::invokeMethod(this, "Interpret", Qt::QueuedConnection);
 }
 
 bool Interpreter::Locate()

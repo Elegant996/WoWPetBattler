@@ -3,6 +3,23 @@
 //Constructors
 PetStage::PetStage(void)
 {
+	int queueState;
+	bool inPetBattle, teamIsAlive, queueEnabled, canAccept;
+	bool playerIsGhost, playerIsDead, playerAffectingCombat;
+	bool initialized, selectPet, selectAbility, wonLastBattle;
+
+	this->queueState = 0;
+	this->inPetBattle = false;
+	this->teamIsAlive = false;
+	this->queueEnabled = false;
+	this->canAccept = false;
+	this->playerIsGhost = true;
+	this->playerIsDead = true;
+	this->playerAffectingCombat = true;
+	this->initialized = false;
+	this->selectPet = false;
+	this->selectAbility = false;
+	this->wonLastBattle = false;
 	this->petTeam.reserve(2);
 	this->petTeam.append(new PetTeam());
 	this->petTeam.append(new PetTeam());
@@ -18,6 +35,7 @@ PetStage::~PetStage(void)
 //Copy Constructor
 PetStage::PetStage(const PetStage& other)
 {
+	this->petTeam.reserve(2);
 	for (int i=0; i < other.petTeam.size(); i++)
 		this->petTeam.append(new PetTeam(*other.petTeam.at(i)));
 }

@@ -1,24 +1,21 @@
-#ifndef WORKER_H
-#define WORKER_H
+#ifndef INTERPRETER_H
+#define INTERPRETER_H
 
 #include <QObject>
+#include <QThread>
 #include <QElapsedTimer>
-#include <QWaitCondition>
-#include <QDebug> //To be removed.
+#include <QDebug>
 #include <Robot.h>
 #include "PetStage.h"
 
 class Interpreter :
-	public QObject
+	public QThread
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-	//
-    explicit Interpreter(QObject *parent = 0);
 	Interpreter(PetStage*, Robot::Window*);
-	~Interpreter();
-    //bool IsWorkRunning();
+	~Interpreter(void);
 
 signals:
 	void OutputToGUI(QString, QString);
@@ -26,21 +23,21 @@ signals:
 	void Stop(QString);
 
 public slots:
-	void Start();
-	void Stop();
+	void Exit();
 
-private slots:
-	void Interpret();
+protected:
+	void run();
 
 private:
 	bool Locate();
 
+	volatile bool running;
 	const int BUILD;
-    volatile bool running; //, stopped;
 
-    QMutex mutex;
+	PetStage *petStage;
+	
+	QMutex mutex;
 	QElapsedTimer timer;
-    QWaitCondition waitCondition;
 
 	Robot::Window *window;
 	Robot::Image *image;
@@ -52,7 +49,6 @@ private:
 	bool readSuccess, oneTimeNotifier;
 	int timeoutCount;
 
-	PetStage *petStage;
 };
 
 #endif

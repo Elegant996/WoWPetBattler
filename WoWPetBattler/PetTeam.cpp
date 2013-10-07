@@ -18,6 +18,7 @@ PetTeam::~PetTeam(void)
 PetTeam::PetTeam(const PetTeam& other)
 {
 	this->activePet = other.activePet;
+	this->pet.reserve(3);
 	for (int i=0; i < other.pet.size(); i++)
 		this->pet.append(new Pet(*other.pet.at(i)));
 }

@@ -6,26 +6,15 @@ WoWPetBattler::WoWPetBattler(QWidget *parent)
 {
 	ui.setupUi(this);
 
-	connect(this, SIGNAL(StopApp(QString)), this, SLOT(Stop(QString)));
-
 	this->petStage = new PetStage();
 
 	this->interpreter = new Interpreter(petStage, &WoWWindow);
 	connect(interpreter, SIGNAL(OutputToGUI(QString, QString)), this, SLOT(Output(QString, QString)));
 	connect(interpreter, SIGNAL(Stop(QString)), this, SLOT(Stop(QString)));
-	connect(this, SIGNAL(StartInterpreter()), interpreter, SLOT(Start()));
-	connect(this, SIGNAL(StopInterpreter()), interpreter, SLOT(Stop()));
 
 	this->ai = new AI(petStage, &WoWWindow);
 	connect(ai, SIGNAL(OutputToGUI(QString, QString)), this, SLOT(Output(QString, QString)));
 	connect(interpreter, SIGNAL(RunAI()), ai, SLOT(Run()));
-
-	interpreterThread = new QThread();
-	connect(this, SIGNAL(destroyed()), interpreter, SLOT(deleteLater()));					//Delete the interpreter object if this object is destroyed.
-	connect(interpreter, SIGNAL(destroyed()), interpreterThread, SLOT(quit()));				//Stop the thread whenever it is destroyed.
-	connect(interpreterThread, SIGNAL(finished()), interpreterThread, SLOT(deleteLater()));	//Clean up the thread.
-	interpreter->moveToThread(interpreterThread);
-	interpreterThread->start();
 
 	aiThread = new QThread();
 	connect(this, SIGNAL(destroyed()), ai, SLOT(deleteLater()));			//Delete the ai object if this object is destroyed.
@@ -38,12 +27,10 @@ WoWPetBattler::WoWPetBattler(QWidget *parent)
 //Destructor
 WoWPetBattler::~WoWPetBattler()
 {
-	if (!ui.playButton->isChecked())
-		emit StopInterpreter();			//Stop interpreter to re-enable arrow
+	if (interpreter->isRunning())
+		interpreter->Exit();
 	aiThread->quit();					//Quit thread.
 	aiThread->wait();					//Wait for thread to terminate.
-	interpreterThread->quit();			//Quit thread.
-	interpreterThread->wait();			//Wait for thread to terminate.
 }
 
 //Output to browser.
@@ -61,7 +48,11 @@ void WoWPetBattler::Stop(QString output)
 	ui.outputBrowser->append(output);
 	ui.playButton->setChecked(false);
 
-	emit StopInterpreter();					//Stop the interpreter.
+	interpreter->Exit();					//Stop the update thread.
+
+	ui.statusLabel->setText("Not Running");
+	ui.outputBrowser->append("Stopped.");
+
 	GUIWindow.SetTopMost(false);			//Stop the GUI from being the top most window.
 }
 
@@ -97,8 +88,10 @@ void WoWPetBattler::on_playButton_clicked()
 		ui.playButton->setChecked(true);
 		ui.statusLabel->setText("Starting Interpreter");
 
-		emit StartInterpreter(); //Start screen reading.
+		interpreter->start();
+		ui.outputBrowser->append("Starting...");
+		Robot::Window::SetActive(WoWWindow);
 	}
 	else
-		emit StopApp("Stopping..."); //We have clicked the stop button, so let's stop everything.
+		Stop("Stopping..."); //We have clicked the stop button, so let's stop everything.
 }

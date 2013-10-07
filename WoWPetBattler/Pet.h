@@ -1,9 +1,17 @@
 #ifndef PET_H
 #define PET_H
 
+#include <QDir>
+#include <QFile>
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QJsonObject>
 #include <QVector>
 #include <QtAlgorithms>
+
 #include "PetAbility.h"
+#include "PetBreed.h"
+#include "PetHelper.h"
 
 class Pet
 {
@@ -27,9 +35,11 @@ public:
 	int GetSpeed();
 
 private:
+	QString name;
 	int speciesID, breed, quality, level;
-	int type, baseHealth, basePower, baseSpeed;
+	float type, baseHealth, basePower, baseSpeed;
 	int currentHealth, currentMaxHealth, currentPower, currentSpeed;
+	QJsonArray abilityList;
 	QVector<PetAbility*> petAbility;
 };
 

@@ -22,11 +22,6 @@ public:
 	WoWPetBattler(QWidget *parent = 0);
 	~WoWPetBattler();
 
-signals:
-	void StopApp(QString);
-	void StartInterpreter();
-	void StopInterpreter();
-
 public slots:
 	void Output(QString, QString);
 	void Stop(QString);
@@ -43,7 +38,6 @@ private:
 	PetStage *petStage;
 
 	Interpreter *interpreter;
-	QThread *interpreterThread;
 
 	AI *ai;
 	QThread *aiThread;
