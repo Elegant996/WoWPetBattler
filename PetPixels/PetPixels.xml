@@ -1,0 +1,365 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
+	<Frame name="PixelFrame" toplevel="true" enableMouse="true" movable="true" parent="UIParent" visible="true">
+
+		<Script file="PetPixels.lua" />
+
+		<Scripts>
+			<OnLoad>
+				self.TimeSinceLastUpdate = 0;
+				self:RegisterForDrag ("LeftButton");
+			</OnLoad>
+			<OnDragStart>
+				self:StartMoving();
+			</OnDragStart>
+			<OnDragStop>
+				self:StopMovingOrSizing();
+			</OnDragStop>
+			<OnUpdate>
+				UpdateEvent (self, elapsed);
+			</OnUpdate>
+		</Scripts>
+
+		<Anchors>
+			<Anchor point="TOPLEFT" />
+		</Anchors>
+		<Size x="450" y="66" />
+
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture name="uiBg1">
+					<Size x="450" y="32" />
+					<Anchors><Anchor point="TOPLEFT" x="0" y="0" /></Anchors>
+					<Color r="1" g="1" b="1" a="1" />
+				</Texture>
+			</Layer>
+
+			<Layer level="ARTWORK">
+				<Texture name="uiBox01">
+					<Size x="20" y="20" />
+					<Anchors><Anchor point="TOPLEFT" x="6" y="-6" /></Anchors>
+					<Color r="1" g="1" b="1" a="1" />
+				</Texture>
+			</Layer>
+
+			<Layer level="ARTWORK">
+				<Texture name="uiBox02">
+					<Size x="20" y="20" />
+					<Anchors><Anchor point="TOPLEFT" x="28" y="-6" /></Anchors>
+					<Color r="1" g="1" b="1" a="1" />
+				</Texture>
+			</Layer>
+
+			<Layer level="ARTWORK">
+				<Texture name="uiBox03">
+					<Size x="20" y="20" />
+					<Anchors><Anchor point="TOPLEFT" x="50" y="-6" /></Anchors>
+					<Color r="1" g="1" b="1" a="1" />
+				</Texture>
+			</Layer>
+
+			<Layer level="ARTWORK">
+				<Texture name="uiBox04">
+					<Size x="20" y="20" />
+					<Anchors><Anchor point="TOPLEFT" x="72" y="-6" /></Anchors>
+					<Color r="1" g="1" b="1" a="1" />
+				</Texture>
+			</Layer>
+
+			<Layer level="ARTWORK">
+				<Texture name="uiBox05">
+					<Size x="20" y="20" />
+					<Anchors><Anchor point="TOPLEFT" x="94" y="-6" /></Anchors>
+					<Color r="1" g="1" b="1" a="1" />
+				</Texture>
+			</Layer>
+
+			<Layer level="ARTWORK">
+				<Texture name="uiBox06">
+					<Size x="20" y="20" />
+					<Anchors><Anchor point="TOPLEFT" x="116" y="-6" /></Anchors>
+					<Color r="1" g="1" b="1" a="1" />
+				</Texture>
+			</Layer>
+
+			<Layer level="ARTWORK">
+				<Texture name="uiBox07">
+					<Size x="20" y="20" />
+					<Anchors><Anchor point="TOPLEFT" x="138" y="-6" /></Anchors>
+					<Color r="1" g="1" b="1" a="1" />
+				</Texture>
+			</Layer>
+
+			<Layer level="ARTWORK">
+				<Texture name="uiBox08">
+					<Size x="20" y="20" />
+					<Anchors><Anchor point="TOPLEFT" x="160" y="-6" /></Anchors>
+					<Color r="1" g="1" b="1" a="1" />
+				</Texture>
+			</Layer>
+
+			<Layer level="ARTWORK">
+				<Texture name="uiBox09">
+					<Size x="20" y="20" />
+					<Anchors><Anchor point="TOPLEFT" x="182" y="-6" /></Anchors>
+					<Color r="1" g="1" b="1" a="1" />
+				</Texture>
+			</Layer>
+
+			<Layer level="ARTWORK">
+				<Texture name="uiBox10">
+					<Size x="20" y="20" />
+					<Anchors><Anchor point="TOPLEFT" x="204" y="-6" /></Anchors>
+					<Color r="1" g="1" b="1" a="1" />
+				</Texture>
+			</Layer>
+
+			<Layer level="ARTWORK">
+				<Texture name="uiBox11">
+					<Size x="20" y="20" />
+					<Anchors><Anchor point="TOPLEFT" x="226" y="-6" /></Anchors>
+					<Color r="1" g="1" b="1" a="1" />
+				</Texture>
+			</Layer>
+
+			<Layer level="ARTWORK">
+				<Texture name="uiBox12">
+					<Size x="20" y="20" />
+					<Anchors><Anchor point="TOPLEFT" x="248" y="-6" /></Anchors>
+					<Color r="1" g="1" b="1" a="1" />
+				</Texture>
+			</Layer>
+
+			<Layer level="ARTWORK">
+				<Texture name="uiBox13">
+					<Size x="20" y="20" />
+					<Anchors><Anchor point="TOPLEFT" x="270" y="-6" /></Anchors>
+					<Color r="1" g="1" b="1" a="1" />
+				</Texture>
+			</Layer>
+
+			<Layer level="ARTWORK">
+				<Texture name="uiBox14">
+					<Size x="20" y="20" />
+					<Anchors><Anchor point="TOPLEFT" x="292" y="-6" /></Anchors>
+					<Color r="1" g="1" b="1" a="1" />
+				</Texture>
+			</Layer>
+
+			<Layer level="ARTWORK">
+				<Texture name="uiBox15">
+					<Size x="20" y="20" />
+					<Anchors><Anchor point="TOPLEFT" x="314" y="-6" /></Anchors>
+					<Color r="1" g="1" b="1" a="1" />
+				</Texture>
+			</Layer>
+
+			<Layer level="ARTWORK">
+				<Texture name="uiBox16">
+					<Size x="20" y="20" />
+					<Anchors><Anchor point="TOPLEFT" x="336" y="-6" /></Anchors>
+					<Color r="1" g="1" b="1" a="1" />
+				</Texture>
+			</Layer>
+
+			<Layer level="ARTWORK">
+				<Texture name="uiBox17">
+					<Size x="20" y="20" />
+					<Anchors><Anchor point="TOPLEFT" x="358" y="-6" /></Anchors>
+					<Color r="1" g="1" b="1" a="1" />
+				</Texture>
+			</Layer>
+
+			<Layer level="ARTWORK">
+				<Texture name="uiBox18">
+					<Size x="20" y="20" />
+					<Anchors><Anchor point="TOPLEFT" x="380" y="-6" /></Anchors>
+					<Color r="1" g="1" b="1" a="1" />
+				</Texture>
+			</Layer>
+			
+			<Layer level="ARTWORK">
+				<Texture name="uiBox19">
+					<Size x="20" y="20" />
+					<Anchors><Anchor point="TOPLEFT" x="402" y="-6" /></Anchors>
+					<Color r="1" g="1" b="1" a="1" />
+				</Texture>
+			</Layer>
+			
+			<Layer level="ARTWORK">
+				<Texture name="uiBox20">
+					<Size x="20" y="20" />
+					<Anchors><Anchor point="TOPLEFT" x="424" y="-6" /></Anchors>
+					<Color r="1" g="1" b="1" a="1" />
+				</Texture>
+			</Layer>
+			
+			<Layer level="ARTWORK">
+				<Texture name="uiBg2">
+					<Size x="450" y="32" />
+					<Anchors><Anchor point="TOPLEFT" x="0" y="-34" /></Anchors>
+					<Color r="1" g="1" b="1" a="1" />
+				</Texture>
+			</Layer>
+
+			<Layer level="ARTWORK">
+				<Texture name="uiBox21">
+					<Size x="20" y="20" />
+					<Anchors><Anchor point="TOPLEFT" x="6" y="-40" /></Anchors>
+					<Color r="1" g="1" b="1" a="1" />
+				</Texture>
+			</Layer>
+
+			<Layer level="ARTWORK">
+				<Texture name="uiBox22">
+					<Size x="20" y="20" />
+					<Anchors><Anchor point="TOPLEFT" x="28" y="-40" /></Anchors>
+					<Color r="1" g="1" b="1" a="1" />
+				</Texture>
+			</Layer>
+
+			<Layer level="ARTWORK">
+				<Texture name="uiBox23">
+					<Size x="20" y="20" />
+					<Anchors><Anchor point="TOPLEFT" x="50" y="-40" /></Anchors>
+					<Color r="1" g="1" b="1" a="1" />
+				</Texture>
+			</Layer>
+
+			<Layer level="ARTWORK">
+				<Texture name="uiBox24">
+					<Size x="20" y="20" />
+					<Anchors><Anchor point="TOPLEFT" x="72" y="-40" /></Anchors>
+					<Color r="1" g="1" b="1" a="1" />
+				</Texture>
+			</Layer>
+
+			<Layer level="ARTWORK">
+				<Texture name="uiBox25">
+					<Size x="20" y="20" />
+					<Anchors><Anchor point="TOPLEFT" x="94" y="-40" /></Anchors>
+					<Color r="1" g="1" b="1" a="1" />
+				</Texture>
+			</Layer>
+
+			<Layer level="ARTWORK">
+				<Texture name="uiBox26">
+					<Size x="20" y="20" />
+					<Anchors><Anchor point="TOPLEFT" x="116" y="-40" /></Anchors>
+					<Color r="1" g="1" b="1" a="1" />
+				</Texture>
+			</Layer>
+
+			<Layer level="ARTWORK">
+				<Texture name="uiBox27">
+					<Size x="20" y="20" />
+					<Anchors><Anchor point="TOPLEFT" x="138" y="-40" /></Anchors>
+					<Color r="1" g="1" b="1" a="1" />
+				</Texture>
+			</Layer>
+
+			<Layer level="ARTWORK">
+				<Texture name="uiBox28">
+					<Size x="20" y="20" />
+					<Anchors><Anchor point="TOPLEFT" x="160" y="-40" /></Anchors>
+					<Color r="1" g="1" b="1" a="1" />
+				</Texture>
+			</Layer>
+
+			<Layer level="ARTWORK">
+				<Texture name="uiBox29">
+					<Size x="20" y="20" />
+					<Anchors><Anchor point="TOPLEFT" x="182" y="-40" /></Anchors>
+					<Color r="1" g="1" b="1" a="1" />
+				</Texture>
+			</Layer>
+
+			<Layer level="ARTWORK">
+				<Texture name="uiBox30">
+					<Size x="20" y="20" />
+					<Anchors><Anchor point="TOPLEFT" x="204" y="-40" /></Anchors>
+					<Color r="1" g="1" b="1" a="1" />
+				</Texture>
+			</Layer>
+
+			<Layer level="ARTWORK">
+				<Texture name="uiBox31">
+					<Size x="20" y="20" />
+					<Anchors><Anchor point="TOPLEFT" x="226" y="-40" /></Anchors>
+					<Color r="1" g="1" b="1" a="1" />
+				</Texture>
+			</Layer>
+
+			<Layer level="ARTWORK">
+				<Texture name="uiBox32">
+					<Size x="20" y="20" />
+					<Anchors><Anchor point="TOPLEFT" x="248" y="-40" /></Anchors>
+					<Color r="1" g="1" b="1" a="1" />
+				</Texture>
+			</Layer>
+
+			<Layer level="ARTWORK">
+				<Texture name="uiBox33">
+					<Size x="20" y="20" />
+					<Anchors><Anchor point="TOPLEFT" x="270" y="-40" /></Anchors>
+					<Color r="1" g="1" b="1" a="1" />
+				</Texture>
+			</Layer>
+
+			<Layer level="ARTWORK">
+				<Texture name="uiBox34">
+					<Size x="20" y="20" />
+					<Anchors><Anchor point="TOPLEFT" x="292" y="-40" /></Anchors>
+					<Color r="1" g="1" b="1" a="1" />
+				</Texture>
+			</Layer>
+
+			<Layer level="ARTWORK">
+				<Texture name="uiBox35">
+					<Size x="20" y="20" />
+					<Anchors><Anchor point="TOPLEFT" x="314" y="-40" /></Anchors>
+					<Color r="1" g="1" b="1" a="1" />
+				</Texture>
+			</Layer>
+
+			<Layer level="ARTWORK">
+				<Texture name="uiBox36">
+					<Size x="20" y="20" />
+					<Anchors><Anchor point="TOPLEFT" x="336" y="-40" /></Anchors>
+					<Color r="1" g="1" b="1" a="1" />
+				</Texture>
+			</Layer>
+
+			<Layer level="ARTWORK">
+				<Texture name="uiBox37">
+					<Size x="20" y="20" />
+					<Anchors><Anchor point="TOPLEFT" x="358" y="-40" /></Anchors>
+					<Color r="1" g="1" b="1" a="1" />
+				</Texture>
+			</Layer>
+
+			<Layer level="ARTWORK">
+				<Texture name="uiBox38">
+					<Size x="20" y="20" />
+					<Anchors><Anchor point="TOPLEFT" x="380" y="-40" /></Anchors>
+					<Color r="1" g="1" b="1" a="1" />
+				</Texture>
+			</Layer>
+			
+			<Layer level="ARTWORK">
+				<Texture name="uiBox39">
+					<Size x="20" y="20" />
+					<Anchors><Anchor point="TOPLEFT" x="402" y="-40" /></Anchors>
+					<Color r="1" g="1" b="1" a="1" />
+				</Texture>
+			</Layer>
+			
+			<Layer level="ARTWORK">
+				<Texture name="uiBox40">
+					<Size x="20" y="20" />
+					<Anchors><Anchor point="TOPLEFT" x="424" y="-40" /></Anchors>
+					<Color r="1" g="1" b="1" a="1" />
+				</Texture>
+			</Layer>
+		</Layers>
+	</Frame>
+</Ui>
