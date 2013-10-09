@@ -38,15 +38,6 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="wowpetbattler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_wowpetbattler.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_wowpetbattler.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
     <ClCompile Include="GeneratedFiles\qrc_wowpetbattler.cpp">
       <Filter>Generated Files</Filter>
     </ClCompile>
@@ -86,14 +77,20 @@
     <ClCompile Include="PetHelper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="WoWPetBattler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_WoWPetBattler.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_WoWPetBattler.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="PetAura.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="wowpetbattler.h">
-      <Filter>Header Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="wowpetbattler.ui">
-      <Filter>Form Files</Filter>
-    </CustomBuild>
     <CustomBuild Include="wowpetbattler.qrc">
       <Filter>Resource Files</Filter>
     </CustomBuild>
@@ -103,11 +100,14 @@
     <CustomBuild Include="AI.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
+    <CustomBuild Include="WoWPetBattler.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="WoWPetBattler.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="GeneratedFiles\ui_wowpetbattler.h">
-      <Filter>Generated Files</Filter>
-    </ClInclude>
     <ClInclude Include="PetStage.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -124,6 +124,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="PetHelper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_WoWPetBattler.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PetAura.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

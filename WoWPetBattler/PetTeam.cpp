@@ -23,6 +23,12 @@ PetTeam::PetTeam(const PetTeam& other)
 		this->pet.append(new Pet(*other.pet.at(i)));
 }
 
+//Adds a dummy pet, used for weather.
+void PetTeam::AddPet()
+{
+	this->pet.append(new Pet());
+}
+
 //Add a pet to the current team.
 void PetTeam::AddPet(int speciesID, int breed, int quality, int level)
 {
@@ -44,5 +50,11 @@ int PetTeam::GetActivePet()
 //Get the pet at the current index.
 Pet* PetTeam::GetPet(int index)
 {
-	return this->pet.at(index-1);
+	return this->pet.at((index == 0) ? 0 : index-1);
+}
+
+//Get the number of pets on the team.
+int PetTeam::GetNumPets()
+{
+	return this->pet.size();
 }

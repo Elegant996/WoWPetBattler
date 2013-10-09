@@ -14,12 +14,12 @@ public:
 	void SetCooldown(int);
 	void IsVerified(bool);
 
-	int GetAbilityID();
+	int GetAbilityId();
 	int GetCooldown();
 	bool IsVerified();
 
 private:
-	int abilityID, cooldown;
+	int abilityId, cooldown;
 	bool isVerified;
 };
 

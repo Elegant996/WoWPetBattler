@@ -1,5 +1,5 @@
 /********************************************************************************
-** Form generated from reading UI file 'wowpetbattler.ui'
+** Form generated from reading UI file 'WoWPetBattler.ui'
 **
 ** Created by: Qt User Interface Compiler version 5.1.1
 **

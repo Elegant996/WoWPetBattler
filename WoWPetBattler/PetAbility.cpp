@@ -1,9 +1,9 @@
 #include "PetAbility.h"
 
 //Constructor
-PetAbility::PetAbility(int abilityID, int cooldown, bool isVerified)
+PetAbility::PetAbility(int abilityId, int cooldown, bool isVerified)
 {
-	this->abilityID = abilityID;
+	this->abilityId = abilityId;
 	this->cooldown = cooldown;
 	this->isVerified = isVerified;
 }
@@ -17,7 +17,7 @@ PetAbility::~PetAbility(void)
 //Copy Constructor
 PetAbility::PetAbility(const PetAbility& other)
 {
-	this->abilityID = other.abilityID;
+	this->abilityId = other.abilityId;
 	this->cooldown = other.cooldown;
 	this->isVerified = other.isVerified;
 }
@@ -34,10 +34,10 @@ void PetAbility::IsVerified(bool verification)
 	this->isVerified = verification;
 }
 
-//Return ability ID.
-int PetAbility::GetAbilityID()
+//Return ability Id.
+int PetAbility::GetAbilityId()
 {
-	return this->abilityID;
+	return this->abilityId;
 }
 
 //Return cooldown status.

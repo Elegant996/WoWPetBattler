@@ -1,4 +1,4 @@
-#include "wowpetbattler.h"
+#include "WoWPetBattler.h"
 
 //Constructor
 WoWPetBattler::WoWPetBattler(QWidget *parent)

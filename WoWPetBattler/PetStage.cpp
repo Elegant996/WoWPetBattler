@@ -20,7 +20,8 @@ PetStage::PetStage(void)
 	this->selectPet = false;
 	this->selectAbility = false;
 	this->wonLastBattle = false;
-	this->petTeam.reserve(2);
+	this->petTeam.reserve(3);
+	this->petTeam.append(new PetTeam());
 	this->petTeam.append(new PetTeam());
 	this->petTeam.append(new PetTeam());
 }
@@ -40,10 +41,10 @@ PetStage::PetStage(const PetStage& other)
 		this->petTeam.append(new PetTeam(*other.petTeam.at(i)));
 }
 
-//Return the desired pet team; 1 for player, 2 for opponent;
-PetTeam* PetStage::GetPetTeam(int index)
+//Return the desired pet team; 0 for field, 1 for player, 2 for opponent;
+PetTeam* PetStage::GetTeam(int index)
 {
-	return this->petTeam.at(index-1);
+	return this->petTeam.at(index);
 }
 
 //Update the queue state.

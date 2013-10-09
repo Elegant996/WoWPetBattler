@@ -1,11 +1,29 @@
 #include "Pet.h"
 
-//Constructor
-Pet::Pet(int speciesID, int breed, int quality, int level)
+//Constructors
+Pet::Pet()
+{
+	this->name = "";
+	this->speciesId = 0;
+	this->breed = 0;
+	this->quality = 0;
+	this->level = 0;
+	this->type = 0;
+	this->baseHealth = 0;
+	this->basePower = 0;
+	this->baseSpeed = 0;
+	this->currentHealth = 0;
+	this->currentMaxHealth = 0;
+	this->currentPower = 0;
+	this->currentSpeed = 0;
+	this->abilityList;
+}
+
+Pet::Pet(int speciesId, int breed, int quality, int level)
 {
 	QFile speciesJson;
 	QDir::setCurrent(QDir::currentPath() + "/Species");
-	speciesJson.setFileName(QString::number(speciesID) + ".json");
+	speciesJson.setFileName(QString::number(speciesId) + ".json");
 	speciesJson.open(QIODevice::ReadOnly | QIODevice::Text);
 	QString speciesJsonContents = speciesJson.readAll();
 	speciesJson.close();
@@ -14,7 +32,7 @@ Pet::Pet(int speciesID, int breed, int quality, int level)
 	QJsonObject species = speciesDocument.object();
 
 	this->name = species.value(QString("name")).toString();
-	this->speciesID = speciesID;
+	this->speciesId = speciesId;
 	this->breed = breed;
 	this->quality = quality;
 	this->level = level;
@@ -27,7 +45,6 @@ Pet::Pet(int speciesID, int breed, int quality, int level)
 	this->currentPower = PetHelper::CalculatePower(this->basePower, PetBreed::GetPower(this->breed), this->level, this->quality);
 	this->currentSpeed = PetHelper::CalculateSpeed(this->baseSpeed, PetBreed::GetSpeed(this->breed), this->level, this->quality);
 	this->abilityList = species.value(QString("abilities")).toArray();
-	this->petAbility.reserve(3);
 }
 
 //Deconstructor
@@ -35,13 +52,14 @@ Pet::~Pet(void)
 {
 	qDeleteAll(this->petAbility);
 	this->petAbility.clear();
+	RemoveAuras();
 }
 
 //Copy Constructor
 Pet::Pet(const Pet& other)
 {
 	this->name = other.name;
-	this->speciesID = other.speciesID;
+	this->speciesId = other.speciesId;
 	this->breed = other.breed;
 	this->quality = other.quality;
 	this->level = other.level;
@@ -57,6 +75,8 @@ Pet::Pet(const Pet& other)
 	this->petAbility.reserve(3);
 	for (int i=0; i < other.petAbility.size(); i++)
 		this->petAbility.append(new PetAbility(*other.petAbility.at(i)));
+	for (int i=0; i < other.petAura.size(); i++)
+		this->petAura.append(new PetAura(*other.petAura.at(i)));
 }
 
 //Add an ability to the current pet.
@@ -65,10 +85,35 @@ void Pet::AddAbility(bool verification, int tier, int cooldown)
 	this->petAbility.append(new PetAbility(abilityList[(2*this->petAbility.size())+tier-1].toObject().value(QString("id")).toDouble(), cooldown, verification));
 }
 
+//Replace the ability of the current pet at specified index.
+void Pet::ReplaceAbility(int index, bool verification, int tier, int cooldown)
+{
+	this->petAbility.replace(index-1, new PetAbility(abilityList[(2*this->petAbility.size())+tier-1].toObject().value(QString("id")).toDouble(), cooldown, verification));
+}
+
 //Return the desired ability at the specified index.
 PetAbility* Pet::GetAbility(int index)
 {
 	return this->petAbility.at(index-1);
+}
+
+//Add an aura to the current pet.
+void Pet::AddAura(int auraId, int duration)
+{
+	this->petAura.append(new PetAura(auraId, duration));
+}
+
+//Removes all pet auras on the current pet.
+void Pet::RemoveAuras()
+{
+	qDeleteAll(this->petAura);
+	this->petAura.clear();
+}
+
+//Return the desired aura at the specified index.
+PetAura* Pet::GetAura(int index)
+{
+	return this->petAura.at(index-1);
 }
 
 //Set the pet's current health.
@@ -95,10 +140,16 @@ void Pet::SetSpeed(int speed)
 	this->currentSpeed = speed;
 }
 
-//Return pet's species ID.
-int Pet::GetSpeciesID()
+//Return pet's species Id.
+int Pet::GetSpeciesId()
 {
-	return this->speciesID;
+	return this->speciesId;
+}
+
+//Return pet's level.
+int Pet::GetLevel()
+{
+	return this->level;
 }
 
 //Return pet's current health.

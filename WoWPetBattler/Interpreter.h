@@ -6,6 +6,7 @@
 #include <QElapsedTimer>
 #include <QDebug>
 #include <Robot.h>
+
 #include "PetStage.h"
 
 class Interpreter :
@@ -30,6 +31,10 @@ protected:
 
 private:
 	bool Locate();
+	void SetupPetTeams();
+	void UpdateHealthPools();
+	void UpdateAbilities();
+	void UpdateAuras();
 
 	volatile bool running;
 	const int BUILD;
