@@ -10,7 +10,6 @@ PetAura::PetAura(int auraId, int duration)
 //Destructor
 PetAura::~PetAura(void)
 {
-
 }
 
 //Copy Constructor

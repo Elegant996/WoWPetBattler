@@ -8,20 +8,13 @@ WoWPetBattler::WoWPetBattler(QWidget *parent)
 
 	this->petStage = new PetStage();
 
-	this->interpreter = new Interpreter(petStage, &WoWWindow);
+	this->interpreter = new Interpreter(petStage, ai, &WoWWindow);
 	connect(interpreter, SIGNAL(OutputToGUI(QString, QString)), this, SLOT(Output(QString, QString)));
 	connect(interpreter, SIGNAL(Stop(QString)), this, SLOT(Stop(QString)));
 
-	this->ai = new AI(petStage, &WoWWindow);
+	this->ai = new AI(petStage);
+	this->ai->moveToThread(interpreter);
 	connect(ai, SIGNAL(OutputToGUI(QString, QString)), this, SLOT(Output(QString, QString)));
-	connect(interpreter, SIGNAL(RunAI()), ai, SLOT(Run()));
-
-	aiThread = new QThread();
-	connect(this, SIGNAL(destroyed()), ai, SLOT(deleteLater()));			//Delete the ai object if this object is destroyed.
-	connect(ai, SIGNAL(destroyed()), aiThread, SLOT(quit()));				//Stop the thread whenever it is destroyed.
-	connect(aiThread, SIGNAL(finished()), aiThread, SLOT(deleteLater()));	//Clean up the thread.
-	ai->moveToThread(aiThread);
-	aiThread->start();
 }
 
 //Destructor
@@ -29,8 +22,10 @@ WoWPetBattler::~WoWPetBattler()
 {
 	if (interpreter->isRunning())
 		interpreter->Exit();
-	aiThread->quit();					//Quit thread.
-	aiThread->wait();					//Wait for thread to terminate.
+
+	delete interpreter;
+	delete ai;
+	delete petStage;
 }
 
 //Output to browser.

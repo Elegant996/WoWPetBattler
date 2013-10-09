@@ -11,7 +11,6 @@ PetAbility::PetAbility(int abilityId, int cooldown, bool isVerified)
 //Deconstructor
 PetAbility::~PetAbility(void)
 {
-
 }
 
 //Copy Constructor

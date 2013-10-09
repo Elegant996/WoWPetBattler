@@ -9,7 +9,7 @@
 #include <Screen.h>
 #include <Window.h>
 
-#include "ui_wowpetbattler.h"
+#include "UI_WoWPetBattler.h"
 #include "PetStage.h"
 #include "Interpreter.h"
 #include "AI.h"
@@ -40,7 +40,6 @@ private:
 	Interpreter *interpreter;
 
 	AI *ai;
-	QThread *aiThread;
 };
 
 #endif // WOWPETBATTLER_H

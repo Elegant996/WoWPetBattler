@@ -7,6 +7,7 @@
 #include <QDebug>
 #include <Robot.h>
 
+#include "AI.h"
 #include "PetStage.h"
 
 class Interpreter :
@@ -15,7 +16,7 @@ class Interpreter :
 	Q_OBJECT
 
 public:
-	Interpreter(PetStage*, Robot::Window*);
+	Interpreter(PetStage*, AI*, Robot::Window*);
 	~Interpreter(void);
 
 signals:
@@ -40,6 +41,7 @@ private:
 	const int BUILD;
 
 	PetStage *petStage;
+	AI* ai;
 	
 	QMutex mutex;
 	QElapsedTimer timer;

@@ -1,10 +1,11 @@
 #include "Interpreter.h"
 
 
-Interpreter::Interpreter(PetStage* petStage, Robot::Window *window) :
+Interpreter::Interpreter(PetStage* petStage, AI* ai, Robot::Window *window) :
 	BUILD(56), running(true), readSuccess(false), oneTimeNotifier(false)
 {
 	this->petStage = petStage;
+	this->ai = ai;
 	this->window = window;
 	this->image = new Robot::Image();
 	this->points = new Robot::Point[40];
@@ -30,15 +31,16 @@ void Interpreter::Exit()
 
 void Interpreter::run()
 {
+	//Update bools in case we run it again.
 	running = true;
 	readSuccess = false;
 	oneTimeNotifier = false;
 
 	while (running)
 	{
+		//Start the timer to limit number of updaters per second.
 		timer.start();
 
-		// do important work here
 		if (!readSuccess)
 		{
 			//Emit message once!
@@ -111,19 +113,17 @@ void Interpreter::run()
 
 			//Call AI and have it determine our next move.
 			qDebug() << "Run AI";
+			ai->Run();
 
 			//Delete all auras.
 			for (int i=0; i < 3; i++)
 				for (int j=0; j < petStage->GetTeam(i)->GetNumPets(); j++)
 					petStage->GetTeam(i)->GetPet(j)->RemoveAuras();
 		}
-
-		//Send a signal to AI if we...
-		/*if ((!petStage->SelectAbility() && (pixels[0].G & 16) != 0)			//Need to select ability.
-				|| (!petStage->SelectPet() && (pixels[0].G & 32) != 0)		//Need to select pet.
-				|| (petStage->QueueState() != 3 && (pixels[0].R & 3) == 3)	//Need to accept queue.
-				|| (petStage->QueueState() == 0 && (pixels[0].R & 3) == 0))	//Need to queue.
-			emit RunAI();*/
+		else if (petStage->QueueState() != 3 && (pixels[0].R & 3) == 3)
+			qDebug() << "Accept Queue";
+		else if (petStage->QueueState() == 0 && (pixels[0].R & 3) == 0)
+			qDebug() << "Queue Up";
 
 		//Update petStage.
 		petStage->InPetBattle((pixels[0].R & 128) != 0);

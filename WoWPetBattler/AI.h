@@ -4,7 +4,6 @@
 #include <QObject>
 #include <QDebug>
 #include <Robot.h>
-#include <Windows.h>
 #include "PetStage.h"
 
 class AI :
@@ -13,7 +12,7 @@ class AI :
     Q_OBJECT
 
 public:
-	AI(PetStage*, Robot::Window*);
+	AI(PetStage*);
 	~AI(void);
 
 signals:
@@ -24,7 +23,6 @@ public slots:
 
 private:
 	PetStage *petStage;
-	Robot::Window *window;
 	Robot::Keyboard keyboard;
 };
 

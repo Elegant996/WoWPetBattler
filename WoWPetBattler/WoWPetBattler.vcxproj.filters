@@ -126,11 +126,11 @@
     <ClInclude Include="PetHelper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="GeneratedFiles\ui_WoWPetBattler.h">
-      <Filter>Generated Files</Filter>
-    </ClInclude>
     <ClInclude Include="PetAura.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\UI_WoWPetBattler.h">
+      <Filter>Generated Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
