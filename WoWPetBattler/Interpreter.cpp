@@ -19,7 +19,6 @@ Interpreter::~Interpreter(void)
 	delete[] pixels;
 	delete[] points;
 	delete image;
-	delete window;
 }
 
 void Interpreter::Exit()
@@ -122,7 +121,7 @@ void Interpreter::run()
 		}
 		else if (petStage->QueueState() != 3 && (pixels[0].R & 3) == 3)
 			qDebug() << "Accept Queue";
-		else if (petStage->QueueState() == 0 && (pixels[0].R & 3) == 0)
+		else if (!petStage->InPetBattle() && petStage->QueueState() == 0 && (pixels[0].R & 3) == 0)
 			qDebug() << "Queue Up";
 
 		//Update petStage.

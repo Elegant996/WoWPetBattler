@@ -32,6 +32,7 @@ private slots:
 private:
 	Ui::WoWPetBattlerClass ui;
 
+	Robot::Taskbar taskbar;
 	Robot::Window GUIWindow, WoWWindow;
 	Robot::Process process;
 

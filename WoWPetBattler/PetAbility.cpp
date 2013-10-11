@@ -3,8 +3,24 @@
 //Constructor
 PetAbility::PetAbility(int abilityId, int cooldown, bool isVerified)
 {
+	QFile abilityJson;
+	QDir::setCurrent(QDir::currentPath() + "/Ability");
+	abilityJson.setFileName(QString::number(abilityId) + ".json");
+	abilityJson.open(QIODevice::ReadOnly | QIODevice::Text);
+	QString abilityJsonContents = abilityJson.readAll();
+	abilityJson.close();
+	QDir::setCurrent(QDir::currentPath() + "/..");
+
+	QJsonDocument abilityDocument = QJsonDocument::fromJson(abilityJsonContents.toUtf8());
+	QJsonObject ability = abilityDocument.object();
+
 	this->abilityId = abilityId;
-	this->cooldown = cooldown;
+	this->name = ability.value(QString("name")).toString();
+	this->cooldown = ability.value(QString("cooldown")).toDouble();
+	this->currentCooldown = cooldown;
+	this->rounds = ability.value(QString("rounds")).toDouble();
+	this->petTypeId = ability.value(QString("petTypeId")).toDouble();
+	this->isPassive = ability.value(QString("isPassive")).toBool();
 	this->isVerified = isVerified;
 }
 
@@ -17,14 +33,19 @@ PetAbility::~PetAbility(void)
 PetAbility::PetAbility(const PetAbility& other)
 {
 	this->abilityId = other.abilityId;
+	this->name = other.name;
 	this->cooldown = other.cooldown;
+	this->currentCooldown = other.currentCooldown;
+	this->rounds = other.rounds;
+	this->petTypeId = other.petTypeId;
+	this->isPassive = other.isPassive;
 	this->isVerified = other.isVerified;
 }
 
 //Update the cooldown of the ability.
 void PetAbility::SetCooldown(int CD)
 {
-	this->cooldown = CD;
+	this->currentCooldown = CD;
 }
 
 //Confirm whether we know this ability is known.
@@ -42,7 +63,7 @@ int PetAbility::GetAbilityId()
 //Return cooldown status.
 int PetAbility::GetCooldown()
 {
-	return this->cooldown;
+	return this->currentCooldown;
 }
 
 //Return whether or not the ability is verified.

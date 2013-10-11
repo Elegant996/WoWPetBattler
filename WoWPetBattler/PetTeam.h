@@ -15,10 +15,12 @@ public:
 
 	void AddPet();
 	void AddPet(int, int, int, int);
+
 	void SetActivePet(int);
 	int GetActivePet();
-	Pet* GetPet(int);
+
 	int GetNumPets();
+	Pet* GetPet(int);
 
 private:
 	int activePet;

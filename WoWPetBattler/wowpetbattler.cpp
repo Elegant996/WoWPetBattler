@@ -6,6 +6,9 @@ WoWPetBattler::WoWPetBattler(QWidget *parent)
 {
 	ui.setupUi(this);
 
+	if (taskbar.Synchronize())
+		move(taskbar.GetBounds().W - size().width() - 15, taskbar.GetBounds().Y - size().height() - 35);
+
 	this->petStage = new PetStage();
 
 	this->interpreter = new Interpreter(petStage, ai, &WoWWindow);

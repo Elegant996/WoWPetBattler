@@ -409,16 +409,16 @@ function encodeHealth()
 	local index = 15;
 
 	for i=1, teams do
-		for j=i, teamSize[i], 2 do
+		for j=i, 3, 2 do
 			r[(i*i+j)/2], g[(i*i+j)/2], b[(i*i+j)/2] = 0, 0, 0;
 
-			petsCurrentHP[i][j] = bit.lshift(petsCurrentHP[i][j], 4);
-			g[(i*i+j)/2] = g[(i*i+j)/2] + bit.band(petsCurrentHP[i][j], 255);
-			petsCurrentHP[i][j] = bit.rshift(petsCurrentHP[i][j], 8);
-			r[(i*i+j)/2] = r[(i*i+j)/2] + bit.band(petsCurrentHP[i][j], 255);
-			b[(i*i+j)/2] = b[(i*i+j)/2] + bit.band(petsCurrentHP[j+1>3 and i+1 or i][j+1>3 and 1 or j+1], 255);
-			petsCurrentHP[j+1>3 and i+1 or i][j+1>3 and 1 or j+1] = bit.rshift(petsCurrentHP[j+1>3 and i+1 or i][j+1>3 and 1 or j+1], 8);
-			g[(i*i+j)/2] = g[(i*i+j)/2] + bit.band(petsCurrentHP[j+1>3 and i+1 or i][j+1>3 and 1 or j+1], 255);
+			petsCurrentHP[i][j] = bit.lshift(petsCurrentHP[i][j]==nil and 0 or petsCurrentHP[i][j], 4);
+			g[(i*i+j)/2] = g[(i*i+j)/2] + bit.band(petsCurrentHP[i][j]==nil and 0 or petsCurrentHP[i][j], 255);
+			petsCurrentHP[i][j] = bit.rshift(petsCurrentHP[i][j]==nil and 0 or petsCurrentHP[i][j], 8);
+			r[(i*i+j)/2] = r[(i*i+j)/2] + bit.band(petsCurrentHP[i][j]==nil and 0 or petsCurrentHP[i][j], 255);
+			b[(i*i+j)/2] = b[(i*i+j)/2] + bit.band(petsCurrentHP[j+1>3 and i+1 or i][j+1>3 and 1 or j+1]==nil and 0 or petsCurrentHP[j+1>3 and i+1 or i][j+1>3 and 1 or j+1], 255);
+			petsCurrentHP[j+1>3 and i+1 or i][j+1>3 and 1 or j+1] = bit.rshift(petsCurrentHP[j+1>3 and i+1 or i][j+1>3 and 1 or j+1]==nil and 0 or petsCurrentHP[j+1>3 and i+1 or i][j+1>3 and 1 or j+1], 8);
+			g[(i*i+j)/2] = g[(i*i+j)/2] + bit.band(petsCurrentHP[j+1>3 and i+1 or i][j+1>3 and 1 or j+1]==nil and 0 or petsCurrentHP[j+1>3 and i+1 or i][j+1>3 and 1 or j+1], 255);
 
 			uiBox[index]:SetVertexColor(r[(i*i+j)/2]/255, g[(i*i+j)/2]/255, b[(i*i+j)/2]/255); index = index + 1;
 		end

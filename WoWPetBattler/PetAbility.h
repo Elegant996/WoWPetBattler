@@ -1,6 +1,10 @@
 #ifndef PETABILITY_H
 #define PETABILITY_H
 
+#include <QDir>
+#include <QFile>
+#include <QJsonDocument>
+#include <QJsonObject>
 #include <QVector>
 #include <QtAlgorithms>
 
@@ -19,8 +23,9 @@ public:
 	bool IsVerified();
 
 private:
-	int abilityId, cooldown;
-	bool isVerified;
+	QString name;
+	int abilityId, cooldown, currentCooldown, rounds, petTypeId;
+	bool isPassive, isVerified;
 };
 
 #endif

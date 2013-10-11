@@ -14,7 +14,7 @@ AI::~AI(void)
 void AI::Run()
 {
 	//PostMessage((HWND)window->GetHandle(), 
-	keyboard.AutoDelay = (5, 10);
+	//keyboard.AutoDelay = (5, 10);
 	if (petStage->SelectAbility())
 		qDebug() << "Select Ability";
 	else if (petStage->SelectPet() && petStage->Initialized())

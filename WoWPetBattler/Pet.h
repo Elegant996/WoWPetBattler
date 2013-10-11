@@ -9,6 +9,8 @@
 #include <QVector>
 #include <QtAlgorithms>
 
+#include <QDebug>
+
 #include "PetAbility.h"
 #include "PetAura.h"
 #include "PetBreed.h"
@@ -22,12 +24,18 @@ public:
 	~Pet(void);
 	Pet(const Pet&);
 
+	int GetNumStatus();
+	QString* GetStatus(int);
+	bool HasStatus(QString);
+
 	void AddAbility(bool, int, int);
 	void ReplaceAbility(int, bool, int, int);
+	int GetNumAbilities();
 	PetAbility* GetAbility(int);
 
 	void AddAura(int, int);
 	void RemoveAuras();
+	int GetNumAuras();
 	PetAura* GetAura(int);
 
 	void SetHealth(int);
@@ -37,6 +45,7 @@ public:
 
 	int GetSpeciesId();
 	int GetLevel();
+	int GetType();
 	int GetHealth();
 	int GetMaxHealth();
 	int GetPower();
@@ -44,10 +53,11 @@ public:
 
 private:
 	QString name;
-	int speciesId, breed, quality, level;
-	float type, baseHealth, basePower, baseSpeed;
+	int speciesId, breed, type, quality, level;
+	float baseHealth, basePower, baseSpeed;
 	int currentHealth, currentMaxHealth, currentPower, currentSpeed;
 	QJsonArray abilityList;
+	QVector<QString*> petStatus;
 	QVector<PetAbility*> petAbility;
 	QVector<PetAura*> petAura;
 };

@@ -47,14 +47,14 @@ int PetTeam::GetActivePet()
 	return this->activePet;
 }
 
-//Get the pet at the current index.
-Pet* PetTeam::GetPet(int index)
-{
-	return this->pet.at((index == 0) ? 0 : index-1);
-}
-
 //Get the number of pets on the team.
 int PetTeam::GetNumPets()
 {
 	return this->pet.size();
+}
+
+//Get the pet at the current index.
+Pet* PetTeam::GetPet(int index)
+{
+	return this->pet.at((index == 0) ? 0 : index-1);
 }
