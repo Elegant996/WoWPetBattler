@@ -5,8 +5,6 @@
 #include <QFile>
 #include <QJsonDocument>
 #include <QJsonObject>
-#include <QVector>
-#include <QtAlgorithms>
 
 class PetAbility
 {

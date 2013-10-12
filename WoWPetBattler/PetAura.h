@@ -1,6 +1,11 @@
 #ifndef PETAURA_H
 #define PETAURA_H
 
+#include <QDir>
+#include <QFile>
+#include <QJsonDocument>
+#include <QJsonObject>
+
 class PetAura
 {
 public:
@@ -9,7 +14,9 @@ public:
 	PetAura(const PetAura&);
 
 private:
-	int auraId, duration;
+	QString name;
+	int auraId, cooldown, rounds, duration, petTypeId;
+	bool isPassive;
 };
 
 #endif
