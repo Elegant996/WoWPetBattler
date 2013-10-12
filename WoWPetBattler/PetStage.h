@@ -13,6 +13,7 @@ public:
 	~PetStage(void);
 	PetStage(const PetStage&);
 
+	void Reinitialize();
 	PetTeam* GetTeam(int);
 
 	void QueueState(int);

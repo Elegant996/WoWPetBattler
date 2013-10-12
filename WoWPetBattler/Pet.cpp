@@ -73,11 +73,11 @@ Pet::Pet(const Pet& other)
 	this->currentSpeed = other.currentSpeed;
 	this->abilityList = other.abilityList;
 	this->petAbility.reserve(3);
-	for (int i=0; i < other.petAbility.size(); i++)
+	for (int i=0; i < other.petAbility.size(); i+=1)
 		this->petAbility.append(new PetAbility(*other.petAbility.at(i)));
-	for (int i=0; i < other.petAura.size(); i++)
+	for (int i=0; i < other.petAura.size(); i+=1)
 		this->petAura.append(new PetAura(*other.petAura.at(i)));
-	for (int i=0; i < other.petStatus.size(); i++)
+	for (int i=0; i < other.petStatus.size(); i+=1)
 		this->petStatus.append(new QString(*other.petStatus.at(i)));
 }
 
@@ -96,7 +96,7 @@ QString* Pet::GetStatus(int index)
 //Return whether or not the pet has a specific status.
 bool Pet::HasStatus(QString petStatus)
 {
-	for (int i=0; i < this->petStatus.size(); i++)
+	for (int i=0; i < this->petStatus.size(); i+=1)
 		if (this->petStatus.at(i) == petStatus)
 			return true;
 	return false;

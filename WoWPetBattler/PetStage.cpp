@@ -3,11 +3,6 @@
 //Constructors
 PetStage::PetStage(void)
 {
-	int queueState;
-	bool inPetBattle, teamIsAlive, queueEnabled, canAccept;
-	bool playerIsGhost, playerIsDead, playerAffectingCombat;
-	bool initialized, selectPet, selectAbility, wonLastBattle;
-
 	this->queueState = 0;
 	this->inPetBattle = false;
 	this->teamIsAlive = false;
@@ -37,8 +32,32 @@ PetStage::~PetStage(void)
 PetStage::PetStage(const PetStage& other)
 {
 	this->petTeam.reserve(2);
-	for (int i=0; i < other.petTeam.size(); i++)
+	for (int i=0; i < other.petTeam.size(); i+=1)
 		this->petTeam.append(new PetTeam(*other.petTeam.at(i)));
+}
+
+//Recreates the basic setup for the stage.
+void PetStage::Reinitialize()
+{
+	//Delete all teams
+	qDeleteAll(this->petTeam);
+	this->petTeam.clear();
+
+	this->queueState = 0;
+	this->inPetBattle = false;
+	this->teamIsAlive = false;
+	this->queueEnabled = false;
+	this->canAccept = false;
+	this->playerIsGhost = true;
+	this->playerIsDead = true;
+	this->playerAffectingCombat = true;
+	this->initialized = false;
+	this->selectPet = false;
+	this->selectAbility = false;
+	this->wonLastBattle = false;
+	this->petTeam.append(new PetTeam());
+	this->petTeam.append(new PetTeam());
+	this->petTeam.append(new PetTeam());
 }
 
 //Return the desired pet team; 0 for field, 1 for player, 2 for opponent;

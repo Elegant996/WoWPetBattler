@@ -21,6 +21,7 @@ for i=1, maxIndex do uiBox[i] = _G[string.format('uiBox%02d',i)]; end
 
 local inPetBattle, wonLastBattle, teamIsAlive, playerIsGhost, playerIsDead, playerAffectingCombat = false, false, false, nil, nil, nil;
 local queueEnabled, queueState, canAccept, initialized, selectPet, selectAbility = false, nil, false, false, false, false;
+local isWildBattle, isPlayerNPC = false, false;
 
 local teamSize, teamsActivePet, petsSpecies, petsBreed = {0, 0}, {0, 0}, {{}, {}}, {{}, {}};
 local petsCurrentHP, petsLevel, petsQuality = {{}, {}}, {{}, {}}, {{}, {}};
@@ -167,6 +168,7 @@ function events:PET_BATTLE_PET_ROUND_PLAYBACK_COMPLETE(...)
 			petsAuras[0][0][k], _, petsAurasDuration[0][0][k], _ = C_PetBattles.GetAuraInfo(0, 0, k);
 		end
 		
+		isWildBattle, isPlayerNPC = C_PetBattles.IsWildBattle(), C_PetBattles.IsPlayerNPC(enemyTeam);
 		initialized, selectAbility = true, true;
 	end
 end
@@ -207,8 +209,7 @@ function events:PET_BATTLE_QUEUE_STATUS(...)
 	queueEnabled = C_PetJournal.IsFindBattleEnabled();
 	queueState = (C_PetBattles.GetPVPMatchmakingInfo());
 	canAccept = C_PetBattles.CanAcceptQueuedPVPMatch();
-	playerIsGhost = UnitIsGhost("player");
-	playerIsDead = UnitIsDead("player");
+	playerIsGhost, playerIsDead = UnitIsGhost("player"), UnitIsDead("player");
 	playerAffectingCombat = UnitAffectingCombat("player");
 	
 	--if (queueState == "proposal" and canAccept) then
@@ -256,9 +257,9 @@ function events:PET_BATTLE_CLOSE(...)
 	teamIsAlive = queueEnabled and (C_PetJournal.GetPetStats(C_PetJournal.GetPetLoadOutInfo(1))) > 0 and
 			(C_PetJournal.GetPetStats(C_PetJournal.GetPetLoadOutInfo(2))) > 0 and
 			(C_PetJournal.GetPetStats(C_PetJournal.GetPetLoadOutInfo(3))) > 0;
-	playerIsGhost = UnitIsGhost("player");
-	playerIsDead = UnitIsDead("player");
+	playerIsGhost, playerIsDead = UnitIsGhost("player"), UnitIsDead("player");
 	playerAffectingCombat = UnitAffectingCombat("player");
+	isWildBattle, isPlayerNPC = false, false;
 
 	for i=1, teams do
 		for j=1, teamSize[i] do
@@ -329,6 +330,8 @@ function encodeStates()
 	if (selectPet) then g = g + 32; end
 	if (selectAbility) then g = g + 16; end
 	if (wonLastBattle) then g = g + 8; end
+	if (isWildBattle) then g = g + 4; end
+	if (isPlayerNPC) then g = g + 2; end
 	
 	b = mVersion;
 
@@ -394,6 +397,9 @@ function encodePetInfo()
 			b[i][j+1] = b[i][j+1] + bit.band(petsAbilitiesCD[3], 255);
 			petsAbilitiesCD[3] = bit.rshift(petsAbilitiesCD[3], 8);
 			g[i][j+1] = g[i][j+1] + bit.band(petsAbilitiesCD[3], 255);
+
+			--Active Pet
+			if (teamsActivePet[i] == ((j-1)/2)+1) then b[i][j+1] = b[i][j+1] + 16; end
 
 			local index = i==1 and i+j or i==2 and 4*i+j-1;
 			if (index == 12) then index = index + 1; end

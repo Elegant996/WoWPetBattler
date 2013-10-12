@@ -26,6 +26,8 @@ void Interpreter::Exit()
 	running = false;
 	if (!wait(2000))
 		terminate();
+
+	petStage->Reinitialize();		//Thread activity has stopped; reinitialize the stage.
 }
 
 void Interpreter::run()
@@ -51,7 +53,7 @@ void Interpreter::run()
 
 			if (!Locate())
 			{
-				timeoutCount++;
+				timeoutCount += 1;
 				if (timeoutCount >= 450)
 					emit Stop("Addon could not be located. Stopping...");
 			
@@ -104,7 +106,7 @@ void Interpreter::run()
 			//Update health pools.
 			UpdateHealthPools();
 
-			//Update abilities and CDs.
+			//Update abilities and CDs as well as the active pet for each team.
 			UpdateAbilities();
 
 			//Update auras on pets.
@@ -112,12 +114,17 @@ void Interpreter::run()
 
 			//Call AI and have it determine our next move.
 			qDebug() << "Run AI";
-			ai->Run();
+			//ai->Run();
 
 			//Delete all auras.
-			for (int i=0; i < 3; i++)
-				for (int j=0; j < petStage->GetTeam(i)->GetNumPets(); j++)
+			for (int i=0; i < 3; i+=1)
+				for (int j=0; j < petStage->GetTeam(i)->GetNumPets(); j+=1)
 					petStage->GetTeam(i)->GetPet(j)->RemoveAuras();
+		}
+		else if (petStage->InPetBattle() == ((pixels[0].R & 128) == 0))
+		{
+			qDebug() << "Determine if victor";
+			petStage->Reinitialize();			//We've just left a pet battle so let's reset the stage.
 		}
 		else if (petStage->QueueState() != 3 && (pixels[0].R & 3) == 3)
 			qDebug() << "Accept Queue";
@@ -286,280 +293,102 @@ bool Interpreter::Locate()
 //Sets up pet teams after initializing.
 void Interpreter::SetupPetTeams()
 {
-	//Weather Control "Pet"
-	petStage->GetTeam(0)->AddPet();
+	petStage->GetTeam(0)->AddPet();					//Weather Control "Pet".
 
-	//Player's Team First Pet
-	int myPetSpecies1 = ((((pixels[1].R << 3) + (pixels[1].G >> 5))) & 2047);
-	if (myPetSpecies1 != 0)
-	{
-		petStage->GetTeam(1)->AddPet(myPetSpecies1, (pixels[1].G & 31), ((pixels[1].B >> 5) & 7),
-										((((pixels[1].B & 31) << 1) + ((pixels[2].R >> 7) & 1)) & 63));
+	bool isWildBattle = ((pixels[0].G & 4) != 0);	//Opponent is a wild pet.
+	bool isPlayerNPC = ((pixels[0].G & 2) != 0);	//Opponent is NPC trainer.
 
-		petStage->GetTeam(1)->GetPet(1)->AddAbility(((pixels[2].R & 1) != 0),
-														(((pixels[2].R >> 5) & 1) + 1),
-														((pixels[2].R >> 1) & 15));
+	int pixelCounter = 1;							//Used to determine what pixel block to look at.
+	for (int i=1; i < 3; i+=1)
+		for (int j=1; j < 6; j+=2)
+		{
+			//Get the species id and continue if it is valid.
+			int species = ((((pixels[pixelCounter].R << 3) + (pixels[pixelCounter].G >> 5))) & 2047);
+			if (species != 0)
+			{
+				//Add the pet to the team.
+				petStage->GetTeam(i)->AddPet(species, (pixels[pixelCounter].G & 31), ((pixels[pixelCounter].B >> 5) & 7),
+												((((pixels[pixelCounter].B & 31) << 1) + ((pixels[pixelCounter+1].R >> 7) & 1)) & 63));
 
-		if (petStage->GetTeam(1)->GetPet(1)->GetLevel() >= 2)
-			petStage->GetTeam(1)->GetPet(1)->AddAbility(((pixels[2].R & 64) != 0),
-															(((pixels[2].G >> 7) & 1) + 1),
-															((pixels[2].G >> 3) & 15));
+				//Every pet has at least one ability.
+				petStage->GetTeam(i)->GetPet(((j-1)/2)+1)->AddAbility(((pixels[pixelCounter+1].R & 1) != 0),
+																		(((pixels[pixelCounter+1].R >> 5) & 1) + 1),
+																		((pixels[pixelCounter+1].R >> 1) & 15));
 
-		if (petStage->GetTeam(1)->GetPet(1)->GetLevel() >= 4)
-			petStage->GetTeam(1)->GetPet(1)->AddAbility(((pixels[2].G & 4) != 0),
-															(((pixels[2].G >> 1) & 1) + 1),
-															(((pixels[2].G << 3) + (pixels[2].B >> 5)) & 15));
-	}
+				//Check if the pet is able to have a second ability.
+				if ( petStage->GetTeam(i)->GetPet(((j-1)/2)+1)->GetLevel() >= 2 || (isPlayerNPC && i==2))
+					petStage->GetTeam(i)->GetPet(((j-1)/2)+1)->AddAbility(((pixels[pixelCounter+1].R & 64) != 0),
+																			(((pixels[pixelCounter+1].G >> 7) & 1) + 1),
+																			((pixels[pixelCounter+1].G >> 3) & 15));
 
-	//Player's Team Second Pet
-	int myPetSpecies2 = ((((pixels[3].R << 3) + (pixels[3].G >> 5))) & 2047);
-	if (myPetSpecies2 != 0)
-	{
-		petStage->GetTeam(1)->AddPet(myPetSpecies2, (pixels[3].G & 31), ((pixels[3].B >> 5) & 7),
-										((((pixels[3].B & 31) << 1) + ((pixels[4].R >> 7) & 1)) & 63));
+				//Check if the pet is able to have a third ability.
+				if (petStage->GetTeam(i)->GetPet(((j-1)/2)+1)->GetLevel() >= 4 || (isPlayerNPC && i==2))
+					petStage->GetTeam(i)->GetPet(((j-1)/2)+1)->AddAbility(((pixels[pixelCounter+1].G & 4) != 0),
+																			(((pixels[pixelCounter+1].G >> 1) & 1) + 1),
+																			(((pixels[pixelCounter+1].G << 3) + (pixels[pixelCounter+1].B >> 5)) & 15));
 
-		petStage->GetTeam(1)->GetPet(2)->AddAbility(((pixels[4].R & 1) != 0),
-														(((pixels[4].R >> 5) & 1) + 1),
-														((pixels[4].R >> 1) & 15));
-			
-		if (petStage->GetTeam(1)->GetPet(2)->GetLevel() >= 2)
-			petStage->GetTeam(1)->GetPet(2)->AddAbility(((pixels[4].R & 64) != 0),
-															(((pixels[4].G >> 7) & 1) + 1),
-															((pixels[4].G >> 3) & 15));
+				//Check if the current pet is the active pet of the team.
+				if (((pixels[pixelCounter+1].B & 16) != 0))
+					petStage->GetTeam(i)->SetActivePet(((j-1)/2)+1);
+			}
 
-		if (petStage->GetTeam(1)->GetPet(2)->GetLevel() >= 4)
-			petStage->GetTeam(1)->GetPet(2)->AddAbility(((pixels[4].G & 4) != 0),
-															(((pixels[4].G >> 1) & 1) + 1),
-															(((pixels[4].G << 3) + (pixels[4].B >> 5)) & 15));
-	}
+			pixelCounter += 2;			//Increment pixel counter.
 
-	//Player's Team Third Pet
-	int myPetSpecies3 = ((((pixels[5].R << 3) + (pixels[5].G >> 5))) & 2047);
-	if (myPetSpecies3 != 0)
-	{
-		petStage->GetTeam(1)->AddPet(myPetSpecies3, (pixels[5].G & 31), ((pixels[5].B >> 5) & 7),
-										((((pixels[5].B & 31) << 1) + ((pixels[6].R >> 7) & 1)) & 63));
-
-		petStage->GetTeam(1)->GetPet(3)->AddAbility(((pixels[6].R & 1) != 0),
-														(((pixels[6].R >> 5) & 1) + 1),
-														((pixels[6].R >> 1) & 15));
-
-		if (petStage->GetTeam(1)->GetPet(3)->GetLevel() >= 2)
-			petStage->GetTeam(1)->GetPet(3)->AddAbility(((pixels[6].R & 64) != 0),
-															(((pixels[6].G >> 7) & 1) + 1),
-															((pixels[6].G >> 3) & 15));
-
-		if (petStage->GetTeam(1)->GetPet(3)->GetLevel() >= 4)
-			petStage->GetTeam(1)->GetPet(3)->AddAbility(((pixels[6].G & 4) != 0),
-															(((pixels[6].G >> 1) & 1) + 1),
-															(((pixels[6].G << 3) + (pixels[6].B >> 5)) & 15));
-	}
-
-	//Opponent's Team First Pet
-	int enemyPetSpecies1 = ((((pixels[7].R << 3) + (pixels[7].G >> 5))) & 2047);
-	if (enemyPetSpecies1 != 0)
-	{
-		petStage->GetTeam(2)->AddPet(enemyPetSpecies1, (pixels[7].G & 31), ((pixels[7].B >> 5) & 7),
-										((((pixels[7].B & 31) << 1) + ((pixels[8].R >> 7) & 1)) & 63));
-
-		petStage->GetTeam(2)->GetPet(1)->AddAbility(((pixels[8].R & 1) != 0),
-														(((pixels[8].R >> 5) & 1) + 1),
-														((pixels[8].R >> 1) & 15));
-
-		if (petStage->GetTeam(2)->GetPet(1)->GetLevel() >= 2)
-			petStage->GetTeam(2)->GetPet(1)->AddAbility(((pixels[8].R & 64) != 0),
-															(((pixels[8].G >> 7) & 1) + 1),
-															((pixels[8].G >> 3) & 15));
-
-		if (petStage->GetTeam(2)->GetPet(1)->GetLevel() >= 4)
-			petStage->GetTeam(2)->GetPet(1)->AddAbility(((pixels[8].G & 4) != 0),
-															(((pixels[8].G >> 1) & 1) + 1),
-															(((pixels[8].G << 3) + (pixels[8].B >> 5)) & 15));
-	}
-
-	//Opponent's Team Second Pet
-	int enemyPetSpecies2 = ((((pixels[9].R << 3) + (pixels[9].G >> 5))) & 2047);
-	if (enemyPetSpecies2 != 0)
-	{
-		petStage->GetTeam(2)->AddPet(enemyPetSpecies2, (pixels[9].G & 31), ((pixels[9].B >> 5) & 7),
-										((((pixels[9].B & 31) << 1) + ((pixels[10].R >> 7) & 1)) & 63));
-
-		petStage->GetTeam(2)->GetPet(2)->AddAbility(((pixels[10].R & 1) != 0),
-														(((pixels[10].R >> 5) & 1) + 1),
-														((pixels[10].R >> 1) & 15));
-
-		if (petStage->GetTeam(2)->GetPet(2)->GetLevel() >= 2)
-			petStage->GetTeam(2)->GetPet(2)->AddAbility(((pixels[10].R & 64) != 0),
-															(((pixels[10].G >> 7) & 1) + 1),
-															((pixels[10].G >> 3) & 15));
-
-		if (petStage->GetTeam(2)->GetPet(2)->GetLevel() >= 4)
-			petStage->GetTeam(2)->GetPet(2)->AddAbility(((pixels[10].G & 4) != 0),
-															(((pixels[10].G >> 1) & 1) + 1),
-															(((pixels[10].G << 3) + (pixels[10].B >> 5)) & 15));
-	}
-
-	//Opponent's Team Third Pet
-	int enemyPetSpecies3 = ((((pixels[12].R << 3) + (pixels[12].G >> 5))) & 2047);
-	if (enemyPetSpecies3 != 0)
-	{
-		petStage->GetTeam(2)->AddPet(enemyPetSpecies3, (pixels[12].G & 31), ((pixels[12].B >> 5) & 7),
-										((((pixels[12].B & 31) << 1) + ((pixels[13].R >> 7) & 1)) & 63));
-
-		petStage->GetTeam(2)->GetPet(3)->AddAbility(((pixels[13].R & 1) != 0),
-														(((pixels[13].R >> 5) & 1) + 1),
-														((pixels[13].R >> 1) & 15));
-
-		if (petStage->GetTeam(2)->GetPet(3)->GetLevel() >= 2)
-			petStage->GetTeam(2)->GetPet(3)->AddAbility(((pixels[13].R & 64) != 0),
-															(((pixels[13].G >> 7) & 1) + 1),
-															((pixels[13].G >> 3) & 15));
-
-		if (petStage->GetTeam(2)->GetPet(3)->GetLevel() >= 4)
-			petStage->GetTeam(2)->GetPet(3)->AddAbility(((pixels[13].G & 4) != 0),
-															(((pixels[13].G >> 1) & 1) + 1),
-															(((pixels[13].G << 3) + (pixels[13].B >> 5)) & 15));
-	}			
+			//Skip over checksum pixel.
+			if (pixelCounter == 11)
+				pixelCounter += 1;
+		}
 }
 
 //Updates the health pools of all pets.
 void Interpreter::UpdateHealthPools()
 {
-	int healthBlock1 = (pixels[14].R << 16) + (pixels[14].G << 8) + pixels[14].B;
-	int healthBlock2 = (pixels[15].R << 16) + (pixels[15].G << 8) + pixels[15].B;
-	int healthBlock3 = (pixels[16].R << 16) + (pixels[16].G << 8) + pixels[16].B;
+	int healthBlock[] = {(pixels[14].R << 16) + (pixels[14].G << 8) + pixels[14].B,
+							(pixels[15].R << 16) + (pixels[15].G << 8) + pixels[15].B,
+							(pixels[16].R << 16) + (pixels[16].G << 8) + pixels[16].B};
 
-	//Player's Team
-	petStage->GetTeam(1)->GetPet(1)->SetHealth(((healthBlock1 >> 12) & 4095));		//First Pet
-	if (petStage->GetTeam(1)->GetNumPets() >= 2)
-		petStage->GetTeam(1)->GetPet(2)->SetHealth((healthBlock1 & 4095));			//Second Pet
-	if (petStage->GetTeam(1)->GetNumPets() == 3)
-		petStage->GetTeam(1)->GetPet(3)->SetHealth(((healthBlock2 >> 12) & 4095));	//Third Pet
+	int healthCounter = 0;
+	for (int i=1; i < 3; i+=1)
+		for (int j=i; j < 4; j+=2)
+		{
+			if (petStage->GetTeam(i)->GetNumPets() >= j)
+				petStage->GetTeam(i)->GetPet(j)->SetHealth(((healthBlock[healthCounter] >> 12) & 4095));
+			if (petStage->GetTeam(i)->GetNumPets() >= j || (i == 1 && j == 3))
+				petStage->GetTeam((j+1>3)?i+1:i)->GetPet((j+1>3)?1:j+1)->SetHealth((healthBlock[healthCounter] & 4095));
 
-	//Opponent's Team
-	petStage->GetTeam(2)->GetPet(1)->SetHealth((healthBlock2 & 4095));				//First Pet
-	if (petStage->GetTeam(2)->GetNumPets() >= 2)
-		petStage->GetTeam(2)->GetPet(2)->SetHealth(((healthBlock3 >> 12) & 4095));	//Second Pet
-	if (petStage->GetTeam(2)->GetNumPets() == 3)
-		petStage->GetTeam(2)->GetPet(3)->SetHealth((healthBlock3 & 4095));			//Third Pet
+			healthCounter += 1;
+		}
 }
 
-//Updates all the pets' abilities.
+//Updates all the pets' abilities and each team's active pet.
 void Interpreter::UpdateAbilities()
 {
-	//Player's Team First Pet
-	petStage->GetTeam(1)->GetPet(1)->GetAbility(1)->SetCooldown(((pixels[2].R >> 1) & 15));
-	if (petStage->GetTeam(1)->GetPet(1)->GetLevel() >= 2)
-		petStage->GetTeam(1)->GetPet(1)->GetAbility(2)->SetCooldown(((pixels[2].G >> 3) & 15));
-	if (petStage->GetTeam(1)->GetPet(1)->GetLevel() >= 4)
-		petStage->GetTeam(1)->GetPet(1)->GetAbility(3)->SetCooldown((((pixels[2].G << 3) + (pixels[2].B >> 5)) & 15));
+	int pixelCounter = 2;			//Used to determine what pixel block to look at.
+	for (int i=1; i < 3; i+=1)
+		for (int j=1; j < petStage->GetTeam(i)->GetNumPets()+1; j+=1)
+		{
+			petStage->GetTeam(i)->GetPet(j)->GetAbility(1)->SetCooldown(((pixels[pixelCounter].R >> 1) & 15));
+			if (petStage->GetTeam(i)->GetPet(j)->GetNumAbilities() >= 2)
+				petStage->GetTeam(i)->GetPet(j)->GetAbility(2)->SetCooldown(((pixels[pixelCounter].G >> 3) & 15));
+			if (petStage->GetTeam(i)->GetPet(j)->GetNumAbilities() == 3)
+				petStage->GetTeam(i)->GetPet(j)->GetAbility(3)->SetCooldown((((pixels[pixelCounter].G << 3) + (pixels[pixelCounter].B >> 5)) & 15));
 
-	//Player's Team Second Pet
-	if (petStage->GetTeam(1)->GetNumPets() >= 2)
-	{
-		petStage->GetTeam(1)->GetPet(2)->GetAbility(1)->SetCooldown(((pixels[4].R >> 1) & 15));
-		if (petStage->GetTeam(1)->GetPet(2)->GetLevel() >= 2)
-			petStage->GetTeam(1)->GetPet(2)->GetAbility(2)->SetCooldown(((pixels[4].G >> 3) & 15));
-		if (petStage->GetTeam(1)->GetPet(2)->GetLevel() >= 4)
-			petStage->GetTeam(1)->GetPet(2)->GetAbility(3)->SetCooldown((((pixels[4].G << 3) + (pixels[4].B >> 5)) & 15));
-	}
+			//Check if the current pet is the active pet of the team.
+			if (((pixels[pixelCounter].B & 16) != 0))
+				petStage->GetTeam(i)->SetActivePet(j);
 
-	//Player's Team Third Pet
-	if (petStage->GetTeam(1)->GetNumPets() == 3)
-	{
-		petStage->GetTeam(1)->GetPet(3)->GetAbility(1)->SetCooldown(((pixels[6].R >> 1) & 15));
-		if (petStage->GetTeam(1)->GetPet(3)->GetLevel() >= 2)
-			petStage->GetTeam(1)->GetPet(3)->GetAbility(2)->SetCooldown(((pixels[6].G >> 3) & 15));
-		if (petStage->GetTeam(1)->GetPet(3)->GetLevel() >= 4)
-			petStage->GetTeam(1)->GetPet(3)->GetAbility(3)->SetCooldown((((pixels[6].G << 3) + (pixels[6].B >> 5)) & 15));
-	}
+			pixelCounter += 2;			//Increment pixel counter.
 
-	//Opponent's Team First Pet
-	if (petStage->GetTeam(2)->GetPet(1)->GetAbility(1)->IsVerified() != ((pixels[8].R & 1) != 0))
-		petStage->GetTeam(2)->GetPet(1)->ReplaceAbility(1, ((pixels[8].R & 1) != 0),
-														(((pixels[8].R >> 5) & 1) + 1),
-														((pixels[8].R >> 1) & 15));
-	else
-		petStage->GetTeam(2)->GetPet(1)->GetAbility(1)->SetCooldown(((pixels[8].R >> 1) & 15));
-	if (petStage->GetTeam(2)->GetPet(1)->GetLevel() >= 2)
-		if (petStage->GetTeam(2)->GetPet(1)->GetAbility(2)->IsVerified() != ((pixels[8].R & 64) != 0))
-			petStage->GetTeam(2)->GetPet(1)->ReplaceAbility(2, ((pixels[8].R & 64) != 0),
-															(((pixels[8].G >> 7) & 1) + 1),
-															((pixels[8].G >> 3) & 15));
-		else
-			petStage->GetTeam(2)->GetPet(1)->GetAbility(2)->SetCooldown(((pixels[8].G >> 3) & 15));
-
-
-
-	if (petStage->GetTeam(2)->GetPet(1)->GetLevel() >= 4)
-		if (petStage->GetTeam(2)->GetPet(1)->GetAbility(3)->IsVerified() != ((pixels[8].G & 4) != 0))
-			petStage->GetTeam(2)->GetPet(1)->ReplaceAbility(3, ((pixels[8].G & 4) != 0),
-															(((pixels[8].G >> 1) & 1) + 1),
-															(((pixels[8].G << 3) + (pixels[8].B >> 5)) & 15));
-		else
-			petStage->GetTeam(2)->GetPet(1)->GetAbility(3)->SetCooldown((((pixels[8].G << 3) + (pixels[8].B >> 5)) & 15));
-
-	//Opponent's Team Second Pet
-	if (petStage->GetTeam(2)->GetNumPets() >= 2)
-	{
-		if (petStage->GetTeam(2)->GetPet(2)->GetAbility(1)->IsVerified() != ((pixels[10].R & 1) != 0))
-			petStage->GetTeam(2)->GetPet(2)->ReplaceAbility(1, ((pixels[10].R & 1) != 0),
-															(((pixels[10].R >> 5) & 1) + 1),
-															((pixels[10].R >> 1) & 15));
-		else
-			petStage->GetTeam(2)->GetPet(2)->GetAbility(1)->SetCooldown(((pixels[10].R >> 1) & 15));
-		if (petStage->GetTeam(2)->GetPet(2)->GetLevel() >= 2)
-			if (petStage->GetTeam(2)->GetPet(2)->GetAbility(2)->IsVerified() != ((pixels[10].R & 64) != 0))
-				petStage->GetTeam(2)->GetPet(2)->ReplaceAbility(2, ((pixels[10].R & 64) != 0),
-																(((pixels[10].G >> 7) & 1) + 1),
-																((pixels[10].G >> 3) & 15));
-			else
-				petStage->GetTeam(2)->GetPet(2)->GetAbility(2)->SetCooldown(((pixels[10].G >> 3) & 15));
-
-
-
-		if (petStage->GetTeam(2)->GetPet(2)->GetLevel() >= 4)
-			if (petStage->GetTeam(2)->GetPet(2)->GetAbility(3)->IsVerified() != ((pixels[10].G & 4) != 0))
-				petStage->GetTeam(2)->GetPet(2)->ReplaceAbility(3, ((pixels[10].G & 4) != 0),
-																(((pixels[10].G >> 1) & 1) + 1),
-																(((pixels[10].G << 3) + (pixels[10].B >> 5)) & 15));
-			else
-				petStage->GetTeam(2)->GetPet(2)->GetAbility(3)->SetCooldown((((pixels[10].G << 3) + (pixels[10].B >> 5)) & 15));
-	}
-
-	//Opponent's Team Third Pet
-	if (petStage->GetTeam(2)->GetNumPets() == 3)
-	{
-		if (petStage->GetTeam(2)->GetPet(3)->GetAbility(1)->IsVerified() != ((pixels[13].R & 1) != 0))
-			petStage->GetTeam(2)->GetPet(3)->ReplaceAbility(1, ((pixels[13].R & 1) != 0),
-															(((pixels[13].R >> 5) & 1) + 1),
-															((pixels[13].R >> 1) & 15));
-		else
-			petStage->GetTeam(2)->GetPet(3)->GetAbility(1)->SetCooldown(((pixels[13].R >> 1) & 15));
-		if (petStage->GetTeam(2)->GetPet(3)->GetLevel() >= 2)
-			if (petStage->GetTeam(2)->GetPet(3)->GetAbility(2)->IsVerified() != ((pixels[13].R & 64) != 0))
-				petStage->GetTeam(2)->GetPet(3)->ReplaceAbility(2, ((pixels[13].R & 64) != 0),
-																(((pixels[13].G >> 7) & 1) + 1),
-																((pixels[13].G >> 3) & 15));
-			else
-				petStage->GetTeam(2)->GetPet(3)->GetAbility(2)->SetCooldown(((pixels[13].G >> 3) & 15));
-
-
-
-		if (petStage->GetTeam(2)->GetPet(3)->GetLevel() >= 4)
-			if (petStage->GetTeam(2)->GetPet(3)->GetAbility(3)->IsVerified() != ((pixels[13].G & 4) != 0))
-				petStage->GetTeam(2)->GetPet(3)->ReplaceAbility(3, ((pixels[13].G & 4) != 0),
-																(((pixels[13].G >> 1) & 1) + 1),
-																(((pixels[13].G << 3) + (pixels[13].B >> 5)) & 15));
-			else
-				petStage->GetTeam(2)->GetPet(3)->GetAbility(3)->SetCooldown((((pixels[13].G << 3) + (pixels[13].B >> 5)) & 15));
-	}
+			//Skip over checksum pixel.
+			if (pixelCounter == 12)
+				pixelCounter += 1;
+		}
 }
 
 //Updates all the auras in the pet battle.
 void Interpreter::UpdateAuras()
 {
-	for (int i=17; i < 40; i++)
+	for (int i=17; i < 40; i+=1)
 	{
 		//i is a checksum box and should be ignored.
 		if (i == 19 || i == 22 || i == 28 || i == 36)

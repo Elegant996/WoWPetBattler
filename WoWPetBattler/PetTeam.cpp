@@ -19,7 +19,7 @@ PetTeam::PetTeam(const PetTeam& other)
 {
 	this->activePet = other.activePet;
 	this->pet.reserve(3);
-	for (int i=0; i < other.pet.size(); i++)
+	for (int i=0; i < other.pet.size(); i+=1)
 		this->pet.append(new Pet(*other.pet.at(i)));
 }
 
@@ -41,8 +41,14 @@ void PetTeam::SetActivePet(int index)
 	this->activePet = index;
 }
 
+//Return the active pet.
+Pet* PetTeam::GetActivePet()
+{
+	return this->pet.at(activePet);
+}
+
 //Return the index of the active pet.
-int PetTeam::GetActivePet()
+int PetTeam::GetActivePetIndex()
 {
 	return this->activePet;
 }
