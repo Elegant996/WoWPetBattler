@@ -17,7 +17,8 @@ public:
 	void AddPet(int, int, int, int);
 
 	void SetActivePet(int);
-	int GetActivePet();
+	Pet* GetActivePet();
+	int GetActivePetIndex();
 
 	int GetNumPets();
 	Pet* GetPet(int);
