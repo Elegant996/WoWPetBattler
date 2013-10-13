@@ -121,7 +121,7 @@ void Interpreter::run()
 				for (int j=0; j < petStage->GetTeam(i)->GetNumPets(); j+=1)
 					petStage->GetTeam(i)->GetPet(j)->RemoveAuras();
 		}
-		else if (petStage->InPetBattle() == ((pixels[0].R & 128) == 0))
+		else if (petStage->InPetBattle() && ((pixels[0].R & 128) == 0))
 		{
 			qDebug() << "Determine if victor";
 			petStage->Reinitialize();			//We've just left a pet battle so let's reset the stage.
@@ -293,8 +293,6 @@ bool Interpreter::Locate()
 //Sets up pet teams after initializing.
 void Interpreter::SetupPetTeams()
 {
-	petStage->GetTeam(0)->AddPet();					//Weather Control "Pet".
-
 	bool isWildBattle = ((pixels[0].G & 4) != 0);	//Opponent is a wild pet.
 	bool isPlayerNPC = ((pixels[0].G & 2) != 0);	//Opponent is NPC trainer.
 

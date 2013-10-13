@@ -16,9 +16,8 @@ PetStage::PetStage(void)
 	this->selectAbility = false;
 	this->wonLastBattle = false;
 	this->petTeam.reserve(3);
-	this->petTeam.append(new PetTeam());
-	this->petTeam.append(new PetTeam());
-	this->petTeam.append(new PetTeam());
+	for (int i=0; i < 3; i+=1)
+		this->petTeam.append(new PetTeam((i==0)?1:3));
 }
 
 //Destructor
@@ -39,10 +38,6 @@ PetStage::PetStage(const PetStage& other)
 //Recreates the basic setup for the stage.
 void PetStage::Reinitialize()
 {
-	//Delete all teams
-	qDeleteAll(this->petTeam);
-	this->petTeam.clear();
-
 	this->queueState = 0;
 	this->inPetBattle = false;
 	this->teamIsAlive = false;
@@ -55,9 +50,8 @@ void PetStage::Reinitialize()
 	this->selectPet = false;
 	this->selectAbility = false;
 	this->wonLastBattle = false;
-	this->petTeam.append(new PetTeam());
-	this->petTeam.append(new PetTeam());
-	this->petTeam.append(new PetTeam());
+	for (int i=0; i < petTeam.size(); i+=1)
+		this->petTeam.at(i)->Remove();
 }
 
 //Return the desired pet team; 0 for field, 1 for player, 2 for opponent;

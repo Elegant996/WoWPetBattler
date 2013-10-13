@@ -1,10 +1,12 @@
 #include "PetTeam.h"
 
 //Constructors
-PetTeam::PetTeam(void)
+PetTeam::PetTeam(int numPets)
 {
 	this->activePet = 0;
-	this->pet.reserve(3);
+	this->pet.reserve(numPets);
+	for (int i=0; i < numPets; i+=1)
+		pet.append(new Pet());
 }
 
 //Destructor
@@ -23,16 +25,23 @@ PetTeam::PetTeam(const PetTeam& other)
 		this->pet.append(new Pet(*other.pet.at(i)));
 }
 
-//Adds a dummy pet, used for weather.
-void PetTeam::AddPet()
+//"Zero-out" the pet team.
+void PetTeam::Remove()
 {
-	this->pet.append(new Pet());
+	this->activePet = 0;
+	for (int i=0; i < pet.size(); i+=1)
+		pet.at(i)->Remove();
 }
 
 //Add a pet to the current team.
 void PetTeam::AddPet(int speciesID, int breed, int quality, int level)
 {
-	this->pet.append(new Pet(speciesID, breed, quality, level));
+	for (int i=0; i < pet.size(); i+=1)
+		if (pet.at(i)->GetSpeciesId() == 0)
+		{
+			this->pet.at(i)->Initialize(speciesID, breed, quality, level);
+			return;
+		}
 }
 
 //Set the index of the active pet.
@@ -56,7 +65,14 @@ int PetTeam::GetActivePetIndex()
 //Get the number of pets on the team.
 int PetTeam::GetNumPets()
 {
-	return this->pet.size();
+	int petCount = 0;
+	for (int i=0; i < pet.size(); i+=1)
+		if (pet.at(i)->GetSpeciesId() != 0)
+			petCount += 1;
+		else
+			break;
+
+	return petCount;
 }
 
 //Get the pet at the current index.

@@ -24,9 +24,8 @@ public:
 	~Pet(void);
 	Pet(const Pet&);
 
-	int GetNumStatus();
-	QString* GetStatus(int);
-	bool HasStatus(QString);
+	void Initialize(int speciesId, int breed, int quality, int level);
+	void Remove();
 
 	void AddAbility(bool, int, int);
 	void ReplaceAbility(int, bool, int, int);
@@ -37,6 +36,10 @@ public:
 	void RemoveAuras();
 	int GetNumAuras();
 	PetAura* GetAura(int);
+
+	int GetNumStatus();
+	QString* GetStatus(int);
+	bool HasStatus(QString);
 
 	void SetHealth(int);
 	void SetMaxHealth(int);

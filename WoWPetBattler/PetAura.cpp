@@ -1,7 +1,36 @@
 #include "PetAura.h"
 
 //Constructor
-PetAura::PetAura(int auraId, int duration)
+PetAura::PetAura(void)
+{
+	this->auraId = 0;
+	this->name = "";
+	this->cooldown = 0;
+	this->rounds = 0;
+	this->duration = 0;
+	this->petTypeId = 0;
+	this->isPassive = false;
+}
+
+//Destructor
+PetAura::~PetAura(void)
+{
+}
+
+//Copy Constructor
+PetAura::PetAura(const PetAura& other)
+{
+	this->auraId = other.auraId;
+	this->name = other.name;
+	this->cooldown = other.cooldown;
+	this->rounds = other.rounds;
+	this->duration = other.duration;
+	this->petTypeId = other.petTypeId;
+	this->isPassive = other.isPassive;
+}
+
+//Sets up the aura for use.
+void PetAura::Initialize(int auraId, int duration)
 {
 	QFile auraJson;
 	QDir::setCurrent(QDir::currentPath() + "/Ability");
@@ -23,19 +52,20 @@ PetAura::PetAura(int auraId, int duration)
 	this->isPassive = aura.value(QString("isPassive")).toBool();
 }
 
-//Destructor
-PetAura::~PetAura(void)
+//"Zero-out" the pet aura.
+void PetAura::Remove()
 {
+	this->auraId = 0;
+	this->name = "";
+	this->cooldown = 0;
+	this->rounds = 0;
+	this->duration = 0;
+	this->petTypeId = 0;
+	this->isPassive = false;
 }
 
-//Copy Constructor
-PetAura::PetAura(const PetAura& other)
+//Returns the aura id.
+int PetAura::GetAuraId()
 {
-	this->auraId = other.auraId;
-	this->name = other.name;
-	this->cooldown = other.cooldown;
-	this->rounds = other.rounds;
-	this->duration = other.duration;
-	this->petTypeId = other.petTypeId;
-	this->isPassive = other.isPassive;
+	return this->auraId;
 }

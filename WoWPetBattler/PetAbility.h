@@ -9,9 +9,12 @@
 class PetAbility
 {
 public:
-	PetAbility(int, int, bool);
+	PetAbility();
 	~PetAbility(void);
 	PetAbility(const PetAbility&);
+
+	void Initialize(int, int, bool);
+	void Remove();
 
 	void SetCooldown(int);
 	void IsVerified(bool);

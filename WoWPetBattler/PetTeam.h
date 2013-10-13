@@ -9,9 +9,11 @@
 class PetTeam
 {
 public:
-	PetTeam(void);
+	PetTeam(int);
 	~PetTeam(void);
 	PetTeam(const PetTeam&);
+
+	void Remove();
 
 	void AddPet();
 	void AddPet(int, int, int, int);

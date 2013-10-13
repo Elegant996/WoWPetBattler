@@ -1,7 +1,38 @@
 #include "PetAbility.h"
 
 //Constructor
-PetAbility::PetAbility(int abilityId, int cooldown, bool isVerified)
+PetAbility::PetAbility(void)
+{
+	this->abilityId = 0;
+	this->name = "";
+	this->cooldown = 0;
+	this->currentCooldown = 0;
+	this->rounds = 0;
+	this->petTypeId = 0;
+	this->isPassive = false;
+	this->isVerified = false;
+}
+
+//Deconstructor
+PetAbility::~PetAbility(void)
+{
+}
+
+//Copy Constructor
+PetAbility::PetAbility(const PetAbility& other)
+{
+	this->abilityId = other.abilityId;
+	this->name = other.name;
+	this->cooldown = other.cooldown;
+	this->currentCooldown = other.currentCooldown;
+	this->rounds = other.rounds;
+	this->petTypeId = other.petTypeId;
+	this->isPassive = other.isPassive;
+	this->isVerified = other.isVerified;
+}
+
+//Sets up the ability for use.
+void PetAbility::Initialize(int abilityId, int cooldown, bool isVerified)
 {
 	QFile abilityJson;
 	QDir::setCurrent(QDir::currentPath() + "/Ability");
@@ -24,22 +55,17 @@ PetAbility::PetAbility(int abilityId, int cooldown, bool isVerified)
 	this->isVerified = isVerified;
 }
 
-//Deconstructor
-PetAbility::~PetAbility(void)
+//"Zero-out" the pet ability.
+void PetAbility::Remove()
 {
-}
-
-//Copy Constructor
-PetAbility::PetAbility(const PetAbility& other)
-{
-	this->abilityId = other.abilityId;
-	this->name = other.name;
-	this->cooldown = other.cooldown;
-	this->currentCooldown = other.currentCooldown;
-	this->rounds = other.rounds;
-	this->petTypeId = other.petTypeId;
-	this->isPassive = other.isPassive;
-	this->isVerified = other.isVerified;
+	this->abilityId = 0;
+	this->name = "";
+	this->cooldown = 0;
+	this->currentCooldown = 0;
+	this->rounds = 0;
+	this->petTypeId = 0;
+	this->isPassive = false;
+	this->isVerified = false;
 }
 
 //Update the cooldown of the ability.
@@ -54,7 +80,7 @@ void PetAbility::IsVerified(bool verification)
 	this->isVerified = verification;
 }
 
-//Return ability Id.
+//Return ability id.
 int PetAbility::GetAbilityId()
 {
 	return this->abilityId;

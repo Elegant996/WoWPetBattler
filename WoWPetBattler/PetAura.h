@@ -9,9 +9,14 @@
 class PetAura
 {
 public:
-	PetAura(int, int);
+	PetAura();
 	~PetAura(void);
 	PetAura(const PetAura&);
+
+	void Initialize(int, int);
+	void Remove();
+
+	int GetAuraId();
 
 private:
 	QString name;
