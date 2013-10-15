@@ -8,6 +8,8 @@
 
 class PetAura
 {
+friend class ScriptHelper;
+
 public:
 	PetAura();
 	~PetAura(void);

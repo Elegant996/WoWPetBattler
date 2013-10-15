@@ -1,18 +1,20 @@
 #ifndef WOWPETBATTLER_H
 #define WOWPETBATTLER_H
 
-#include <QtWidgets/QMainWindow>
+#include <QScriptEngine>
 #include <QThread>
+#include <QtWidgets/QMainWindow>
 #include <QDebug> //To be removed.
 
 #include <Process.h>
 #include <Screen.h>
 #include <Window.h>
 
-#include "UI_WoWPetBattler.h"
+#include "AI.h"
 #include "PetStage.h"
 #include "Interpreter.h"
-#include "AI.h"
+#include "ScriptHelper.h"
+#include "UI_WoWPetBattler.h"
 
 class WoWPetBattler : public QMainWindow
 {
@@ -36,10 +38,12 @@ private:
 	Robot::Window GUIWindow, WoWWindow;
 	Robot::Process process;
 
+	QScriptEngine *engine;
 	PetStage *petStage;
 
-	Interpreter *interpreter;
+	ScriptHelper scriptHelper;
 
+	Interpreter *interpreter;
 	AI *ai;
 };
 

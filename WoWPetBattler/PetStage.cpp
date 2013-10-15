@@ -30,7 +30,7 @@ PetStage::~PetStage(void)
 //Copy Constructor
 PetStage::PetStage(const PetStage& other)
 {
-	this->petTeam.reserve(2);
+	this->petTeam.reserve(3);
 	for (int i=0; i < other.petTeam.size(); i+=1)
 		this->petTeam.append(new PetTeam(*other.petTeam.at(i)));
 }

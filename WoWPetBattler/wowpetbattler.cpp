@@ -9,7 +9,9 @@ WoWPetBattler::WoWPetBattler(QWidget *parent)
 	if (taskbar.Synchronize())
 		move(taskbar.GetBounds().W - size().width() - 15, taskbar.GetBounds().Y - size().height() - 35);
 
+	this->engine = new QScriptEngine();
 	this->petStage = new PetStage();
+	this->scriptHelper.NewJsPetStage(engine, petStage);
 
 	this->interpreter = new Interpreter(petStage, ai, &WoWWindow);
 	connect(interpreter, SIGNAL(OutputToGUI(QString, QString)), this, SLOT(Output(QString, QString)));
@@ -57,6 +59,8 @@ void WoWPetBattler::Stop(QString output)
 //Handler for play button.
 void WoWPetBattler::on_playButton_clicked()
 {
+	qDebug() << engine->globalObject().property("petTeam").property("activePet").toNumber();
+
 	if (ui.playButton->isChecked())
 	{
 		//Make the GUI the top most window while running.

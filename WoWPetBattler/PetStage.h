@@ -1,13 +1,15 @@
 #ifndef PETSTAGE_H
 #define PETSTAGE_H
 
-#include <QVector>
 #include <QtAlgorithms>
+#include <QVector>
 
 #include "PetTeam.h"
 
 class PetStage
 {
+friend class ScriptHelper;
+
 public:
 	PetStage(void);
 	~PetStage(void);

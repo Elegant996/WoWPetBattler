@@ -68,6 +68,11 @@ void PetAbility::Remove()
 	this->isVerified = false;
 }
 
+//Use the current ability.
+void PetAbility::UseAbility()
+{
+}
+
 //Update the cooldown of the ability.
 void PetAbility::SetCooldown(int CD)
 {

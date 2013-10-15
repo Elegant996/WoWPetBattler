@@ -89,6 +89,9 @@
     <ClCompile Include="PetAura.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ScriptHelper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="wowpetbattler.qrc">
@@ -131,6 +134,9 @@
     </ClInclude>
     <ClInclude Include="GeneratedFiles\UI_WoWPetBattler.h">
       <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ScriptHelper.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

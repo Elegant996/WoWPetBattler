@@ -8,6 +8,8 @@
 
 class PetAbility
 {
+friend class ScriptHelper;
+
 public:
 	PetAbility();
 	~PetAbility(void);
@@ -15,6 +17,8 @@ public:
 
 	void Initialize(int, int, bool);
 	void Remove();
+
+	void UseAbility();
 
 	void SetCooldown(int);
 	void IsVerified(bool);

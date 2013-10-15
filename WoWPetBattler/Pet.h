@@ -18,6 +18,8 @@
 
 class Pet
 {
+friend class ScriptHelper;
+
 public:
 	Pet();
 	Pet(int, int, int, int);

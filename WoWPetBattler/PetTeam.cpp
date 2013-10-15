@@ -3,7 +3,7 @@
 //Constructors
 PetTeam::PetTeam(int numPets)
 {
-	this->activePet = 0;
+	this->activePet = 5;
 	this->pet.reserve(numPets);
 	for (int i=0; i < numPets; i+=1)
 		pet.append(new Pet());
