@@ -18,6 +18,47 @@ WoWPetBattler::WoWPetBattler(QWidget *parent)
 	this->ai = new AI(petStage);
 	this->ai->moveToThread(interpreter);
 	connect(ai, SIGNAL(OutputToGUI(QString, QString)), this, SLOT(Output(QString, QString)));
+
+	//QQmlComponent component(&engine, QUrl::fromLocalFile("MyItem.qml"));
+
+	//Testing data
+	petStage->GetTeam(0)->AddPet();
+
+	petStage->GetTeam(1)->AddPet(1229, 5, 4, 25);
+	petStage->GetTeam(1)->GetPet(1)->AddAbility(true, 1, 0);
+	petStage->GetTeam(1)->GetPet(1)->AddAbility(true, 1, 0);
+	petStage->GetTeam(1)->GetPet(1)->AddAbility(true, 2, 0);
+
+	petStage->GetTeam(1)->AddPet(439, 9, 4, 25);
+	petStage->GetTeam(1)->GetPet(2)->AddAbility(true, 1, 0);
+	petStage->GetTeam(1)->GetPet(2)->AddAbility(true, 1, 0);
+	petStage->GetTeam(1)->GetPet(2)->AddAbility(true, 2, 0);
+
+	petStage->GetTeam(1)->AddPet(519, 7, 4, 25);
+	petStage->GetTeam(1)->GetPet(3)->AddAbility(true, 2, 0);
+	petStage->GetTeam(1)->GetPet(3)->AddAbility(true, 2, 0);
+	petStage->GetTeam(1)->GetPet(3)->AddAbility(true, 1, 0);
+
+	petStage->GetTeam(2)->AddPet(1012, 5, 6, 25);
+	petStage->GetTeam(2)->GetPet(1)->AddAbility(true, 1, 0);
+	petStage->GetTeam(2)->GetPet(1)->AddAbility(true, 1, 0);
+	petStage->GetTeam(2)->GetPet(1)->AddAbility(true, 1, 0);
+
+	petStage->GetTeam(2)->AddPet(1011, 7, 6, 25);
+	petStage->GetTeam(2)->GetPet(2)->AddAbility(true, 1, 0);
+	petStage->GetTeam(2)->GetPet(2)->AddAbility(true, 1, 0);
+	petStage->GetTeam(2)->GetPet(2)->AddAbility(true, 1, 0);
+
+	petStage->GetTeam(2)->AddPet(1010, 8, 6, 25);
+	petStage->GetTeam(2)->GetPet(3)->AddAbility(true, 1, 0);
+	petStage->GetTeam(2)->GetPet(3)->AddAbility(true, 1, 0);
+	petStage->GetTeam(2)->GetPet(3)->AddAbility(true, 1, 0);
+
+	petStage->GetTeam(1)->SetActivePet(1);
+	petStage->GetTeam(2)->SetActivePet(1);
+
+	//qRegisterMetaType<QList<PetTeam*> >("QList<PetTeam*>>");
+	//qRegisterMetaType<PetTeam*>("PetTeam*");
 }
 
 //Destructor
@@ -57,6 +98,30 @@ void WoWPetBattler::Stop(QString output)
 //Handler for play button.
 void WoWPetBattler::on_playButton_clicked()
 {
+	qmlRegisterType<PetStage>();
+	qmlRegisterType<PetTeam>();
+	qmlRegisterType<Pet>();
+	qmlRegisterType<PetAbility>();
+	qmlRegisterType<PetAura>();
+	QQmlContext *objectContext = new QQmlContext(engine.rootContext());
+	objectContext->setContextProperty("petStage", petStage);
+	//objectContext->setContextProperty("petTeams", petStage->GetTeams());
+	
+	
+
+	//QDir::setCurrent(QDir::currentPath() + "/Scripts");
+	QQmlComponent component(&engine, QUrl::fromLocalFile("Scripts/MyItem.qml"));
+	QObject *object = component.create(objectContext);
+	//QDir::setCurrent(QDir::currentPath() + "/..");
+
+	if (component.status() == 3)
+		qDebug() << component.errors();
+
+	QMetaObject::invokeMethod(object, "printActivePet");
+
+	delete objectContext;
+
+	/*	
 	if (ui.playButton->isChecked())
 	{
 		//Make the GUI the top most window while running.
@@ -92,4 +157,5 @@ void WoWPetBattler::on_playButton_clicked()
 	}
 	else
 		Stop("Stopping..."); //We have clicked the stop button, so let's stop everything.
+	*/
 }

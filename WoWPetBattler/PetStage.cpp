@@ -2,6 +2,7 @@
 
 //Constructors
 PetStage::PetStage(void)
+	: QObject(NULL), parentStage(NULL)
 {
 	this->queueState = 0;
 	this->inPetBattle = false;
@@ -15,33 +16,48 @@ PetStage::PetStage(void)
 	this->selectPet = false;
 	this->selectAbility = false;
 	this->wonLastBattle = false;
-	this->petTeam.reserve(3);
-	this->petTeam.append(new PetTeam());
-	this->petTeam.append(new PetTeam());
-	this->petTeam.append(new PetTeam());
+	this->isPvPBattle = false;
+	this->petTeams.reserve(3);
+	this->petTeams.append(new PetTeam());
+	this->petTeams.append(new PetTeam());
+	this->petTeams.append(new PetTeam());
 }
 
 //Destructor
 PetStage::~PetStage(void)
 {
-	qDeleteAll(this->petTeam);
-	this->petTeam.clear();
+	qDeleteAll(this->petTeams);
+	this->petTeams.clear();
 }
 
 //Copy Constructor
 PetStage::PetStage(const PetStage& other)
+	: QObject(NULL), parentStage(&other)
 {
-	this->petTeam.reserve(2);
-	for (int i=0; i < other.petTeam.size(); i+=1)
-		this->petTeam.append(new PetTeam(*other.petTeam.at(i)));
+	this->queueState = other.queueState;
+	this->inPetBattle = other.inPetBattle;
+	this->teamIsAlive = other.teamIsAlive;
+	this->queueEnabled = other.queueEnabled;
+	this->canAccept = other.canAccept;
+	this->playerIsGhost = other.playerIsGhost;
+	this->playerIsDead = other.playerIsDead;
+	this->playerAffectingCombat = other.playerAffectingCombat;
+	this->initialized = other.initialized;
+	this->selectPet = other.selectPet;
+	this->selectAbility = other.selectAbility;
+	this->wonLastBattle = other.wonLastBattle;
+	this->isPvPBattle = other.isPvPBattle;
+	this->petTeams.reserve(3);
+	for (int i=0; i < other.petTeams.size(); i+=1)
+		this->petTeams.append(new PetTeam(*other.petTeams.at(i)));
 }
 
 //Recreates the basic setup for the stage.
 void PetStage::Reinitialize()
 {
 	//Delete all teams
-	qDeleteAll(this->petTeam);
-	this->petTeam.clear();
+	qDeleteAll(this->petTeams);
+	this->petTeams.clear();
 
 	this->queueState = 0;
 	this->inPetBattle = false;
@@ -55,15 +71,29 @@ void PetStage::Reinitialize()
 	this->selectPet = false;
 	this->selectAbility = false;
 	this->wonLastBattle = false;
-	this->petTeam.append(new PetTeam());
-	this->petTeam.append(new PetTeam());
-	this->petTeam.append(new PetTeam());
+	this->isPvPBattle = false;
+	this->petTeams.append(new PetTeam());
+	this->petTeams.append(new PetTeam());
+	this->petTeams.append(new PetTeam());
+}
+
+//Update CDs and auras.
+void PetStage::RoundUpdate()
+{
+	foreach(PetTeam *petTeam, this->petTeams)
+		petTeam->RoundUpdate();
 }
 
 //Return the desired pet team; 0 for field, 1 for player, 2 for opponent;
 PetTeam* PetStage::GetTeam(int index)
 {
-	return this->petTeam.at(index);
+	return this->petTeams.at(index);
+}
+
+//For QML purposes.
+QQmlListProperty<PetTeam> PetStage::GetTeams()
+{
+	return QQmlListProperty<PetTeam>(this, petTeams);
 }
 
 //Update the queue state.
@@ -138,6 +168,12 @@ void PetStage::WonLastBattle(bool wonLastBattle)
 	this->wonLastBattle = wonLastBattle;
 }
 
+//Update whether or not it is a PvP Battle.
+void PetStage::IsPvPBattle(bool isPvPBattle)
+{
+	this->isPvPBattle = isPvPBattle;
+}
+
 //Return the current queue state.
 int PetStage::QueueState()
 {
@@ -209,4 +245,10 @@ bool PetStage::SelectAbility()
 bool PetStage::WonLastBattle()
 {
 	return this->wonLastBattle;
+}
+
+//Return whether or not it is a PvP battle.
+bool PetStage::IsPvPBattle()
+{
+	return this->isPvPBattle;
 }

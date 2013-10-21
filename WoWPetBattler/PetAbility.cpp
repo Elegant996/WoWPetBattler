@@ -2,6 +2,7 @@
 
 //Constructor
 PetAbility::PetAbility(int abilityId, int cooldown, bool isVerified)
+	: QObject(NULL)
 {
 	QFile abilityJson;
 	QDir::setCurrent(QDir::currentPath() + "/Ability");
@@ -22,6 +23,7 @@ PetAbility::PetAbility(int abilityId, int cooldown, bool isVerified)
 	this->petTypeId = ability.value(QString("petTypeId")).toDouble();
 	this->isPassive = ability.value(QString("isPassive")).toBool();
 	this->isVerified = isVerified;
+	this->usedThisTurn = false;
 }
 
 //Deconstructor
@@ -31,6 +33,7 @@ PetAbility::~PetAbility(void)
 
 //Copy Constructor
 PetAbility::PetAbility(const PetAbility& other)
+	: QObject(NULL)
 {
 	this->abilityId = other.abilityId;
 	this->name = other.name;
@@ -40,6 +43,16 @@ PetAbility::PetAbility(const PetAbility& other)
 	this->petTypeId = other.petTypeId;
 	this->isPassive = other.isPassive;
 	this->isVerified = other.isVerified;
+	this->usedThisTurn = other.usedThisTurn;
+}
+
+//Update CDs and auras.
+void PetAbility::RoundUpdate()
+{
+	if (!usedThisTurn && currentCooldown > 0)
+		currentCooldown -= 1;
+	else if (usedThisTurn)
+		usedThisTurn = false;
 }
 
 //Update the cooldown of the ability.

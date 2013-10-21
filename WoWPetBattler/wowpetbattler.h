@@ -4,6 +4,9 @@
 #include <QtWidgets/QMainWindow>
 #include <QThread>
 #include <QDebug> //To be removed.
+#include <QtQml>
+
+#include <QQmlListProperty>
 
 #include <Process.h>
 #include <Screen.h>
@@ -41,6 +44,8 @@ private:
 	Interpreter *interpreter;
 
 	AI *ai;
+
+	QQmlEngine engine;
 };
 
 #endif // WOWPETBATTLER_H

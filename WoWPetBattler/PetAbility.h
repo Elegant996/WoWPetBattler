@@ -5,13 +5,18 @@
 #include <QFile>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QObject>
 
-class PetAbility
+class PetAbility : public QObject
 {
+	Q_OBJECT
+
 public:
 	PetAbility(int, int, bool);
 	~PetAbility(void);
 	PetAbility(const PetAbility&);
+
+	void RoundUpdate();
 
 	void SetCooldown(int);
 	void IsVerified(bool);
@@ -23,7 +28,7 @@ public:
 private:
 	QString name;
 	int abilityId, cooldown, currentCooldown, rounds, petTypeId;
-	bool isPassive, isVerified;
+	bool isPassive, isVerified, usedThisTurn;
 };
 
 #endif

@@ -2,6 +2,7 @@
 
 //Constructors
 Pet::Pet()
+	: QObject(NULL)
 {
 	this->name = "";
 	this->speciesId = 0;
@@ -40,7 +41,8 @@ Pet::Pet(int speciesId, int breed, int quality, int level)
 	this->baseHealth = species.value(QString("baseHealth")).toDouble();
 	this->basePower = species.value(QString("basePower")).toDouble();
 	this->baseSpeed = species.value(QString("baseSpeed")).toDouble();
-	this->currentHealth = PetHelper::CalculateHealth(this->baseHealth, PetBreed::GetHealth(this->breed), this->level, this->quality);
+	this->maxHealth = PetHelper::CalculateHealth(this->baseHealth, PetBreed::GetHealth(this->breed), this->level, this->quality);
+	this->currentHealth = this->maxHealth;
 	this->currentMaxHealth = this->currentHealth;
 	this->currentPower = PetHelper::CalculatePower(this->basePower, PetBreed::GetPower(this->breed), this->level, this->quality);
 	this->currentSpeed = PetHelper::CalculateSpeed(this->baseSpeed, PetBreed::GetSpeed(this->breed), this->level, this->quality);
@@ -50,13 +52,14 @@ Pet::Pet(int speciesId, int breed, int quality, int level)
 //Deconstructor
 Pet::~Pet(void)
 {
-	qDeleteAll(this->petAbility);
-	this->petAbility.clear();
+	qDeleteAll(this->petAbilities);
+	this->petAbilities.clear();
 	RemoveAuras();
 }
 
 //Copy Constructor
 Pet::Pet(const Pet& other)
+	: QObject(NULL)
 {
 	this->name = other.name;
 	this->speciesId = other.speciesId;
@@ -72,83 +75,116 @@ Pet::Pet(const Pet& other)
 	this->currentPower = other.currentPower;
 	this->currentSpeed = other.currentSpeed;
 	this->abilityList = other.abilityList;
-	this->petAbility.reserve(3);
-	for (int i=0; i < other.petAbility.size(); i+=1)
-		this->petAbility.append(new PetAbility(*other.petAbility.at(i)));
-	for (int i=0; i < other.petAura.size(); i+=1)
-		this->petAura.append(new PetAura(*other.petAura.at(i)));
-	for (int i=0; i < other.petStatus.size(); i+=1)
-		this->petStatus.append(new QString(*other.petStatus.at(i)));
+	this->petAbilities.reserve(3);
+	for (int i=0; i < other.petAbilities.size(); i+=1)
+		this->petAbilities.append(new PetAbility(*other.petAbilities.at(i)));
+	for (int i=0; i < other.petAuras.size(); i+=1)
+		this->petAuras.append(new PetAura(*other.petAuras.at(i)));
+	for (int i=0; i < other.petStatuses.size(); i+=1)
+		this->petStatuses.append(new QString(*other.petStatuses.at(i)));
+}
+
+//Update CDs and auras.
+void Pet::RoundUpdate()
+{
+	//consider clearing this...
+	foreach (QString *petStatus, this->petStatuses)
+	{
+	}
+
+	foreach (PetAbility *petAbility, this->petAbilities)
+		petAbility->RoundUpdate();
+
+	foreach (PetAura *petAura, this->petAuras)
+		petAura->RoundUpdate();
+}
+
+//Return whether or not the pet has a specific status.
+bool Pet::HasStatus(QString petStatuses)
+{
+	for (int i=0; i < this->petStatuses.size(); i+=1)
+		if (this->petStatuses.at(i) == petStatuses)
+			return true;
+	return false;
 }
 
 //Return the number of status effects on the pet.
-int Pet::GetNumStatus()
+int Pet::GetNumStatuses()
 {
-	return petStatus.size();
+	return petStatuses.size();
 }
 
 //Return the pet's status vector.
 QString* Pet::GetStatus(int index)
 {
-	return this->petStatus.at(index-1);
+	return this->petStatuses.at(index-1);
 }
 
-//Return whether or not the pet has a specific status.
-bool Pet::HasStatus(QString petStatus)
+//For QML purposes.
+QQmlListProperty<QString> Pet::GetStatuses()
 {
-	for (int i=0; i < this->petStatus.size(); i+=1)
-		if (this->petStatus.at(i) == petStatus)
-			return true;
-	return false;
+	return QQmlListProperty<QString>(this, petStatuses);
 }
 
 //Add an ability to the current pet.
 void Pet::AddAbility(bool verification, int tier, int cooldown)
 {
-	this->petAbility.append(new PetAbility(abilityList[(this->petAbility.size()+1)+((tier-1)*3)-1].toObject().value(QString("id")).toDouble(), cooldown, verification));
+	this->petAbilities.append(new PetAbility(abilityList[(this->petAbilities.size()+1)+((tier-1)*3)-1].toObject().value(QString("id")).toDouble(), cooldown, verification));
 }
 
 //Replace the ability of the current pet at specified index.
 void Pet::ReplaceAbility(int index, bool verification, int tier, int cooldown)
 {
-	this->petAbility.replace(index-1, new PetAbility(abilityList[(index+1)+((tier-1)*3)-1].toObject().value(QString("id")).toDouble(), cooldown, verification));
+	this->petAbilities.replace(index-1, new PetAbility(abilityList[(index+1)+((tier-1)*3)-1].toObject().value(QString("id")).toDouble(), cooldown, verification));
 }
 
 //Return the number of abilities known by the pet.
 int Pet::GetNumAbilities()
 {
-	return petAbility.size();
+	return petAbilities.size();
 }
 
 //Return the desired ability at the specified index.
 PetAbility* Pet::GetAbility(int index)
 {
-	return this->petAbility.at(index-1);
+	return this->petAbilities.at(index-1);
+}
+
+//For QML purposes.
+QQmlListProperty<PetAbility> Pet::GetAbilities()
+{
+	return QQmlListProperty<PetAbility>(this, petAbilities);
 }
 
 //Add an aura to the current pet.
-void Pet::AddAura(int auraId, int duration)
+void Pet::AddAura(int auraId, int duration, bool isFresh)
 {
-	this->petAura.append(new PetAura(auraId, duration));
+	this->petAuras.append(new PetAura(auraId, duration, isFresh));
 }
 
 //Removes all pet auras on the current pet.
 void Pet::RemoveAuras()
 {
-	qDeleteAll(this->petAura);
-	this->petAura.clear();
+	qDeleteAll(this->petAuras);
+	this->petAuras.clear();
 }
 
 //Return number of auras on the pet
 int Pet::GetNumAuras()
 {
-	return petAura.size();
+	return petAuras.size();
 }
 
 //Return the desired aura at the specified index.
 PetAura* Pet::GetAura(int index)
 {
-	return this->petAura.at(index-1);
+	return this->petAuras.at(index-1);
+}
+
+//For QML purposes.
+QQmlListProperty<PetAura> Pet::GetAuras()
+{
+	return QQmlListProperty<PetAura>(this, petAuras);
 }
 
 //Set the pet's current health.

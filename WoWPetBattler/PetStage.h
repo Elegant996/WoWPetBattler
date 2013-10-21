@@ -1,20 +1,28 @@
 #ifndef PETSTAGE_H
 #define PETSTAGE_H
 
-#include <QVector>
+#include <QList>
+#include <QObject>
+#include <QQmlListProperty>
 #include <QtAlgorithms>
 
 #include "PetTeam.h"
 
-class PetStage
+class PetStage : public QObject
 {
+	Q_OBJECT
+	Q_PROPERTY(QQmlListProperty<PetTeam> teams READ GetTeams)
+
 public:
 	PetStage(void);
 	~PetStage(void);
 	PetStage(const PetStage&);
 
 	void Reinitialize();
+	void RoundUpdate();
+
 	PetTeam* GetTeam(int);
+	QQmlListProperty<PetTeam> GetTeams();
 
 	void QueueState(int);
 	void InPetBattle(bool);
@@ -28,6 +36,7 @@ public:
 	void SelectPet(bool);
 	void SelectAbility(bool);
 	void WonLastBattle(bool);
+	void IsPvPBattle(bool);
 
 	int QueueState();
 	bool InPetBattle();
@@ -41,13 +50,16 @@ public:
 	bool SelectPet();
 	bool SelectAbility();
 	bool WonLastBattle();
+	bool IsPvPBattle();
 
 private:
+	const PetStage *parentStage;
 	int queueState;
 	bool inPetBattle, teamIsAlive, queueEnabled, canAccept;
 	bool playerIsGhost, playerIsDead, playerAffectingCombat;
 	bool initialized, selectPet, selectAbility, wonLastBattle;
-	QVector<PetTeam*> petTeam;
+	bool isPvPBattle;
+	QList<PetTeam*> petTeams;
 };
 
 #endif

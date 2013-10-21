@@ -1,5 +1,5 @@
 ## Interface: 50400
-## Title: Pet Pixels
+## Title: _PetPixels
 ## Version: 1.0.0
 ## Notes: For external usage.
 ## Author: Elegant
