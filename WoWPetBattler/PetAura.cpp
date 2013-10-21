@@ -5,12 +5,10 @@ PetAura::PetAura(int auraId, int duration, bool isFresh)
 	: QObject(NULL)
 {
 	QFile auraJson;
-	QDir::setCurrent(QDir::currentPath() + "/Ability");
-	auraJson.setFileName(QString::number(auraId) + ".json");
+	auraJson.setFileName("Ability/" + QString::number(auraId) + ".json");
 	auraJson.open(QIODevice::ReadOnly | QIODevice::Text);
 	QString auraJsonContents = auraJson.readAll();
 	auraJson.close();
-	QDir::setCurrent(QDir::currentPath() + "/..");
 
 	QJsonDocument auraDocument = QJsonDocument::fromJson(auraJsonContents.toUtf8());
 	QJsonObject aura = auraDocument.object();

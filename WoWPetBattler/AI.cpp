@@ -3,12 +3,26 @@
 //Constructor
 AI::AI(PetStage *petStage)
 {
+	qmlRegisterType<PetStage>();
+	qmlRegisterType<PetTeam>();
+	qmlRegisterType<Pet>();
+	qmlRegisterType<PetAbility>();
+	qmlRegisterType<PetAura>();
+
+	//QtQml member variables.
+	this->engine = new QQmlEngine;
+	this->objectContext = new QQmlContext(engine->rootContext());
+	this->component = new QQmlComponent(engine);
+
 	this->petStage = petStage;
 }
 
 //Destructor
 AI::~AI(void)
 {
+	delete component;
+	delete objectContext;
+	delete engine;
 }
 
 //Begin AI simulation and respond with best move.
@@ -32,8 +46,15 @@ void AI::Run()
 }
 
 //Modified minimax that also uses expected in computation.
-Move Expectiminimax(PetStage* stageNode, int depth)
+Move AI::Expectiminimax(PetStage* stageNode, int depth)
 {
+	/*Important for setup procedure
+	objectContext->setContextProperty("petStage", stageNode);	
+	component->loadUrl(QUrl::fromLocalFile("Scripts/MyItem.qml"));
+	object = component->create(objectContext);
+	QMetaObject::invokeMethod(object, "printActivePet");
+	*/
+
 	//Get weather.
 	PetAura *weather = NULL;
 	if (stageNode->GetTeam(0)->GetPet(0)->GetNumAuras() != 0)

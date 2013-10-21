@@ -19,8 +19,6 @@ WoWPetBattler::WoWPetBattler(QWidget *parent)
 	this->ai->moveToThread(interpreter);
 	connect(ai, SIGNAL(OutputToGUI(QString, QString)), this, SLOT(Output(QString, QString)));
 
-	//QQmlComponent component(&engine, QUrl::fromLocalFile("MyItem.qml"));
-
 	//Testing data
 	petStage->GetTeam(0)->AddPet();
 
@@ -103,21 +101,27 @@ void WoWPetBattler::on_playButton_clicked()
 	qmlRegisterType<Pet>();
 	qmlRegisterType<PetAbility>();
 	qmlRegisterType<PetAura>();
-	QQmlContext *objectContext = new QQmlContext(engine.rootContext());
-	objectContext->setContextProperty("petStage", petStage);
-	//objectContext->setContextProperty("petTeams", petStage->GetTeams());
-	
-	
 
-	//QDir::setCurrent(QDir::currentPath() + "/Scripts");
+	PetStage *petStage2 = new PetStage(*petStage);
+
+	QQmlContext *objectContext = new QQmlContext(engine.rootContext());
+	objectContext->setContextProperty("petStage", petStage);	
+
 	QQmlComponent component(&engine, QUrl::fromLocalFile("Scripts/MyItem.qml"));
 	QObject *object = component.create(objectContext);
-	//QDir::setCurrent(QDir::currentPath() + "/..");
 
 	if (component.status() == 3)
 		qDebug() << component.errors();
 
 	QMetaObject::invokeMethod(object, "printActivePet");
+
+	objectContext->setContextProperty("petStage", petStage2);	
+	component.loadUrl(QUrl::fromLocalFile("Scripts/MyItem_2.qml"));
+	object = component.create(objectContext);
+
+	QMetaObject::invokeMethod(object, "printActivePet");
+
+	delete object;
 
 	delete objectContext;
 

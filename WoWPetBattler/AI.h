@@ -28,6 +28,11 @@ public slots:
 private:
 	Move Expectiminimax(PetStage*, int);
 
+	QQmlEngine *engine;
+	QQmlContext *objectContext;
+	QQmlComponent *component;
+	QObject *object;
+
 	PetStage *petStage;
 	Robot::Keyboard keyboard;
 };

@@ -1,7 +1,6 @@
 #ifndef PET_H
 #define PET_H
 
-#include <QDir>
 #include <QFile>
 #include <QJsonArray>
 #include <QJsonDocument>

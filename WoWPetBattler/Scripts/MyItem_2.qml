@@ -5,7 +5,7 @@ Item
 {
     function printActivePet()
     {
-        console.log("Test");
+        console.log("Override");
         console.log(petStage);
         console.log(petStage.teams[1]);
         console.log(petStage.teams[1].activePet);

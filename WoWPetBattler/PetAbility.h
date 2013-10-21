@@ -1,7 +1,6 @@
 #ifndef PETABILITY_H
 #define PETABILITY_H
 
-#include <QDir>
 #include <QFile>
 #include <QJsonDocument>
 #include <QJsonObject>

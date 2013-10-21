@@ -5,12 +5,10 @@ PetAbility::PetAbility(int abilityId, int cooldown, bool isVerified)
 	: QObject(NULL)
 {
 	QFile abilityJson;
-	QDir::setCurrent(QDir::currentPath() + "/Ability");
-	abilityJson.setFileName(QString::number(abilityId) + ".json");
+	abilityJson.setFileName("Ability/" + QString::number(abilityId) + ".json");
 	abilityJson.open(QIODevice::ReadOnly | QIODevice::Text);
 	QString abilityJsonContents = abilityJson.readAll();
 	abilityJson.close();
-	QDir::setCurrent(QDir::currentPath() + "/..");
 
 	QJsonDocument abilityDocument = QJsonDocument::fromJson(abilityJsonContents.toUtf8());
 	QJsonObject ability = abilityDocument.object();

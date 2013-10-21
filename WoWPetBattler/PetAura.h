@@ -1,7 +1,6 @@
 #ifndef PETAURA_H
 #define PETAURA_H
 
-#include <QDir>
 #include <QFile>
 #include <QJsonDocument>
 #include <QJsonObject>

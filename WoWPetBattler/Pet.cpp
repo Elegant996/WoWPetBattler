@@ -22,12 +22,10 @@ Pet::Pet()
 Pet::Pet(int speciesId, int breed, int quality, int level)
 {
 	QFile speciesJson;
-	QDir::setCurrent(QDir::currentPath() + "/Species");
-	speciesJson.setFileName(QString::number(speciesId) + ".json");
+	speciesJson.setFileName("Species/" + QString::number(speciesId) + ".json");
 	speciesJson.open(QIODevice::ReadOnly | QIODevice::Text);
 	QString speciesJsonContents = speciesJson.readAll();
 	speciesJson.close();
-	QDir::setCurrent(QDir::currentPath() + "/..");
 
 	QJsonDocument speciesDocument = QJsonDocument::fromJson(speciesJsonContents.toUtf8());
 	QJsonObject species = speciesDocument.object();
