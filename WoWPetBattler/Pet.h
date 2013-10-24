@@ -64,6 +64,7 @@ public:
 	PetAura* GetAura(quint8);
 	//QQmlListProperty<PetAura> GetAuras();
 
+	void SetLastKnownHealth(quint16);
 	void SetHealth(quint16);
 	void SetMaxHealth(quint16);
 	void SetPower(quint16);
@@ -76,6 +77,7 @@ public:
 	quint16 GetNormalMaxHealth();
 	quint16 GetNormalPower();
 	quint16 GetNormalSpeed();
+	quint16 GetLastKnownHealth();
 	quint16 GetHealth();
 	quint16 GetMaxHealth();
 	quint16 GetPower();
@@ -88,7 +90,7 @@ private:
 	PetType::Type type;
 	quint8 breed, quality, level;
 	float baseHealth, basePower, baseSpeed;
-	quint16 normalMaxHealth, normalPower, normalSpeed;
+	quint16 normalMaxHealth, normalPower, normalSpeed, lastKnownHealth;
 	quint16 currentHealth, currentMaxHealth, currentPower, currentSpeed;
 
 	bool racialUsed;

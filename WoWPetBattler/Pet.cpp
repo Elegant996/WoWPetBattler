@@ -42,11 +42,12 @@ Pet::Pet(quint16 speciesId, quint8 breed, quint8 quality, quint8 level)
 	this->basePower = species.value(QString("basePower")).toDouble();
 	this->baseSpeed = species.value(QString("baseSpeed")).toDouble();
 	this->normalMaxHealth = PetHelper::CalculateHealth(this->baseHealth, PetBreed::GetHealth(this->breed), this->level, this->quality);
+	this->normalPower = PetHelper::CalculatePower(this->basePower, PetBreed::GetPower(this->breed), this->level, this->quality);
+	this->normalSpeed = PetHelper::CalculateSpeed(this->baseSpeed, PetBreed::GetSpeed(this->breed), this->level, this->quality);
+	this->lastKnownHealth = 0;
 	this->currentHealth = this->normalMaxHealth;
 	this->currentMaxHealth = this->currentHealth;
-	this->normalPower = PetHelper::CalculatePower(this->basePower, PetBreed::GetPower(this->breed), this->level, this->quality);
 	this->currentPower = this->normalPower;
-	this->normalSpeed = PetHelper::CalculateSpeed(this->baseSpeed, PetBreed::GetSpeed(this->breed), this->level, this->quality);
 	this->currentSpeed = this->normalSpeed;
 	this->racialUsed = (type==1 || type==3 || type==9) ? false : true;
 	this->currentAction = new PetAction(0, 0);
@@ -76,11 +77,12 @@ Pet::Pet(const Pet& other)
 	this->basePower = other.basePower;
 	this->baseSpeed = other.baseSpeed;
 	this->normalMaxHealth = other.normalMaxHealth;
+	this->normalPower = other.normalPower;
+	this->normalSpeed = other.normalSpeed;
+	this->lastKnownHealth = other.lastKnownHealth;
 	this->currentHealth = other.currentHealth;
 	this->currentMaxHealth = other.currentMaxHealth;
-	this->normalPower = other.normalPower;
 	this->currentPower = other.currentPower;
-	this->normalSpeed = other.normalSpeed;
 	this->currentSpeed = other.currentSpeed;
 	this->racialUsed = other.racialUsed;
 	this->currentAction = new PetAction(*other.currentAction);
@@ -202,6 +204,12 @@ PetAura* Pet::GetAura(quint8 index)
 	return QQmlListProperty<PetAura>(this, petAuras);
 }*/
 
+//Set the pet's last know health.
+void Pet::SetLastKnownHealth(quint16 lastKnownHealth)
+{
+	this->lastKnownHealth = lastKnownHealth;
+}
+
 //Set the pet's current health.
 void Pet::SetHealth(quint16 health)
 {
@@ -266,6 +274,12 @@ quint16 Pet::GetNormalPower()
 quint16 Pet::GetNormalSpeed()
 {
 	return this->normalSpeed;
+}
+
+//Return pet's last known health;
+quint16 Pet::GetLastKnownHealth()
+{
+	return this->lastKnownHealth;
 }
 
 //Return pet's current health.
