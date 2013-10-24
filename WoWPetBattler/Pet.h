@@ -27,6 +27,9 @@ class Pet : public QObject
 	//Q_PROPERTY(QQmlListProperty<PetAura> Auras READ GetAuras)
 	Q_PROPERTY(quint8 Level READ GetLevel)
 	Q_PROPERTY(quint8 Type READ GetType)
+	Q_PROPERTY(quint16 NormalMaxHealth READ GetNormalMaxHealth)
+	Q_PROPERTY(quint16 NormalPower READ GetNormalPower)
+	Q_PROPERTY(quint16 NormalSpeed READ GetNormalSpeed)
 	Q_PROPERTY(quint16 Health READ GetHealth WRITE SetHealth)
 	Q_PROPERTY(quint16 MaxHealth READ GetMaxHealth WRITE SetMaxHealth)
 	Q_PROPERTY(quint16 Power READ GetPower WRITE SetPower)
@@ -70,6 +73,9 @@ public:
 	quint16 GetSpeciesId();
 	quint8 GetLevel();
 	PetType::Type GetType();
+	quint16 GetNormalMaxHealth();
+	quint16 GetNormalPower();
+	quint16 GetNormalSpeed();
 	quint16 GetHealth();
 	quint16 GetMaxHealth();
 	quint16 GetPower();
@@ -82,7 +88,8 @@ private:
 	PetType::Type type;
 	quint8 breed, quality, level;
 	float baseHealth, basePower, baseSpeed;
-	quint16 maxHealth, currentHealth, currentMaxHealth, currentPower, currentSpeed;
+	quint16 normalMaxHealth, normalPower, normalSpeed;
+	quint16 currentHealth, currentMaxHealth, currentPower, currentSpeed;
 
 	bool racialUsed;
 	PetAction *currentAction; //Determine how to use this.

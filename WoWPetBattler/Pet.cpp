@@ -41,11 +41,13 @@ Pet::Pet(quint16 speciesId, quint8 breed, quint8 quality, quint8 level)
 	this->baseHealth = species.value(QString("baseHealth")).toDouble();
 	this->basePower = species.value(QString("basePower")).toDouble();
 	this->baseSpeed = species.value(QString("baseSpeed")).toDouble();
-	this->maxHealth = PetHelper::CalculateHealth(this->baseHealth, PetBreed::GetHealth(this->breed), this->level, this->quality);
-	this->currentHealth = this->maxHealth;
+	this->normalMaxHealth = PetHelper::CalculateHealth(this->baseHealth, PetBreed::GetHealth(this->breed), this->level, this->quality);
+	this->currentHealth = this->normalMaxHealth;
 	this->currentMaxHealth = this->currentHealth;
-	this->currentPower = PetHelper::CalculatePower(this->basePower, PetBreed::GetPower(this->breed), this->level, this->quality);
-	this->currentSpeed = PetHelper::CalculateSpeed(this->baseSpeed, PetBreed::GetSpeed(this->breed), this->level, this->quality);
+	this->normalPower = PetHelper::CalculatePower(this->basePower, PetBreed::GetPower(this->breed), this->level, this->quality);
+	this->currentPower = this->normalPower;
+	this->normalSpeed = PetHelper::CalculateSpeed(this->baseSpeed, PetBreed::GetSpeed(this->breed), this->level, this->quality);
+	this->currentSpeed = this->normalSpeed;
 	this->racialUsed = (type==1 || type==3 || type==9) ? false : true;
 	this->currentAction = new PetAction(0, 0);
 	this->abilityList = species.value(QString("abilities")).toArray();
@@ -73,9 +75,12 @@ Pet::Pet(const Pet& other)
 	this->baseHealth = other.baseHealth;
 	this->basePower = other.basePower;
 	this->baseSpeed = other.baseSpeed;
+	this->normalMaxHealth = other.normalMaxHealth;
 	this->currentHealth = other.currentHealth;
 	this->currentMaxHealth = other.currentMaxHealth;
+	this->normalPower = other.normalPower;
 	this->currentPower = other.currentPower;
+	this->normalSpeed = other.normalSpeed;
 	this->currentSpeed = other.currentSpeed;
 	this->racialUsed = other.racialUsed;
 	this->currentAction = new PetAction(*other.currentAction);
@@ -243,6 +248,24 @@ PetType::Type Pet::GetType()
 quint8 Pet::GetLevel()
 {
 	return this->level;
+}
+
+//Return pet's normal max health.
+quint16 Pet::GetNormalMaxHealth()
+{
+	return this->normalMaxHealth;
+}
+
+//Return pet's normal power.
+quint16 Pet::GetNormalPower()
+{
+	return this->normalPower;
+}
+
+//Return pet's normal speed.
+quint16 Pet::GetNormalSpeed()
+{
+	return this->normalSpeed;
 }
 
 //Return pet's current health.
