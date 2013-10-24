@@ -50,7 +50,7 @@ public:
 
 	Q_INVOKABLE void AddStatus(PetStatus);
 	Q_INVOKABLE bool HasStatus(PetStatus);
-	int GetNumStatuses();
+	Q_INVOKABLE int GetNumStatuses();
 	Q_INVOKABLE PetStatus GetStatus(quint8);
 	//QList<int> GetStatuses();
 
@@ -60,10 +60,10 @@ public:
 	Q_INVOKABLE PetAbility* GetAbility(quint8);
 	//QQmlListProperty<PetAbility> GetAbilities();
 
-	void AddAura(quint16, qint8, bool);
+	Q_INVOKABLE void AddAura(quint16, qint8, bool);
 	void RemoveAuras();
-	int GetNumAuras();
-	PetAura* GetAura(quint8);
+	Q_INVOKABLE int GetNumAuras();
+	Q_INVOKABLE PetAura* GetAura(quint8);
 	//QQmlListProperty<PetAura> GetAuras();
 
 	void SetLastKnownHealth(quint16);
