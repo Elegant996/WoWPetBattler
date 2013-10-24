@@ -74,11 +74,11 @@ void Interpreter::run()
 
 		//Addon location already known, grab pixels.	
 		Robot::Screen::GrabScreen(*window, image, addonBar1);
-		for (int i=0; i < 20; i+=1)
+		for (quint8 i=0; i < 20; i+=1)
 			pixels[i] = image->GetPixel(points[i]);
 
 		Robot::Screen::GrabScreen(*window, image, addonBar2);
-		for (int i=20; i < 40; i+=1)
+		for (quint8 i=20; i < 40; i+=1)
 			pixels[i] = image->GetPixel(points[i]);
 
 		//Run checksums again to be sure it didn't move.
@@ -117,8 +117,8 @@ void Interpreter::run()
 			//ai->Run();
 
 			//Delete all auras.
-			for (int i=0; i < 3; i+=1)
-				for (int j=0; j < petStage->GetTeam(i)->GetNumPets(); j+=1)
+			for (quint8 i=0; i < 3; i+=1)
+				for (quint8 j=0; j < petStage->GetTeam(i)->GetNumPets()+1; j+=1)
 					petStage->GetTeam(i)->GetPet(j)->RemoveAuras();
 		}
 		else if (petStage->InPetBattle() && ((pixels[0].R & 128) == 0))
@@ -244,7 +244,7 @@ bool Interpreter::Locate()
 				float start = 16 * (w / 450);
 				float length = 22 * (w / 450);
 
-				for (int i=0; i < 20; i+=1)
+				for (quint8 i=0; i < 20; i+=1)
 				{
 					points[i].X = length * i;
 					points[i+20].X = length * i;
@@ -293,18 +293,16 @@ bool Interpreter::Locate()
 //Sets up pet teams after initializing.
 void Interpreter::SetupPetTeams()
 {
-	petStage->GetTeam(0)->AddPet();							//Weather Control "Pet".
-
 	bool isWildBattle = ((pixels[0].G & 4) != 0);			//Opponent is a wild pet.
 	bool isPlayerNPC = ((pixels[0].G & 2) != 0);			//Opponent is NPC trainer.
 	petStage->IsPvPBattle(!isWildBattle && !isPlayerNPC);	//Set PvP flag.
 
-	int pixelCounter = 1;									//Used to determine what pixel block to look at.
-	for (int i=1; i < 3; i+=1)
-		for (int j=1; j < 6; j+=2)
+	quint8 pixelCounter = 1;								//Used to determine what pixel block to look at.
+	for (quint8 i=1; i < 3; i+=1)
+		for (quint8 j=1; j < 6; j+=2)
 		{
 			//Get the species id and continue if it is valid.
-			int species = ((((pixels[pixelCounter].R << 3) + (pixels[pixelCounter].G >> 5))) & 2047);
+			quint16 species = ((((pixels[pixelCounter].R << 3) + (pixels[pixelCounter].G >> 5))) & 2047);
 			if (species != 0)
 			{
 				//Add the pet to the team.
@@ -344,13 +342,13 @@ void Interpreter::SetupPetTeams()
 //Updates the health pools of all pets.
 void Interpreter::UpdateHealthPools()
 {
-	int healthBlock[] = {(pixels[14].R << 16) + (pixels[14].G << 8) + pixels[14].B,
+	quint16 healthBlock[] = {(pixels[14].R << 16) + (pixels[14].G << 8) + pixels[14].B,
 							(pixels[15].R << 16) + (pixels[15].G << 8) + pixels[15].B,
 							(pixels[16].R << 16) + (pixels[16].G << 8) + pixels[16].B};
 
-	int healthCounter = 0;
-	for (int i=1; i < 3; i+=1)
-		for (int j=i; j < 4; j+=2)
+	quint8 healthCounter = 0;
+	for (quint8 i=1; i < 3; i+=1)
+		for (quint8 j=i; j < 4; j+=2)
 		{
 			if (petStage->GetTeam(i)->GetNumPets() >= j)
 				petStage->GetTeam(i)->GetPet(j)->SetHealth(((healthBlock[healthCounter] >> 12) & 4095));
@@ -364,9 +362,9 @@ void Interpreter::UpdateHealthPools()
 //Updates all the pets' abilities and each team's active pet.
 void Interpreter::UpdateAbilities()
 {
-	int pixelCounter = 2;			//Used to determine what pixel block to look at.
-	for (int i=1; i < 3; i+=1)
-		for (int j=1; j < petStage->GetTeam(i)->GetNumPets()+1; j+=1)
+	quint8 pixelCounter = 2;			//Used to determine what pixel block to look at.
+	for (quint8 i=1; i < 3; i+=1)
+		for (quint8 j=1; j < petStage->GetTeam(i)->GetNumPets()+1; j+=1)
 		{
 			petStage->GetTeam(i)->GetPet(j)->GetAbility(1)->SetCooldown(((pixels[pixelCounter].R >> 1) & 15));
 			if (petStage->GetTeam(i)->GetPet(j)->GetNumAbilities() >= 2)
@@ -389,13 +387,13 @@ void Interpreter::UpdateAbilities()
 //Updates all the auras in the pet battle.
 void Interpreter::UpdateAuras()
 {
-	for (int i=17; i < 40; i+=1)
+	for (quint8 i=17; i < 40; i+=1)
 	{
 		//i is a checksum box and should be ignored.
 		if (i == 19 || i == 22 || i == 28 || i == 36)
 			continue;
 
-		int auraId = (pixels[i].G << 4) + (pixels[i].B >> 4);
+		quint16 auraId = (pixels[i].G << 4) + (pixels[i].B >> 4);
 		if (auraId != 0)
 			petStage->GetTeam((pixels[i].R >> 6))->GetPet(((pixels[i].R >> 4) & 3))->AddAura(auraId, (pixels[i].R & 15), false);
 		else

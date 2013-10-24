@@ -6,27 +6,32 @@
 #include <QJsonObject>
 #include <QObject>
 
+#include "PetType.h"
+
 class PetAbility : public QObject
 {
 	Q_OBJECT
+	Q_PROPERTY(quint16 AbilityId READ GetAbilityId)
 
 public:
-	PetAbility(int, int, bool);
+	PetAbility(quint16, qint8, bool);
 	~PetAbility(void);
 	PetAbility(const PetAbility&);
 
 	void RoundUpdate();
 
-	void SetCooldown(int);
+	void SetCooldown(qint8);
 	void IsVerified(bool);
 
-	int GetAbilityId();
-	int GetCooldown();
+	quint16 GetAbilityId();
+	qint8 GetCooldown();
 	bool IsVerified();
 
 private:
 	QString name;
-	int abilityId, cooldown, currentCooldown, rounds, petTypeId;
+	quint16 abilityId;
+	qint8 cooldown, currentCooldown, rounds;
+	PetType::Type petTypeId;
 	bool isPassive, isVerified, usedThisTurn;
 };
 

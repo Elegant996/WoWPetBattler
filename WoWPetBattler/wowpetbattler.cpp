@@ -13,15 +13,15 @@ WoWPetBattler::WoWPetBattler(QWidget *parent)
 
 	this->interpreter = new Interpreter(petStage, ai, &WoWWindow);
 	connect(interpreter, SIGNAL(OutputToGUI(QString, QString)), this, SLOT(Output(QString, QString)));
+	connect(interpreter, SIGNAL(OutputToGUI(QString)), this, SLOT(Output("", QString)));
 	connect(interpreter, SIGNAL(Stop(QString)), this, SLOT(Stop(QString)));
 
 	this->ai = new AI(petStage);
 	this->ai->moveToThread(interpreter);
 	connect(ai, SIGNAL(OutputToGUI(QString, QString)), this, SLOT(Output(QString, QString)));
+	connect(ai, SIGNAL(OutputToGUI(QString)), this, SLOT(Output("", QString)));
 
 	//Testing data
-	petStage->GetTeam(0)->AddPet();
-
 	petStage->GetTeam(1)->AddPet(1229, 5, 4, 25);
 	petStage->GetTeam(1)->GetPet(1)->AddAbility(true, 1, 0);
 	petStage->GetTeam(1)->GetPet(1)->AddAbility(true, 1, 0);
@@ -55,8 +55,7 @@ WoWPetBattler::WoWPetBattler(QWidget *parent)
 	petStage->GetTeam(1)->SetActivePet(1);
 	petStage->GetTeam(2)->SetActivePet(1);
 
-	//qRegisterMetaType<QList<PetTeam*> >("QList<PetTeam*>>");
-	//qRegisterMetaType<PetTeam*>("PetTeam*");
+	petStage->GetTeam(1)->GetPet(2)->AddStatus(Pet::PetStatus::Rooted);
 }
 
 //Destructor
@@ -98,7 +97,9 @@ void WoWPetBattler::on_playButton_clicked()
 {
 	qmlRegisterType<PetStage>();
 	qmlRegisterType<PetTeam>();
-	qmlRegisterType<Pet>();
+	qmlRegisterType<PetType>("PetType", 1, 0, "PetType");
+	qmlRegisterType<PetAction>();
+	qmlRegisterType<Pet>("PetStatus", 1, 0, "PetStatus");
 	qmlRegisterType<PetAbility>();
 	qmlRegisterType<PetAura>();
 
@@ -119,7 +120,10 @@ void WoWPetBattler::on_playButton_clicked()
 	component.loadUrl(QUrl::fromLocalFile("Scripts/MyItem_2.qml"));
 	object = component.create(objectContext);
 
-	QMetaObject::invokeMethod(object, "printActivePet");
+	QMetaObject::invokeMethod(object, "printActivePet", Q_ARG(QVariant, 566));
+
+	if (component.status() == 3)
+		qDebug() << component.errors();
 
 	delete object;
 

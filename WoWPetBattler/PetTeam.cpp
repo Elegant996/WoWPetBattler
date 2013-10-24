@@ -5,7 +5,7 @@ PetTeam::PetTeam(void)
 	: QObject(NULL)
 {
 	this->activePet = 0;
-	this->pets.reserve(3);
+	this->pets.append(new Pet());
 }
 
 //Destructor
@@ -20,7 +20,6 @@ PetTeam::PetTeam(const PetTeam& other)
 	: QObject(NULL)
 {
 	this->activePet = other.activePet;
-	this->pets.reserve(3);
 	//foreach (Pet *myPet, other.pet)
 		//this->pet.append(new Pet(*myPet));
 
@@ -35,6 +34,17 @@ void PetTeam::RoundUpdate()
 		pet->RoundUpdate();
 }
 
+//Determine whether or not the team is dead.
+bool PetTeam::IsTeamDead()
+{
+	//Check to see if anyone's health is above 0.
+	for (int i=1; i < pets.size(); i+=1)
+		if (pets.at(i)->GetHealth() > 0)
+			return false;
+	//Team must be dead.
+	return true;
+}
+
 //Adds a dummy pet, used for weather.
 void PetTeam::AddPet()
 {
@@ -42,13 +52,13 @@ void PetTeam::AddPet()
 }
 
 //Add a pet to the current team.
-void PetTeam::AddPet(int speciesID, int breed, int quality, int level)
+void PetTeam::AddPet(quint16 speciesID, quint8 breed, quint8 quality, quint8 level)
 {
 	this->pets.append(new Pet(speciesID, breed, quality, level));
 }
 
 //Set the index of the active pet.
-void PetTeam::SetActivePet(int index)
+void PetTeam::SetActivePet(quint8 index)
 {
 	this->activePet = index;
 }
@@ -56,11 +66,11 @@ void PetTeam::SetActivePet(int index)
 //Return the active pet.
 Pet* PetTeam::GetActivePet()
 {
-	return this->pets.at(activePet-1);
+	return this->pets.at(activePet);
 }
 
 //Return the index of the active pet.
-int PetTeam::GetActivePetIndex()
+quint8 PetTeam::GetActivePetIndex()
 {
 	return this->activePet;
 }
@@ -68,17 +78,17 @@ int PetTeam::GetActivePetIndex()
 //Get the number of pets on the team.
 int PetTeam::GetNumPets()
 {
-	return this->pets.size();
+	return this->pets.size()-1;
 }
 
 //Get the pet at the current index.
-Pet* PetTeam::GetPet(int index)
+Pet* PetTeam::GetPet(quint8 index)
 {
-	return this->pets.at((index == 0) ? 0 : index-1);
+	return this->pets.at(index);
 }
 
 //For QML purposes.
-QQmlListProperty<Pet> PetTeam::GetPets()
+/*QQmlListProperty<Pet> PetTeam::GetPets()
 {
 	return QQmlListProperty<Pet>(this, pets);
-}
+}*/

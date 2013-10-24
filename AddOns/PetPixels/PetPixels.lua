@@ -23,7 +23,10 @@ local inPetBattle, wonLastBattle, teamIsAlive, playerIsGhost, playerIsDead, play
 local queueEnabled, queueState, canAccept, initialized, selectPet, selectAbility = false, nil, false, false, false, false;
 local isWildBattle, isPlayerNPC = false, false;
 
+local roundLockoutCount = 0;
+
 local teamSize, teamsActivePet, petsSpecies, petsBreed = {0, 0}, {0, 0}, {{}, {}}, {{}, {}};
+		teamSize[0], teamsActivePet[0] = 0, 4;
 local petsCurrentHP, petsLevel, petsQuality = {{}, {}}, {{}, {}}, {{}, {}};
 local petsAbilitiesVerified, petsAbilities, petsAbilitiesCD = {{}, {}}, {{}, {}}, {{}, {}};
 local petsNumAuras, petsAuras, petsAurasDuration = {}, {}, {};
@@ -35,7 +38,7 @@ for i=0, teams do petsNumAuras[i], petsAuras[i], petsAurasDuration[i] = {}, {}, 
 
 function events:CHAT_MSG_PET_BATTLE_COMBAT_LOG(...)
 	--print("CHAT_MSG_PET_BATTLE_COMBAT_LOG");
-	if (not initialized or not isPVPBattle()) then
+	if (not initialized--[[or not isPVPBattle()]]) then
 		return;
 	end
 
@@ -44,7 +47,19 @@ function events:CHAT_MSG_PET_BATTLE_COMBAT_LOG(...)
 
 	abilityID, power, speed = tonumber(abilityID), tonumber(power), tonumber(speed);
 
-	if (power == C_PetBattles.GetPower(enemyTeam, teamsActivePet[enemyTeam]) and speed == C_PetBattles.GetSpeed(enemyTeam, teamsActivePet[enemyTeam])) then
+	--Get how many rounds it takes for our selected ability to complete.
+	if (power == C_PetBattles.GetPower(myTeam, teamsActivePet[myTeam]) and speed == C_PetBattles.GetSpeed(myTeam, teamsActivePet[myTeam])) then
+		local idTable, _ = C_PetJournal.GetPetAbilityList(C_PetBattles.GetPetSpeciesID(myTeam, teamsActivePet[myTeam]));
+
+		for i=1, 6 do
+			if (idTable[i] == abilityID) then
+				roundLockoutCount = (select(6, C_PetBattles.GetAbilityInfoByID(abilityID)));
+				break;
+			end
+		end
+	end
+	--Determine what ability our opponent (PvP only) just used and verify it against what we know.
+	elseif (isPVPBattle() and power == C_PetBattles.GetPower(enemyTeam, teamsActivePet[enemyTeam]) and speed == C_PetBattles.GetSpeed(enemyTeam, teamsActivePet[enemyTeam])) then
 		local idTable, _ = C_PetJournal.GetPetAbilityList(C_PetBattles.GetPetSpeciesID(enemyTeam, teamsActivePet[enemyTeam]));
 
 		for i=0, 5 do
@@ -54,7 +69,6 @@ function events:CHAT_MSG_PET_BATTLE_COMBAT_LOG(...)
 				break;
 			end
 		end
-	end
 end
 
 function events:PET_BATTLE_HEALTH_CHANGED(...)
@@ -69,7 +83,7 @@ end
 function events:PET_BATTLE_AURA_CHANGED(...)
 	--print("PET_BATTLE_AURA_CHANGED");
 	for i=0, teams do
-		for j=(i==0) and 0 or 1, (i==0) and 0 or teamSize[i] do
+		for j=0, teamSize[i] do
 			petsNumAuras[i][j], petsAuras[i][j], petsAurasDuration[i][j] = C_PetBattles.GetNumAuras(i, j), {}, {};
 			for k=1, petsNumAuras[i][j] do
 				petsAuras[i][j][k], _, petsAurasDuration[i][j][k], _ = C_PetBattles.GetAuraInfo(i, j, k);
@@ -81,7 +95,7 @@ end
 function events:PET_BATTLE_AURA_APPLIED(...)
 	--print("PET_BATTLE_AURA_APPLIED");
 	for i=0, teams do
-		for j=(i==0) and 0 or 1, (i==0) and 0 or teamSize[i] do
+		for j=0, teamSize[i] do
 			petsNumAuras[i][j], petsAuras[i][j], petsAurasDuration[i][j] = C_PetBattles.GetNumAuras(i, j), {}, {};
 			for k=1, petsNumAuras[i][j] do
 				petsAuras[i][j][k], petsAurasDuration[i][j][k] = (select(1, C_PetBattles.GetAuraInfo(i, j, k))), (select(3, C_PetBattles.GetAuraInfo(i, j, k)));
@@ -93,7 +107,7 @@ end
 function events:PET_BATTLE_AURA_CANCELED(...)
 	--print("PET_BATTLE_AURA_CANCELED");
 	for i=0, teams do
-		for j=(i==0) and 0 or 1, (i==0) and 0 or teamSize[i] do
+		for j=0, teamSize[i] do
 			petsNumAuras[i][j], petsAuras[i][j], petsAurasDuration[i][j] = C_PetBattles.GetNumAuras(i, j), {}, {};
 			for k=1, petsNumAuras[i][j] do
 				petsAuras[i][j][k], _, petsAurasDuration[i][j][k], _ = C_PetBattles.GetAuraInfo(i, j, k);
@@ -119,40 +133,43 @@ function events:PET_BATTLE_PET_ROUND_PLAYBACK_COMPLETE(...)
 			end
 		end
 
-		selectAbility, selectPet = true, C_PetBattles.ShouldShowPetSelect();
+		roundLockoutCount = roundLockoutCount - 1;	--Used to determine if we can actually make a move.
+		selectAbility, selectPet = (roundLockoutCount <= 0) and true or false, C_PetBattles.ShouldShowPetSelect();
 	else		
-		for i=1, teams do
+		for i=0, teams do
 			teamSize[i], teamsActivePet[i] = C_PetBattles.GetNumPets(i), C_PetBattles.GetActivePet(i);
 
-			for j=1, teamSize[i] do
-				petsSpecies[i][j] = C_PetBattles.GetPetSpeciesID(i, j);
-				petsBreed[i][j] = (LibPetBreedInfo:GetBreedByPetBattleSlot(i, j));
-				petsLevel[i][j] = C_PetBattles.GetLevel(i, j);
-				petsQuality[i][j] = C_PetBattles.GetBreedQuality(i, j);
-				petsCurrentHP[i][j] = C_PetBattles.GetHealth(i, j);
+			for j=0, teamSize[i] do
+				if (i > 0 and j > 0) then
+					petsSpecies[i][j] = C_PetBattles.GetPetSpeciesID(i, j);
+					petsBreed[i][j] = (LibPetBreedInfo:GetBreedByPetBattleSlot(i, j));
+					petsLevel[i][j] = C_PetBattles.GetLevel(i, j);
+					petsQuality[i][j] = C_PetBattles.GetBreedQuality(i, j);
+					petsCurrentHP[i][j] = C_PetBattles.GetHealth(i, j);
 
-				petsAbilitiesVerified[i][j], petsAbilities[i][j], petsAbilitiesCD[i][j] = {}, {}, {};
-				for k=1, numAbilities do
-					local idTable, _ = C_PetJournal.GetPetAbilityList(petsSpecies[i][j]);
+					petsAbilitiesVerified[i][j], petsAbilities[i][j], petsAbilitiesCD[i][j] = {}, {}, {};
+					for k=1, numAbilities do
+						local idTable, _ = C_PetJournal.GetPetAbilityList(petsSpecies[i][j]);
 
-					for l=1, 6 do
-						if (idTable[l] == (C_PetBattles.GetAbilityInfo(i, j, k))) then
-							petsAbilitiesVerified[i][j][k] = isPVPBattle() and i==2 and j==1 and petsLevel[i][j] < 10 and true
-															or isPVPBattle() and i==2 and j==2 and petsLevel[i][j] < 15 and true
-															or isPVPBattle() and i==2 and j==3 and petsLevel[i][j] < 20 and true
-															or isPVPBattle() and false
-															or true;
-							petsAbilities[i][j][k] = isPVPBattle() and i==enemyTeam and 1 or math.ceil(l/3);
-							break
+						for l=1, 6 do
+							if (idTable[l] == (C_PetBattles.GetAbilityInfo(i, j, k))) then
+								petsAbilitiesVerified[i][j][k] = isPVPBattle() and i==2 and j==1 and petsLevel[i][j] < 10 and true
+																or isPVPBattle() and i==2 and j==2 and petsLevel[i][j] < 15 and true
+																or isPVPBattle() and i==2 and j==3 and petsLevel[i][j] < 20 and true
+																or isPVPBattle() and false
+																or true;
+								petsAbilities[i][j][k] = isPVPBattle() and i==enemyTeam and 1 or math.ceil(l/3);
+								break
+							end
 						end
-					end
 
-					if (C_PetBattles.GetAbilityState(i, j, k) ~= nil and (select(2, C_PetBattles.GetAbilityState(i, j, k))) >= (select(3, C_PetBattles.GetAbilityState(i, j, k)))) then
-						petsAbilitiesCD[i][j][k] = (select(2, C_PetBattles.GetAbilityState(i, j, k)));
-					elseif (C_PetBattles.GetAbilityState(i, j, k) ~= nil and (select(2, C_PetBattles.GetAbilityState(i, j, k))) < (select(3, C_PetBattles.GetAbilityState(i, j, k)))) then
-						petsAbilitiesCD[i][j][k] = (select(3, C_PetBattles.GetAbilityState(i, j, k)));
-					else
-						petsAbilitiesCD[i][j][k] = 0;
+						if (C_PetBattles.GetAbilityState(i, j, k) ~= nil and (select(2, C_PetBattles.GetAbilityState(i, j, k))) >= (select(3, C_PetBattles.GetAbilityState(i, j, k)))) then
+							petsAbilitiesCD[i][j][k] = (select(2, C_PetBattles.GetAbilityState(i, j, k)));
+						elseif (C_PetBattles.GetAbilityState(i, j, k) ~= nil and (select(2, C_PetBattles.GetAbilityState(i, j, k))) < (select(3, C_PetBattles.GetAbilityState(i, j, k)))) then
+							petsAbilitiesCD[i][j][k] = (select(3, C_PetBattles.GetAbilityState(i, j, k)));
+						else
+							petsAbilitiesCD[i][j][k] = 0;
+						end
 					end
 				end
 
@@ -161,11 +178,6 @@ function events:PET_BATTLE_PET_ROUND_PLAYBACK_COMPLETE(...)
 					petsAuras[i][j][k], _, petsAurasDuration[i][j][k], _ = C_PetBattles.GetAuraInfo(i, j, k);
 				end
 			end
-		end
-
-		petsNumAuras[0][0], petsAuras[0][0], petsAurasDuration[0][0] = C_PetBattles.GetNumAuras(0, 0), {}, {};
-		for k=1, petsNumAuras[0][0] do
-			petsAuras[0][0][k], _, petsAurasDuration[0][0][k], _ = C_PetBattles.GetAuraInfo(0, 0, k);
 		end
 		
 		isWildBattle, isPlayerNPC = C_PetBattles.IsWildBattle(), C_PetBattles.IsPlayerNPC(enemyTeam);
@@ -187,7 +199,10 @@ function events:PET_BATTLE_OPENING_START(...)
 	--print("PET_BATTLE_OPENING_START");
 	inPetBattle = C_PetBattles.IsInBattle();
 
+	roundLockoutCount = 0;
+
 	teamSize, teamsActivePet, petsSpecies, petsBreed = {0, 0}, {0, 0}, {{}, {}}, {{}, {}};
+		teamSize[0], teamsActivePet[0] = 0, 4;
 	petsCurrentHP, petsLevel, petsQuality = {{}, {}}, {{}, {}}, {{}, {}};
 	petsAbilitiesVerified, petsAbilities, petsAbilitiesCD = {{}, {}}, {{}, {}}, {{}, {}};
 	petsNumAuras, petsAuras, petsAurasDuration = {}, {}, {};
@@ -212,9 +227,9 @@ function events:PET_BATTLE_QUEUE_STATUS(...)
 	playerIsGhost, playerIsDead = UnitIsGhost("player"), UnitIsDead("player");
 	playerAffectingCombat = UnitAffectingCombat("player");
 	
-	--if (queueState == "proposal" and canAccept) then
-		--C_PetBattles.AcceptQueuedPVPMatch();
-	--end
+	--[[if (queueState == "proposal" and canAccept) then
+		C_PetBattles.AcceptQueuedPVPMatch();
+	end]]
 end
 
 function events:PET_BATTLE_OVER(...)
@@ -261,18 +276,22 @@ function events:PET_BATTLE_CLOSE(...)
 	playerAffectingCombat = UnitAffectingCombat("player");
 	isWildBattle, isPlayerNPC = false, false;
 
-	for i=1, teams do
-		for j=1, teamSize[i] do
-			petsSpecies[i][j] = 0;
-			petsBreed[i][j] = 0;
-			petsLevel[i][j] = 0;
-			petsQuality[i][j] = 0;
-			petsCurrentHP[i][j] = 0;
+	roundLockoutCount = 0;
 
-			for k=1, numAbilities do
-				petsAbilitiesVerified[i][j][k] = false;
-				petsAbilities[i][j][k] = 0;
-				petsAbilitiesCD[i][j][k] = 0;
+	for i=0, teams do
+		for j=0, teamSize[i] do
+			if (i > 0 and j > 0) then 
+				petsSpecies[i][j] = 0;
+				petsBreed[i][j] = 0;
+				petsLevel[i][j] = 0;
+				petsQuality[i][j] = 0;
+				petsCurrentHP[i][j] = 0;
+
+				for k=1, numAbilities do
+					petsAbilitiesVerified[i][j][k] = false;
+					petsAbilities[i][j][k] = 0;
+					petsAbilitiesCD[i][j][k] = 0;
+				end
 			end
 
 			for k=1, petsNumAuras[i][j] do
@@ -280,10 +299,6 @@ function events:PET_BATTLE_CLOSE(...)
 			end
 			petsNumAuras[i][j] = 0;
 		end
-	end
-
-	for k=1, petsNumAuras[0][0]==nil and 0 or petsNumAuras[0][0] do
-		petsAuras[0][0][k], _, petsAurasDuration[0][0][k], _ = C_PetBattles.GetAuraInfo(0, 0, k);
 	end
 end
 
@@ -435,7 +450,7 @@ function encodeAuras()
 	local index = 18;
 
 	for i=0, teams do
-		for j=(i==0) and 0 or 1, (i==0) and 0 or teamSize[i] do
+		for j=0, teamSize[i] do
 			for k=1, petsNumAuras[i][j] ~= nil and petsNumAuras[i][j] or 0 do
 				local r, g, b = 0, 0, 0;
 				local team, pet = deepCopy(i), deepCopy(j);

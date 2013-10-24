@@ -21,6 +21,7 @@ public:
 
 signals:
 	void OutputToGUI(QString, QString);
+	void OutputToGUI(QString);
 
 public slots:
 	void Run();

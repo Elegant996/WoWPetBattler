@@ -11,7 +11,7 @@
 class PetStage : public QObject
 {
 	Q_OBJECT
-	Q_PROPERTY(QQmlListProperty<PetTeam> teams READ GetTeams)
+	//Q_PROPERTY(QQmlListProperty<PetTeam> Teams READ GetTeams)
 
 public:
 	PetStage(void);
@@ -21,8 +21,8 @@ public:
 	void Reinitialize();
 	void RoundUpdate();
 
-	PetTeam* GetTeam(int);
-	QQmlListProperty<PetTeam> GetTeams();
+	Q_INVOKABLE PetTeam* GetTeam(int);
+	//QQmlListProperty<PetTeam> GetTeams();
 
 	void QueueState(int);
 	void InPetBattle(bool);
@@ -38,7 +38,7 @@ public:
 	void WonLastBattle(bool);
 	void IsPvPBattle(bool);
 
-	int QueueState();
+	qint8 QueueState();
 	bool InPetBattle();
 	bool TeamIsAlive();
 	bool QueueEnabled();
@@ -54,7 +54,7 @@ public:
 
 private:
 	const PetStage *parentStage;
-	int queueState;
+	qint8 queueState;
 	bool inPetBattle, teamIsAlive, queueEnabled, canAccept;
 	bool playerIsGhost, playerIsDead, playerAffectingCombat;
 	bool initialized, selectPet, selectAbility, wonLastBattle;

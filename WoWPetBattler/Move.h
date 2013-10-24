@@ -1,15 +1,17 @@
 #ifndef MOVE_H
 #define MOVE_H
 
+#include <QDataStream>
+
 class Move
 {
 public:
-	Move(int);
+	Move(quint8);
 	~Move(void);
 	Move(const Move&);
 
 private:
-	const int move;
+	const quint8 move;
 	float heuristic;
 };
 

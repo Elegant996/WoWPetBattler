@@ -5,7 +5,8 @@ AI::AI(PetStage *petStage)
 {
 	qmlRegisterType<PetStage>();
 	qmlRegisterType<PetTeam>();
-	qmlRegisterType<Pet>();
+	qmlRegisterType<PetType>("PetType", 1, 0, "PetType");
+	qmlRegisterType<Pet>("PetStatus", 1, 0, "PetStatus");
 	qmlRegisterType<PetAbility>();
 	qmlRegisterType<PetAura>();
 
@@ -54,17 +55,6 @@ Move AI::Expectiminimax(PetStage* stageNode, int depth)
 	object = component->create(objectContext);
 	QMetaObject::invokeMethod(object, "printActivePet");
 	*/
-
-	//Get weather.
-	PetAura *weather = NULL;
-	if (stageNode->GetTeam(0)->GetPet(0)->GetNumAuras() != 0)
-		weather = stageNode->GetTeam(0)->GetPet(0)->GetAura(1);
-
-	//Assess weather situation.
-	if (weather != NULL)
-	{
-
-	}
 
 	//Who goes first?
 	if (stageNode->GetTeam(1)->GetActivePet()->GetSpeed() > stageNode->GetTeam(2)->GetActivePet()->GetSpeed())

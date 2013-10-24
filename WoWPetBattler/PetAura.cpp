@@ -1,7 +1,7 @@
 #include "PetAura.h"
 
 //Constructor
-PetAura::PetAura(int auraId, int duration, bool isFresh)
+PetAura::PetAura(quint16 auraId, qint8 duration, bool isFresh)
 	: QObject(NULL)
 {
 	QFile auraJson;
@@ -18,9 +18,11 @@ PetAura::PetAura(int auraId, int duration, bool isFresh)
 	this->cooldown = aura.value(QString("cooldown")).toDouble();
 	this->rounds = aura.value(QString("rounds")).toDouble();
 	this->duration = (duration == 0) ? -1 : duration;
-	this->petTypeId = aura.value(QString("petTypeId")).toDouble();
+	this->petTypeId = (PetType::Type)(int)aura.value(QString("petTypeId")).toDouble();
 	this->isPassive = aura.value(QString("isPassive")).toBool();
 	this->isFresh = isFresh;
+	this->isObject = false;
+	this->onSwapIn = false;
 }
 
 //Destructor
@@ -40,6 +42,8 @@ PetAura::PetAura(const PetAura& other)
 	this->petTypeId = other.petTypeId;
 	this->isPassive = other.isPassive;
 	this->isFresh = other.isFresh;
+	this->isObject = other.isObject;
+	this->onSwapIn = other.onSwapIn;
 }
 
 //Update CDs and auras.
@@ -49,4 +53,40 @@ void PetAura::RoundUpdate()
 		this->duration -= 1;
 	else
 		isFresh = false;
+}
+
+//Return the name of the aura.
+QString PetAura::GetName()
+{
+	return this->name;
+}
+
+//Return the id of the aura.
+quint16 PetAura::GetAuraId()
+{
+	return this->auraId;
+}
+
+//Set whether or not the aura is an object.
+void PetAura::IsObject(bool isObject)
+{
+	this->isObject = isObject;
+}
+
+//Set whether or not the aura takes effect on a pet swap in.
+void PetAura::OnSwapIn(bool onSwapIn)
+{
+	this->onSwapIn = onSwapIn;
+}
+
+//Return whether or not the aura is an object.
+bool PetAura::IsObject()
+{
+	return this->isObject;
+}
+
+//Return whether or not the aura takes effect on a pet swap in.
+bool PetAura::OnSwapIn()
+{
+	return this->onSwapIn;
 }

@@ -4,12 +4,12 @@
 Pet::Pet()
 	: QObject(NULL)
 {
-	this->name = "";
+	this->name = "Dummy Pet";
 	this->speciesId = 0;
 	this->breed = 0;
 	this->quality = 0;
 	this->level = 0;
-	this->type = 0;
+	this->type = (PetType::Type)0;
 	this->baseHealth = 0;
 	this->basePower = 0;
 	this->baseSpeed = 0;
@@ -17,9 +17,11 @@ Pet::Pet()
 	this->currentMaxHealth = 0;
 	this->currentPower = 0;
 	this->currentSpeed = 0;
+	this->racialUsed = false;
+	this->currentAction = new PetAction(0, 0);
 }
 
-Pet::Pet(int speciesId, int breed, int quality, int level)
+Pet::Pet(quint16 speciesId, quint8 breed, quint8 quality, quint8 level)
 {
 	QFile speciesJson;
 	speciesJson.setFileName("Species/" + QString::number(speciesId) + ".json");
@@ -33,7 +35,7 @@ Pet::Pet(int speciesId, int breed, int quality, int level)
 	this->name = species.value(QString("name")).toString();
 	this->speciesId = speciesId;
 	this->breed = breed;
-	this->type = species.value(QString("petTypeId")).toDouble();
+	this->type = (PetType::Type)(int)species.value(QString("petTypeId")).toDouble();
 	this->quality = quality;
 	this->level = level;
 	this->baseHealth = species.value(QString("baseHealth")).toDouble();
@@ -44,12 +46,15 @@ Pet::Pet(int speciesId, int breed, int quality, int level)
 	this->currentMaxHealth = this->currentHealth;
 	this->currentPower = PetHelper::CalculatePower(this->basePower, PetBreed::GetPower(this->breed), this->level, this->quality);
 	this->currentSpeed = PetHelper::CalculateSpeed(this->baseSpeed, PetBreed::GetSpeed(this->breed), this->level, this->quality);
+	this->racialUsed = (type==1 || type==3 || type==9) ? false : true;
+	this->currentAction = new PetAction(0, 0);
 	this->abilityList = species.value(QString("abilities")).toArray();
 }
 
 //Deconstructor
 Pet::~Pet(void)
 {
+	delete currentAction;
 	qDeleteAll(this->petAbilities);
 	this->petAbilities.clear();
 	RemoveAuras();
@@ -72,21 +77,22 @@ Pet::Pet(const Pet& other)
 	this->currentMaxHealth = other.currentMaxHealth;
 	this->currentPower = other.currentPower;
 	this->currentSpeed = other.currentSpeed;
+	this->racialUsed = other.racialUsed;
+	this->currentAction = new PetAction(*other.currentAction);
 	this->abilityList = other.abilityList;
-	this->petAbilities.reserve(3);
 	for (int i=0; i < other.petAbilities.size(); i+=1)
 		this->petAbilities.append(new PetAbility(*other.petAbilities.at(i)));
 	for (int i=0; i < other.petAuras.size(); i+=1)
 		this->petAuras.append(new PetAura(*other.petAuras.at(i)));
 	for (int i=0; i < other.petStatuses.size(); i+=1)
-		this->petStatuses.append(new QString(*other.petStatuses.at(i)));
+		this->petStatuses.append(PetStatus(other.petStatuses.at(i)));
 }
 
 //Update CDs and auras.
 void Pet::RoundUpdate()
 {
 	//consider clearing this...
-	foreach (QString *petStatus, this->petStatuses)
+	foreach (int petStatus, this->petStatuses)
 	{
 	}
 
@@ -97,11 +103,17 @@ void Pet::RoundUpdate()
 		petAura->RoundUpdate();
 }
 
+//Adds the status to the list.
+void Pet::AddStatus(Pet::PetStatus status)
+{
+	petStatuses.append(status);
+}
+
 //Return whether or not the pet has a specific status.
-bool Pet::HasStatus(QString petStatuses)
+bool Pet::HasStatus(Pet::PetStatus petStatus)
 {
 	for (int i=0; i < this->petStatuses.size(); i+=1)
-		if (this->petStatuses.at(i) == petStatuses)
+		if (this->petStatuses.at(i) == petStatus)
 			return true;
 	return false;
 }
@@ -113,25 +125,25 @@ int Pet::GetNumStatuses()
 }
 
 //Return the pet's status vector.
-QString* Pet::GetStatus(int index)
+Pet::PetStatus Pet::GetStatus(quint8 index)
 {
-	return this->petStatuses.at(index-1);
+	return (Pet::PetStatus)this->petStatuses.at(index-1);
 }
 
 //For QML purposes.
-QQmlListProperty<QString> Pet::GetStatuses()
+/*QList<int> Pet::GetStatuses()
 {
-	return QQmlListProperty<QString>(this, petStatuses);
-}
+	return petStatuses;
+}*/
 
 //Add an ability to the current pet.
-void Pet::AddAbility(bool verification, int tier, int cooldown)
+void Pet::AddAbility(bool verification, quint8 tier, qint8 cooldown)
 {
 	this->petAbilities.append(new PetAbility(abilityList[(this->petAbilities.size()+1)+((tier-1)*3)-1].toObject().value(QString("id")).toDouble(), cooldown, verification));
 }
 
 //Replace the ability of the current pet at specified index.
-void Pet::ReplaceAbility(int index, bool verification, int tier, int cooldown)
+void Pet::ReplaceAbility(quint8 index, bool verification, quint8 tier, qint8 cooldown)
 {
 	this->petAbilities.replace(index-1, new PetAbility(abilityList[(index+1)+((tier-1)*3)-1].toObject().value(QString("id")).toDouble(), cooldown, verification));
 }
@@ -143,19 +155,19 @@ int Pet::GetNumAbilities()
 }
 
 //Return the desired ability at the specified index.
-PetAbility* Pet::GetAbility(int index)
+PetAbility* Pet::GetAbility(quint8 index)
 {
 	return this->petAbilities.at(index-1);
 }
 
 //For QML purposes.
-QQmlListProperty<PetAbility> Pet::GetAbilities()
+/*QQmlListProperty<PetAbility> Pet::GetAbilities()
 {
 	return QQmlListProperty<PetAbility>(this, petAbilities);
-}
+}*/
 
 //Add an aura to the current pet.
-void Pet::AddAura(int auraId, int duration, bool isFresh)
+void Pet::AddAura(quint16 auraId, qint8 duration, bool isFresh)
 {
 	this->petAuras.append(new PetAura(auraId, duration, isFresh));
 }
@@ -174,78 +186,90 @@ int Pet::GetNumAuras()
 }
 
 //Return the desired aura at the specified index.
-PetAura* Pet::GetAura(int index)
+PetAura* Pet::GetAura(quint8 index)
 {
 	return this->petAuras.at(index-1);
 }
 
 //For QML purposes.
-QQmlListProperty<PetAura> Pet::GetAuras()
+/*QQmlListProperty<PetAura> Pet::GetAuras()
 {
 	return QQmlListProperty<PetAura>(this, petAuras);
-}
+}*/
 
 //Set the pet's current health.
-void Pet::SetHealth(int health)
+void Pet::SetHealth(quint16 health)
 {
 	this->currentHealth = health;
 }
 
 //Set the pet's current max health.
-void Pet::SetMaxHealth(int maxHealth)
+void Pet::SetMaxHealth(quint16 maxHealth)
 {
 	this->currentMaxHealth = maxHealth;
 }
 
 //Set the pet's current power.
-void Pet::SetPower(int power)
+void Pet::SetPower(quint16 power)
 {
 	this->currentPower = power;
 }
 
 //Set the pet's current speed.
-void Pet::SetSpeed(int speed)
+void Pet::SetSpeed(quint16 speed)
 {
 	this->currentSpeed = speed;
 }
 
+//Set whether or not the racial has been used.
+void Pet::RacialUsed(bool racialUsed)
+{
+	this->racialUsed = racialUsed;
+}
+
 //Return pet's species Id.
-int Pet::GetSpeciesId()
+quint16 Pet::GetSpeciesId()
 {
 	return this->speciesId;
 }
 
 //Return pet's type.
-int Pet::GetType()
+PetType::Type Pet::GetType()
 {
 	return this->type;
 }
 
 //Return pet's level.
-int Pet::GetLevel()
+quint8 Pet::GetLevel()
 {
 	return this->level;
 }
 
 //Return pet's current health.
-int Pet::GetHealth()
+quint16 Pet::GetHealth()
 {
 	return this->currentHealth;
 }
 //Return pet's current max health.
-int Pet::GetMaxHealth()
+quint16 Pet::GetMaxHealth()
 {
 	return this->currentMaxHealth;
 }
 
 //Return pet's current power.
-int Pet::GetPower()
+quint16 Pet::GetPower()
 {
 	return this->currentPower;
 }
 
 //Return pet's current speed.
-int Pet::GetSpeed()
+quint16 Pet::GetSpeed()
 {
 	return this->currentSpeed;
+}
+
+//Return whether or not the pet's racial has been used.
+bool Pet::RacialUsed()
+{
+	return this->racialUsed;
 }

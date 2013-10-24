@@ -21,6 +21,7 @@ public:
 
 signals:
 	void OutputToGUI(QString, QString);
+	void OutputToGUI(QString);
 	void RunAI();
 	void Stop(QString);
 
@@ -38,7 +39,7 @@ private:
 	void UpdateAuras();
 
 	volatile bool running;
-	const int BUILD;
+	const quint8 BUILD;
 
 	PetStage *petStage;
 	AI* ai;
@@ -54,7 +55,7 @@ private:
 	Robot::Bounds addonBar1, addonBar2;
 
 	bool readSuccess, oneTimeNotifier;
-	int timeoutCount;
+	quint8 timeoutCount;
 
 };
 

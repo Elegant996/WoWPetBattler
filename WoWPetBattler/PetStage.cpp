@@ -17,10 +17,8 @@ PetStage::PetStage(void)
 	this->selectAbility = false;
 	this->wonLastBattle = false;
 	this->isPvPBattle = false;
-	this->petTeams.reserve(3);
-	this->petTeams.append(new PetTeam());
-	this->petTeams.append(new PetTeam());
-	this->petTeams.append(new PetTeam());
+	for (int i=0; i < 3; i+=1)
+		this->petTeams.append(new PetTeam());
 }
 
 //Destructor
@@ -91,10 +89,10 @@ PetTeam* PetStage::GetTeam(int index)
 }
 
 //For QML purposes.
-QQmlListProperty<PetTeam> PetStage::GetTeams()
+/*QQmlListProperty<PetTeam> PetStage::GetTeams()
 {
 	return QQmlListProperty<PetTeam>(this, petTeams);
-}
+}*/
 
 //Update the queue state.
 void PetStage::QueueState(int queueState)
@@ -175,7 +173,7 @@ void PetStage::IsPvPBattle(bool isPvPBattle)
 }
 
 //Return the current queue state.
-int PetStage::QueueState()
+qint8 PetStage::QueueState()
 {
 	//0 - not in queue; 1 - suspended; 2 - queued; 3 - proposal
 	return this->queueState;

@@ -1,7 +1,7 @@
 #include "Move.h"
 
 //Constructor
-Move::Move(int move)
+Move::Move(quint8 move)
 	: move(move)
 {
 	this->heuristic = 0;

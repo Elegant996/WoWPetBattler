@@ -7,10 +7,10 @@ Item
     {
         console.log("Test");
         console.log(petStage);
-        console.log(petStage.teams[1]);
-        console.log(petStage.teams[1].activePet);
-        petStage.teams[1].activePetIndex = 2;
-        console.log(petStage.teams[1].activePet);
-        console.log(petStage.teams[1].activePet.health);
+        console.log(petStage.Teams[1]);
+        console.log(petStage.Teams[1].ActivePet);
+        petStage.Teams[1].ActivePetIndex = 2;
+        console.log(petStage.Teams[1].ActivePet);
+        console.log(petStage.Teams[1].ActivePet.Health);
     }
 }

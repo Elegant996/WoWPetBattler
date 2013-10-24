@@ -11,9 +11,9 @@
 class PetTeam : public QObject
 {
 	Q_OBJECT
-	Q_PROPERTY(QQmlListProperty<Pet> pets READ GetPets)
-	Q_PROPERTY(Pet* activePet READ GetActivePet)
-	Q_PROPERTY(int activePetIndex READ GetActivePetIndex WRITE SetActivePet)
+	//Q_PROPERTY(QQmlListProperty<Pet> Pets READ GetPets)
+	Q_PROPERTY(Pet* ActivePet READ GetActivePet)
+	Q_PROPERTY(quint8 ActivePetIndex READ GetActivePetIndex WRITE SetActivePet)
 
 public:
 	PetTeam(void);
@@ -22,19 +22,21 @@ public:
 
 	void RoundUpdate();
 
-	void AddPet();
-	void AddPet(int, int, int, int);
+	bool IsTeamDead();
 
-	void SetActivePet(int);
+	void AddPet();
+	void AddPet(quint16, quint8, quint8, quint8);
+
+	void SetActivePet(quint8);
 	Pet* GetActivePet();
-	int GetActivePetIndex();
+	quint8 GetActivePetIndex();
 
 	int GetNumPets();
-	Pet* GetPet(int);
-	QQmlListProperty<Pet> GetPets();
+	Pet* GetPet(quint8);
+	//QQmlListProperty<Pet> GetPets();
 
 private:
-	int activePet;
+	quint8 activePet;
 	QList<Pet*> pets;
 };
 
