@@ -30,10 +30,13 @@ class Pet : public QObject
 	Q_PROPERTY(quint16 NormalMaxHealth READ GetNormalMaxHealth)
 	Q_PROPERTY(quint16 NormalPower READ GetNormalPower)
 	Q_PROPERTY(quint16 NormalSpeed READ GetNormalSpeed)
+	Q_PROPERTY(quint16 LastKnownHealth READ GetLastKnownHealth WRITE SetLastKnownHealth)
 	Q_PROPERTY(quint16 Health READ GetHealth WRITE SetHealth)
 	Q_PROPERTY(quint16 MaxHealth READ GetMaxHealth WRITE SetMaxHealth)
 	Q_PROPERTY(quint16 Power READ GetPower WRITE SetPower)
 	Q_PROPERTY(quint16 Speed READ GetSpeed WRITE SetSpeed)
+	Q_PROPERTY(bool RacialUsed READ RacialUsed WRITE RacialUsed)
+	Q_PROPERTY(bool AttackedThisRound READ AttackedThisRound WRITE AttackedThisRound)
 
 public:
 	Pet();
@@ -41,7 +44,6 @@ public:
 	~Pet(void);
 	Pet(const Pet&);
 
-	//enum PetType { Humanoid, Dragonkin, Flying, Undead, Critter, Magic, Elemental, Beast, Aquatic, Mechanical };
 	enum PetStatus { First, Second, Stunned, Rooted, Burning, Chilled, Bleeding, Webbed, Blinded, Poisoned, Evading, Asleep };
 
 	void RoundUpdate();
@@ -70,6 +72,7 @@ public:
 	void SetPower(quint16);
 	void SetSpeed(quint16);
 	void RacialUsed(bool);
+	void AttackedThisRound(bool);
 
 	quint16 GetSpeciesId();
 	quint8 GetLevel();
@@ -83,6 +86,7 @@ public:
 	quint16 GetPower();
 	quint16 GetSpeed();
 	bool RacialUsed();
+	bool AttackedThisRound();
 
 private:
 	QString name;
@@ -93,7 +97,7 @@ private:
 	quint16 normalMaxHealth, normalPower, normalSpeed, lastKnownHealth;
 	quint16 currentHealth, currentMaxHealth, currentPower, currentSpeed;
 
-	bool racialUsed;
+	bool racialUsed, attackedThisRound;
 	PetAction *currentAction; //Determine how to use this.
 
 	QJsonArray abilityList;

@@ -113,16 +113,14 @@ void Pet::RoundUpdate()
 //Adds the status to the list.
 void Pet::AddStatus(Pet::PetStatus status)
 {
-	petStatuses.append(status);
+	if (!petStatuses.contains(status))
+		petStatuses.append(status);
 }
 
 //Return whether or not the pet has a specific status.
 bool Pet::HasStatus(Pet::PetStatus petStatus)
 {
-	for (int i=0; i < this->petStatuses.size(); i+=1)
-		if (this->petStatuses.at(i) == petStatus)
-			return true;
-	return false;
+	return petStatuses.contains(petStatus);
 }
 
 //Return the number of status effects on the pet.
@@ -240,6 +238,12 @@ void Pet::RacialUsed(bool racialUsed)
 	this->racialUsed = racialUsed;
 }
 
+//Set whether or not the pet attacked this round.
+void Pet::AttackedThisRound(bool attackedThisRound)
+{
+	this->attackedThisRound = attackedThisRound;
+}
+
 //Return pet's species Id.
 quint16 Pet::GetSpeciesId()
 {
@@ -309,4 +313,10 @@ quint16 Pet::GetSpeed()
 bool Pet::RacialUsed()
 {
 	return this->racialUsed;
+}
+
+//Return whether or not the pet attacked this round.
+bool Pet::AttackedThisRound()
+{
+	return this->attackedThisRound;
 }
