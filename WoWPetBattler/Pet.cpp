@@ -17,6 +17,14 @@ Pet::Pet()
 	this->currentMaxHealth = 0;
 	this->currentPower = 0;
 	this->currentSpeed = 0;
+	this->accuracyOffset = 0.00;
+	this->damageModifier = 1.00;
+	this->healingModifier = 1.00;
+	this->defenseModifier = 1.00;
+	this->bonusDamage = 0;
+	this->blockDamage = 0;
+	this->bonusHealing = 0;
+	this->blockHealing = 0;
 	this->racialUsed = false;
 	this->attackedThisRound = false;
 	this->currentAction = new PetAction(0, 0);
