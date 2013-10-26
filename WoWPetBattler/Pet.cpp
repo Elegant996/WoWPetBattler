@@ -452,6 +452,12 @@ quint16 Pet::GetBlockHealing()
 	return this->blockHealing;
 }
 
+//Return the pet's current action.
+PetAction* Pet::GetCurrentAction()
+{
+	return this->currentAction;
+}
+
 //Return whether or not the pet's racial has been used.
 bool Pet::RacialUsed()
 {

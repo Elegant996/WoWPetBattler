@@ -44,6 +44,7 @@ class Pet : public QObject
 	Q_PROPERTY(quint16 BlockDamage READ GetBlockDamage WRITE SetBlockDamage)
 	Q_PROPERTY(quint16 BonusHealing READ GetBonusHealing WRITE SetBonusHealing)
 	Q_PROPERTY(quint16 BlockHealing READ GetBlockHealing WRITE SetBlockHealing)
+	Q_PROPERTY(PetAction* CurrentAction READ GetCurrentAction)
 	Q_PROPERTY(bool RacialUsed READ RacialUsed WRITE RacialUsed)
 	Q_PROPERTY(bool AttackedThisRound READ AttackedThisRound WRITE AttackedThisRound)
 
@@ -114,6 +115,7 @@ public:
 	quint16 GetBlockDamage();
 	quint16 GetBonusHealing();
 	quint16 GetBlockHealing();
+	PetAction* GetCurrentAction();
 	bool RacialUsed();
 	bool AttackedThisRound();
 
@@ -129,7 +131,7 @@ private:
 	quint16 bonusDamage, blockDamage, bonusHealing, blockHealing;
 
 	bool racialUsed, attackedThisRound;
-	PetAction *currentAction; //TODO: Determine how to use this.
+	PetAction *currentAction;
 
 	QJsonArray abilityList;
 	QList<int> petStatuses;
