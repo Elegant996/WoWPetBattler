@@ -18,6 +18,7 @@ Pet::Pet()
 	this->currentPower = 0;
 	this->currentSpeed = 0;
 	this->racialUsed = false;
+	this->attackedThisRound = false;
 	this->currentAction = new PetAction(0, 0);
 }
 
@@ -49,7 +50,16 @@ Pet::Pet(quint16 speciesId, quint8 breed, quint8 quality, quint8 level)
 	this->currentMaxHealth = this->currentHealth;
 	this->currentPower = this->normalPower;
 	this->currentSpeed = this->normalSpeed;
+	this->accuracyOffset = 0.00;
+	this->damageModifier = 1.00;
+	this->healingModifier = 1.00;
+	this->defenseModifier = 1.00;
+	this->bonusDamage = 0;
+	this->blockDamage = 0;
+	this->bonusHealing = 0;
+	this->blockHealing = 0;
 	this->racialUsed = false;
+	this->attackedThisRound = false;
 	this->currentAction = new PetAction(0, 0);
 	this->abilityList = species.value(QString("abilities")).toArray();
 	this->petAuras.append(new PetAura(PetType::GetTypeAuraId(type), 0, false));
@@ -85,7 +95,16 @@ Pet::Pet(const Pet& other)
 	this->currentMaxHealth = other.currentMaxHealth;
 	this->currentPower = other.currentPower;
 	this->currentSpeed = other.currentSpeed;
+	this->accuracyOffset = other.accuracyOffset;
+	this->damageModifier = other.damageModifier;
+	this->healingModifier = other.healingModifier;
+	this->defenseModifier = other.defenseModifier;
+	this->bonusDamage = other.bonusDamage;
+	this->blockDamage = other.blockDamage;
+	this->bonusHealing = other.bonusHealing;
+	this->blockHealing = other.blockHealing;
 	this->racialUsed = other.racialUsed;
+	this->attackedThisRound = other.attackedThisRound;
 	this->currentAction = new PetAction(*other.currentAction);
 	this->abilityList = other.abilityList;
 	for (int i=0; i < other.petAbilities.size(); i+=1)
@@ -96,17 +115,20 @@ Pet::Pet(const Pet& other)
 		this->petStatuses.append(PetStatus(other.petStatuses.at(i)));
 }
 
-//Update CDs and auras.
+//Update current action, CDs and auras.
 void Pet::RoundUpdate()
 {
-	//consider clearing this...
-	foreach (int petStatus, this->petStatuses)
-	{
-	}
+	//Update the current action.
+	this->currentAction->RoundUpdate();
 
+	//Remove all statuses.
+	this->petStatuses.clear();
+
+	//Update each ability.
 	foreach (PetAbility *petAbility, this->petAbilities)
 		petAbility->RoundUpdate();
 
+	//Update each aura.
 	foreach (PetAura *petAura, this->petAuras)
 		petAura->RoundUpdate();
 }
@@ -249,6 +271,54 @@ void Pet::SetSpeed(quint16 speed)
 	this->currentSpeed = speed;
 }
 
+//Set the pet's accuracy offset.
+void Pet::SetAccuracyOffset(float accuracyOffset)
+{
+	this->accuracyOffset = accuracyOffset;
+}
+
+//Set the pet's damage modifier.
+void Pet::SetDamageModifier(float damageModifier)
+{
+	this->damageModifier = damageModifier;
+}
+
+//Set the pet's healing modifier.
+void Pet::SetHealingModifier(float healingModifier)
+{
+	this->healingModifier = healingModifier;
+}
+
+//Set the pet's defense modifier.
+void Pet::SetDefenseModifier(float defenseModifier)
+{
+	this->defenseModifier = defenseModifier;
+}
+
+//Set the pet's bonus damage.
+void Pet::SetBonusDamage(quint16 bonusDamage)
+{
+	this->bonusDamage = bonusDamage;
+}
+
+//Set the pet's block damage.
+void Pet::SetBlockDamage(quint16 blockDamage)
+{
+	this->blockDamage = blockDamage;
+}
+
+//Set the pet's bonus healing.
+void Pet::SetBonusHealing(quint16 bonusHealing)
+{
+	this->bonusHealing = bonusHealing;
+}
+
+//Set the pet's block healing.
+void Pet::SetBlockHealing(quint16 blockHealing)
+{
+	this->blockHealing = blockHealing;
+}
+
 //Set whether or not the racial has been used.
 void Pet::RacialUsed(bool racialUsed)
 {
@@ -324,6 +394,54 @@ quint16 Pet::GetPower()
 quint16 Pet::GetSpeed()
 {
 	return this->currentSpeed;
+}
+
+//Return the pet's accuracy offset.
+float Pet::GetAccuracyOffset()
+{
+	return this->accuracyOffset;
+}
+
+//Return the pet's damage modifier.
+float Pet::GetDamageModifier()
+{
+	return this->damageModifier;
+}
+
+//Return the pet's healing modifier.
+float Pet::GetHealingModifier()
+{
+	return this->healingModifier;
+}
+
+//Return the pet's defense modifier.
+float Pet::GetDefenseModifier()
+{
+	return this->defenseModifier;
+}
+
+//Return the pet's bonus damage.
+quint16 Pet::GetBonusDamage()
+{
+	return this->bonusDamage;
+}
+
+//Return the pet's block damage.
+quint16 Pet::GetBlockDamage()
+{
+	return this->blockDamage;
+}
+
+//Return the pet's bonus healing.
+quint16 Pet::GetBonusHealing()
+{
+	return this->bonusHealing;
+}
+
+//Return the pet's block healing.
+quint16 Pet::GetBlockHealing()
+{
+	return this->blockHealing;
 }
 
 //Return whether or not the pet's racial has been used.

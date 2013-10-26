@@ -21,6 +21,13 @@ PetAction::PetAction(const PetAction& other)
 	this->roundsRemaining = other.roundsRemaining;
 }
 
+//Update rounds remaining on the current action.
+void PetAction::RoundUpdate()
+{
+	if (this->roundsRemaining > 0)
+		this->roundsRemaining -= 1;
+}
+
 //Set the ability id.
 void PetAction::SetAbilityId(quint16 abilityId)
 {

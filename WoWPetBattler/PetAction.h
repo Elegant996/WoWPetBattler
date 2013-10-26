@@ -13,6 +13,8 @@ public:
 	~PetAction(void);
 	PetAction(const PetAction&);
 
+	void RoundUpdate();
+
 	void SetAbilityId(quint16);
 	void SetRoundsRemaining(qint8);
 

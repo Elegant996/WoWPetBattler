@@ -36,6 +36,14 @@ class Pet : public QObject
 	Q_PROPERTY(quint16 MaxHealth READ GetMaxHealth WRITE SetMaxHealth)
 	Q_PROPERTY(quint16 Power READ GetPower WRITE SetPower)
 	Q_PROPERTY(quint16 Speed READ GetSpeed WRITE SetSpeed)
+	Q_PROPERTY(float AccuracyOffset READ GetAccuracyOffset WRITE SetAccuracyOffset)
+	Q_PROPERTY(float DamageModifier READ GetDamageModifier WRITE SetDamageModifier)
+	Q_PROPERTY(float HealingModifier READ GetHealingModifier WRITE SetHealingModifier)
+	Q_PROPERTY(float DefenseModifier READ GetDefenseModifier WRITE SetDefenseModifier)
+	Q_PROPERTY(quint16 BonusDamage READ GetBonusDamage WRITE SetBonusDamage)
+	Q_PROPERTY(quint16 BlockDamage READ GetBlockDamage WRITE SetBlockDamage)
+	Q_PROPERTY(quint16 BonusHealing READ GetBonusHealing WRITE SetBonusHealing)
+	Q_PROPERTY(quint16 BlockHealing READ GetBlockHealing WRITE SetBlockHealing)
 	Q_PROPERTY(bool RacialUsed READ RacialUsed WRITE RacialUsed)
 	Q_PROPERTY(bool AttackedThisRound READ AttackedThisRound WRITE AttackedThisRound)
 
@@ -76,6 +84,14 @@ public:
 	void SetMaxHealth(quint16);
 	void SetPower(quint16);
 	void SetSpeed(quint16);
+	void SetAccuracyOffset(float);
+	void SetDamageModifier(float);
+	void SetHealingModifier(float);
+	void SetDefenseModifier(float);
+	void SetBonusDamage(quint16);
+	void SetBlockDamage(quint16);
+	void SetBonusHealing(quint16);
+	void SetBlockHealing(quint16);
 	void RacialUsed(bool);
 	void AttackedThisRound(bool);
 
@@ -90,6 +106,14 @@ public:
 	quint16 GetMaxHealth();
 	quint16 GetPower();
 	quint16 GetSpeed();
+	float GetAccuracyOffset();
+	float GetDamageModifier();
+	float GetHealingModifier();
+	float GetDefenseModifier();
+	quint16 GetBonusDamage();
+	quint16 GetBlockDamage();
+	quint16 GetBonusHealing();
+	quint16 GetBlockHealing();
 	bool RacialUsed();
 	bool AttackedThisRound();
 
@@ -101,9 +125,11 @@ private:
 	float baseHealth, basePower, baseSpeed;
 	quint16 normalMaxHealth, normalPower, normalSpeed, lastKnownHealth;
 	quint16 currentHealth, currentMaxHealth, currentPower, currentSpeed;
+	float accuracyOffset, damageModifier, healingModifier, defenseModifier;
+	quint16 bonusDamage, blockDamage, bonusHealing, blockHealing;
 
 	bool racialUsed, attackedThisRound;
-	PetAction *currentAction; //Determine how to use this.
+	PetAction *currentAction; //TODO: Determine how to use this.
 
 	QJsonArray abilityList;
 	QList<int> petStatuses;
