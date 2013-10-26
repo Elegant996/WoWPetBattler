@@ -15,7 +15,7 @@
 #include "PetAction.h"
 #include "PetAura.h"
 #include "PetBreed.h"
-#include "PetHelper.h"
+#include "PetStats.h"
 #include "PetType.h"
 
 class Pet : public QObject
@@ -30,6 +30,7 @@ class Pet : public QObject
 	Q_PROPERTY(quint16 NormalMaxHealth READ GetNormalMaxHealth)
 	Q_PROPERTY(quint16 NormalPower READ GetNormalPower)
 	Q_PROPERTY(quint16 NormalSpeed READ GetNormalSpeed)
+	Q_PROPERTY(bool IsDead READ IsDead)
 	Q_PROPERTY(quint16 LastKnownHealth READ GetLastKnownHealth WRITE SetLastKnownHealth)
 	Q_PROPERTY(quint16 Health READ GetHealth WRITE SetHealth)
 	Q_PROPERTY(quint16 MaxHealth READ GetMaxHealth WRITE SetMaxHealth)
@@ -44,7 +45,9 @@ public:
 	~Pet(void);
 	Pet(const Pet&);
 
-	enum PetStatus { First, Second, Stunned, Rooted, Burning, Chilled, Bleeding, Webbed, Blinded, Poisoned, Evading, Asleep };
+	enum PetStatus { First, Second, Stunned, Rooted, Burning, Chilled, Bleeding,
+					Webbed, Blinded, Poisoned, Evading, Burrowed, Resilient, Asleep,
+					Unkillable };
 
 	void RoundUpdate();
 
@@ -65,6 +68,8 @@ public:
 	Q_INVOKABLE int GetNumAuras();
 	Q_INVOKABLE PetAura* GetAura(quint8);
 	//QQmlListProperty<PetAura> GetAuras();
+
+	bool IsDead();
 
 	void SetLastKnownHealth(quint16);
 	void SetHealth(quint16);

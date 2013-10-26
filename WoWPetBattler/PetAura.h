@@ -23,6 +23,8 @@ public:
 
 	void RoundUpdate();
 
+	void UpdateAura(int, bool);
+
 	QString GetName();
 	quint16 GetAuraId();
 

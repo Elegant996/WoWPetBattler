@@ -238,10 +238,11 @@
     <ClCompile Include="PetAction.cpp" />
     <ClCompile Include="PetAura.cpp" />
     <ClCompile Include="PetBreed.cpp" />
-    <ClCompile Include="PetHelper.cpp" />
+    <ClCompile Include="PetStats.cpp" />
     <ClCompile Include="PetStage.cpp" />
     <ClCompile Include="Interpreter.cpp" />
     <ClCompile Include="PetTeam.cpp" />
+    <ClCompile Include="PetType.cpp" />
     <ClCompile Include="WoWPetBattler.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -396,7 +397,7 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DWIN64 -DQT_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_WIDGETS_LIB -DQT_QML_LIB "-I.\GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtWidgets" "-I$(QTDIR)\include\QtQml"</Command>
     </CustomBuild>
     <ClInclude Include="PetBreed.h" />
-    <ClInclude Include="PetHelper.h" />
+    <ClInclude Include="PetStats.h" />
     <CustomBuild Include="PetTeam.h">
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Moc%27ing PetTeam.h...</Message>

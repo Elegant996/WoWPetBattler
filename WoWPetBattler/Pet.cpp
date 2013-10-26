@@ -41,17 +41,18 @@ Pet::Pet(quint16 speciesId, quint8 breed, quint8 quality, quint8 level)
 	this->baseHealth = species.value(QString("baseHealth")).toDouble();
 	this->basePower = species.value(QString("basePower")).toDouble();
 	this->baseSpeed = species.value(QString("baseSpeed")).toDouble();
-	this->normalMaxHealth = PetHelper::CalculateHealth(this->baseHealth, PetBreed::GetHealth(this->breed), this->level, this->quality);
-	this->normalPower = PetHelper::CalculatePower(this->basePower, PetBreed::GetPower(this->breed), this->level, this->quality);
-	this->normalSpeed = PetHelper::CalculateSpeed(this->baseSpeed, PetBreed::GetSpeed(this->breed), this->level, this->quality);
+	this->normalMaxHealth = PetStats::CalculateHealth(this->baseHealth, PetBreed::GetHealth(this->breed), this->level, this->quality);
+	this->normalPower = PetStats::CalculatePower(this->basePower, PetBreed::GetPower(this->breed), this->level, this->quality);
+	this->normalSpeed = PetStats::CalculateSpeed(this->baseSpeed, PetBreed::GetSpeed(this->breed), this->level, this->quality);
 	this->lastKnownHealth = 0;
 	this->currentHealth = this->normalMaxHealth;
 	this->currentMaxHealth = this->currentHealth;
 	this->currentPower = this->normalPower;
 	this->currentSpeed = this->normalSpeed;
-	this->racialUsed = (type==1 || type==3 || type==9) ? false : true;
+	this->racialUsed = false;
 	this->currentAction = new PetAction(0, 0);
 	this->abilityList = species.value(QString("abilities")).toArray();
+	this->petAuras.append(new PetAura(PetType::GetTypeAuraId(type), 0, false));
 }
 
 //Deconstructor
@@ -174,6 +175,16 @@ PetAbility* Pet::GetAbility(quint8 index)
 //Add an aura to the current pet.
 void Pet::AddAura(quint16 auraId, qint8 duration, bool isFresh)
 {
+	//Check to see if petAuras is empty, if not check to see if it exists already and overwrite.
+	if (!petAuras.isEmpty())
+		for (int i=0; i < this->petAuras.size(); i+=1)
+			if (auraId == this->petAuras.at(i)->GetAuraId())
+			{
+				this->petAuras.at(i)->UpdateAura(duration, isFresh);
+				return;
+			}
+
+	//If it doesn't exist, add it.
 	this->petAuras.append(new PetAura(auraId, duration, isFresh));
 }
 
@@ -201,6 +212,12 @@ PetAura* Pet::GetAura(quint8 index)
 {
 	return QQmlListProperty<PetAura>(this, petAuras);
 }*/
+
+//Return whether or not the pet is dead.
+bool Pet::IsDead()
+{
+	return (currentHealth == 0) ? true : false;
+}
 
 //Set the pet's last know health.
 void Pet::SetLastKnownHealth(quint16 lastKnownHealth)

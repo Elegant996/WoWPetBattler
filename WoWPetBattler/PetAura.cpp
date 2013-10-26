@@ -49,10 +49,17 @@ PetAura::PetAura(const PetAura& other)
 //Update CDs and auras.
 void PetAura::RoundUpdate()
 {
-	if (!isFresh)
+	if (!isFresh && duration != -1)
 		this->duration -= 1;
 	else
 		isFresh = false;
+}
+
+//Update the aura. Used when recasted.
+void PetAura::UpdateAura(int duration, bool isFresh)
+{
+	this->duration = (duration == 0) ? -1 : duration;
+	this->isFresh = isFresh;
 }
 
 //Return the name of the aura.

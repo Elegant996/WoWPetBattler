@@ -9,6 +9,11 @@ class PetType : public QObject
 	Q_ENUMS(Type)
 public:
 	static enum Type { Humanoid, Dragonkin, Flying, Undead, Critter, Magic, Elemental, Beast, Aquatic, Mechanical };
+
+	static int GetTypeAuraId(Type);
+
+private:
+	static int auraIds[];
 };
 
 #endif

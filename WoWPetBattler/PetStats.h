@@ -1,9 +1,9 @@
-#ifndef PETHELPER_H
-#define PETHELPER_H
+#ifndef PETSTATS_H
+#define PETSTATS_H
 
-#include <math.h>
+#include <QtCore/qmath.h>
 
-class PetHelper
+class PetStats
 {
 public:
 	static int CalculateHealth(float, float, float, float);

@@ -39,7 +39,7 @@ bool PetTeam::IsTeamDead()
 {
 	//Check to see if anyone's health is above 0.
 	for (int i=1; i < pets.size(); i+=1)
-		if (pets.at(i)->GetHealth() > 0)
+		if (!pets.at(i)->IsDead())
 			return false;
 	//Team must be dead.
 	return true;

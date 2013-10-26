@@ -74,9 +74,6 @@
     <ClCompile Include="PetBreed.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="PetHelper.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="WoWPetBattler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -137,6 +134,12 @@
     <ClCompile Include="GeneratedFiles\Release\moc_PetAction.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
+    <ClCompile Include="PetStats.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PetType.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="wowpetbattler.qrc">
@@ -180,13 +183,13 @@
     <ClInclude Include="PetBreed.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="PetHelper.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="GeneratedFiles\UI_WoWPetBattler.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
     <ClInclude Include="Move.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PetStats.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
