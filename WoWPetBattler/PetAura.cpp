@@ -23,6 +23,7 @@ PetAura::PetAura(quint16 auraId, qint8 duration, bool isFresh)
 	this->isFresh = isFresh;
 	this->isObject = false;
 	this->onSwapIn = false;
+	this->charges = 0;
 }
 
 //Destructor
@@ -44,6 +45,7 @@ PetAura::PetAura(const PetAura& other)
 	this->isFresh = other.isFresh;
 	this->isObject = other.isObject;
 	this->onSwapIn = other.onSwapIn;
+	this->charges = other.charges;
 }
 
 //Update CDs and auras.
@@ -62,6 +64,24 @@ void PetAura::UpdateAura(int duration, bool isFresh)
 	this->isFresh = isFresh;
 }
 
+//Set whether or not the aura is an object.
+void PetAura::IsObject(bool isObject)
+{
+	this->isObject = isObject;
+}
+
+//Set whether or not the aura takes effect on a pet swap in.
+void PetAura::OnSwapIn(bool onSwapIn)
+{
+	this->onSwapIn = onSwapIn;
+}
+
+//Set the number of charges left on the aura.
+void PetAura::SetCharges(quint8 charges)
+{
+	this->charges = charges;
+}
+
 //Return the name of the aura.
 QString PetAura::GetName()
 {
@@ -74,16 +94,10 @@ quint16 PetAura::GetAuraId()
 	return this->auraId;
 }
 
-//Set whether or not the aura is an object.
-void PetAura::IsObject(bool isObject)
+//Return the number of charges left on the aura.
+quint8 PetAura::GetCharges()
 {
-	this->isObject = isObject;
-}
-
-//Set whether or not the aura takes effect on a pet swap in.
-void PetAura::OnSwapIn(bool onSwapIn)
-{
-	this->onSwapIn = onSwapIn;
+	return this->charges;
 }
 
 //Return whether or not the aura is an object.

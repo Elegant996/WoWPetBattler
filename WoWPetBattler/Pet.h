@@ -37,6 +37,8 @@ class Pet : public QObject
 	Q_PROPERTY(quint16 Power READ GetPower WRITE SetPower)
 	Q_PROPERTY(quint16 Speed READ GetSpeed WRITE SetSpeed)
 	Q_PROPERTY(float AccuracyOffset READ GetAccuracyOffset WRITE SetAccuracyOffset)
+	Q_PROPERTY(float AvoidanceModifier READ GetAvoidanceModifier WRITE SetAvoidanceModifier)
+	Q_PROPERTY(float CriticalStrikeModifier READ GetCriticalStrikeModifier WRITE SetCriticalStrikeModifier)
 	Q_PROPERTY(float DamageModifier READ GetDamageModifier WRITE SetDamageModifier)
 	Q_PROPERTY(float HealingModifier READ GetHealingModifier WRITE SetHealingModifier)
 	Q_PROPERTY(float DefenseModifier READ GetDefenseModifier WRITE SetDefenseModifier)
@@ -86,6 +88,8 @@ public:
 	void SetPower(quint16);
 	void SetSpeed(quint16);
 	void SetAccuracyOffset(float);
+	void SetAvoidanceModifier(float);
+	void SetCriticalStrikeModifier(float);
 	void SetDamageModifier(float);
 	void SetHealingModifier(float);
 	void SetDefenseModifier(float);
@@ -108,6 +112,8 @@ public:
 	quint16 GetPower();
 	quint16 GetSpeed();
 	float GetAccuracyOffset();
+	float GetAvoidanceModifier();
+	float GetCriticalStrikeModifier();
 	float GetDamageModifier();
 	float GetHealingModifier();
 	float GetDefenseModifier();
@@ -127,7 +133,8 @@ private:
 	float baseHealth, basePower, baseSpeed;
 	quint16 normalMaxHealth, normalPower, normalSpeed, lastKnownHealth;
 	quint16 currentHealth, currentMaxHealth, currentPower, currentSpeed;
-	float accuracyOffset, damageModifier, healingModifier, defenseModifier;
+	float accuracyOffset, avoidanceModifier, criticalStrikeModifier;
+	float damageModifier, healingModifier, defenseModifier;
 	quint16 bonusDamage, blockDamage, bonusHealing, blockHealing;
 
 	bool racialUsed, attackedThisRound;

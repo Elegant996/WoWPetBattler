@@ -26,6 +26,22 @@ AI::~AI(void)
 	delete engine;
 }
 
+//Accept the queue when it has popped.
+void AI::QueueUp()
+{
+	//Accept Queue.
+	//keyboard.Click("`");
+	qDebug() << "`";
+}
+
+//Queue up for PvP Battle.
+void AI::AcceptQueue()
+{
+	//Queue Up.
+	//keyboard.Click("`");	
+	qDebug() << "`";
+}
+
 //Begin AI simulation and respond with best move.
 void AI::Run()
 {
@@ -38,12 +54,6 @@ void AI::Run()
 	else if (petStage->SelectPet() && !petStage->Initialized())
 		qDebug() << "F1";
 		//keyboard.Click("F1");	//Select First Pet
-	else if (petStage->QueueState() == 3)
-		//keyboard.Click("`");		//Accept Queue
-		qDebug() << "`";
-	else if (petStage->QueueState() == 0)
-		//keyboard.Click("`");	//Queue Up
-		qDebug() << "`";
 }
 
 //Modified minimax that also uses expected in computation.

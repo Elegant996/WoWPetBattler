@@ -19,6 +19,9 @@ public:
 	AI(PetStage*);
 	~AI(void);
 
+	void QueueUp();
+	void AcceptQueue();
+
 signals:
 	void OutputToGUI(QString, QString);
 	void OutputToGUI(QString);

@@ -2,7 +2,7 @@
 
 
 Interpreter::Interpreter(PetStage* petStage, AI* ai, Robot::Window *window) :
-	BUILD(56), running(true), readSuccess(false), oneTimeNotifier(false)
+	BUILD(56), running(true), queueEnabled(false), readSuccess(false), oneTimeNotifier(false)
 {
 	this->petStage = petStage;
 	this->ai = ai;
@@ -126,10 +126,10 @@ void Interpreter::run()
 			qDebug() << "Determine if victor";
 			petStage->Reinitialize();			//We've just left a pet battle so let's reset the stage.
 		}
-		else if (petStage->QueueState() != 3 && (pixels[0].R & 3) == 3)
-			qDebug() << "Accept Queue";
-		else if (!petStage->InPetBattle() && petStage->QueueState() == 0 && (pixels[0].R & 3) == 0)
-			qDebug() << "Queue Up";
+		else if (queueEnabled && petStage->QueueState() != 3 && (pixels[0].R & 3) == 3)
+			ai->AcceptQueue();
+		else if (queueEnabled && !petStage->InPetBattle() && petStage->QueueState() == 0 && (pixels[0].R & 3) == 0)
+			ai->QueueUp();
 
 		//Update petStage.
 		petStage->InPetBattle((pixels[0].R & 128) != 0);

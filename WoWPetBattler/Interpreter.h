@@ -38,7 +38,7 @@ private:
 	void UpdateAbilities();
 	void UpdateAuras();
 
-	volatile bool running;
+	volatile bool running, queueEnabled;
 	const quint8 BUILD;
 
 	PetStage *petStage;

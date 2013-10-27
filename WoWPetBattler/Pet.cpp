@@ -18,6 +18,8 @@ Pet::Pet()
 	this->currentPower = 0;
 	this->currentSpeed = 0;
 	this->accuracyOffset = 0.00;
+	this->avoidanceModifier = 1.00;
+	this->criticalStrikeModifier = 1.05;
 	this->damageModifier = 1.00;
 	this->healingModifier = 1.00;
 	this->defenseModifier = 1.00;
@@ -27,7 +29,7 @@ Pet::Pet()
 	this->blockHealing = 0;
 	this->racialUsed = false;
 	this->attackedThisRound = false;
-	this->currentAction = new PetAction(0, 0);
+	this->currentAction = 0;
 }
 
 Pet::Pet(quint16 speciesId, quint8 breed, quint8 quality, quint8 level)
@@ -59,6 +61,8 @@ Pet::Pet(quint16 speciesId, quint8 breed, quint8 quality, quint8 level)
 	this->currentPower = this->normalPower;
 	this->currentSpeed = this->normalSpeed;
 	this->accuracyOffset = 0.00;
+	this->avoidanceModifier = 1.00;
+	this->criticalStrikeModifier = 1.05;
 	this->damageModifier = 1.00;
 	this->healingModifier = 1.00;
 	this->defenseModifier = 1.00;
@@ -79,7 +83,8 @@ Pet::~Pet(void)
 	delete currentAction;
 	qDeleteAll(this->petAbilities);
 	this->petAbilities.clear();
-	RemoveAuras();
+	qDeleteAll(this->petAuras);
+	this->petAuras.clear();
 }
 
 //Copy Constructor
@@ -104,6 +109,8 @@ Pet::Pet(const Pet& other)
 	this->currentPower = other.currentPower;
 	this->currentSpeed = other.currentSpeed;
 	this->accuracyOffset = other.accuracyOffset;
+	this->avoidanceModifier = other.avoidanceModifier;
+	this->criticalStrikeModifier = other.criticalStrikeModifier;
 	this->damageModifier = other.damageModifier;
 	this->healingModifier = other.healingModifier;
 	this->defenseModifier = other.defenseModifier;
@@ -218,11 +225,17 @@ void Pet::AddAura(quint16 auraId, qint8 duration, bool isFresh)
 	this->petAuras.append(new PetAura(auraId, duration, isFresh));
 }
 
-//Removes all pet auras on the current pet.
+//Removes all pet auras except the racial passive on the pet.
 void Pet::RemoveAuras()
 {
-	qDeleteAll(this->petAuras);
-	this->petAuras.clear();
+	//Mutable iterator to allow modification of the QList.
+	QMutableListIterator<PetAura*> i(petAuras);
+	if (i.hasNext())
+	{
+		i.next();
+		while (i.hasNext())
+			i.remove();
+	}
 }
 
 //Return number of auras on the pet
@@ -283,6 +296,18 @@ void Pet::SetSpeed(quint16 speed)
 void Pet::SetAccuracyOffset(float accuracyOffset)
 {
 	this->accuracyOffset = accuracyOffset;
+}
+
+//Set the pet's avoidance modifier.
+void Pet::SetAvoidanceModifier(float avoidanceModifier)
+{
+	this->avoidanceModifier = avoidanceModifier;
+}
+
+//Set the pet's critical strike modifier.
+void Pet::SetCriticalStrikeModifier(float criticalStrikeModifier)
+{
+	this->criticalStrikeModifier = criticalStrikeModifier;
 }
 
 //Set the pet's damage modifier.
@@ -408,6 +433,18 @@ quint16 Pet::GetSpeed()
 float Pet::GetAccuracyOffset()
 {
 	return this->accuracyOffset;
+}
+
+//Return the pet's avoidance modifier.
+float Pet::GetAvoidanceModifier()
+{
+	return this->avoidanceModifier;
+}
+
+//Return the pet's critical strike modifier.
+float Pet::GetCriticalStrikeModifier()
+{
+	return this->criticalStrikeModifier;
 }
 
 //Return the pet's damage modifier.
