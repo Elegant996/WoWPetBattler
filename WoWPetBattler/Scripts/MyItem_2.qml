@@ -18,6 +18,7 @@ Item
         console.log(petStage.GetTeam(1));
         console.log(petStage.GetTeam(1).ActivePet);
         petStage.GetTeam(1).ActivePetIndex = petPos;
+        petStage.GetTeam(1).ActivePetIndex += 1;
         console.log(petStage.GetTeam(1).ActivePet);
         console.log(petStage.GetTeam(1).ActivePet.Health);
         console.log(petStage.GetTeam(1).ActivePet.GetAbility(1));

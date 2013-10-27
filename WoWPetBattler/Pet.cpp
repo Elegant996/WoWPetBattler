@@ -29,7 +29,7 @@ Pet::Pet()
 	this->blockHealing = 0;
 	this->racialUsed = false;
 	this->attackedThisRound = false;
-	this->currentAction = 0;
+	this->currentAction = new PetAction(0, 0);
 }
 
 Pet::Pet(quint16 speciesId, quint8 breed, quint8 quality, quint8 level)
