@@ -32,6 +32,7 @@ public:
 
 	QString GetName();
 	quint16 GetAuraId();
+	qint8 GetDuration();
 	quint8 GetCharges();
 	bool IsObject();
 	bool OnSwapIn();	

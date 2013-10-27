@@ -29,16 +29,14 @@ AI::~AI(void)
 //Accept the queue when it has popped.
 void AI::QueueUp()
 {
-	//Accept Queue.
-	//keyboard.Click("`");
+	//keyboard.Click("`");		//Accept Queue.
 	qDebug() << "`";
 }
 
 //Queue up for PvP Battle.
 void AI::AcceptQueue()
 {
-	//Queue Up.
-	//keyboard.Click("`");	
+	//keyboard.Click("`");		//Queue Up.	
 	qDebug() << "`";
 }
 

@@ -94,6 +94,12 @@ quint16 PetAura::GetAuraId()
 	return this->auraId;
 }
 
+//Return the duration of the aura.
+qint8 PetAura::GetDuration()
+{
+	return this->duration;
+}
+
 //Return the number of charges left on the aura.
 quint8 PetAura::GetCharges()
 {

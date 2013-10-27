@@ -81,10 +81,16 @@ Pet::Pet(quint16 speciesId, quint8 breed, quint8 quality, quint8 level)
 Pet::~Pet(void)
 {
 	delete currentAction;
-	qDeleteAll(this->petAbilities);
-	this->petAbilities.clear();
+
+	//qDeleteAll(this->petAbilities);
+	//this->petAbilities.clear();
+
+	for (int i=0; i < petAuras.size(); i+=1)
+		delete (petAuras.takeAt(0));
+
 	qDeleteAll(this->petAuras);
 	this->petAuras.clear();
+
 }
 
 //Copy Constructor
@@ -144,8 +150,28 @@ void Pet::RoundUpdate()
 		petAbility->RoundUpdate();
 
 	//Update each aura.
-	foreach (PetAura *petAura, this->petAuras)
+	/*QMutableListIterator<PetAura*> i(this->petAuras);
+	while (i.hasNext())
+	{
+		PetAura* petAura = i.next();
 		petAura->RoundUpdate();
+		if (petAura->GetDuration() == 0)
+			i.remove();
+	}*/
+
+	//TODO: Test this!
+	for (int i=0; i < petAuras.size(); i+=1)
+	{
+		petAuras.at(i)->RoundUpdate();
+		if (petAuras.at(i)->GetDuration() == 0)
+		{
+			delete (petAuras.takeAt(i));
+			i -= 1; //To correct the loop.
+		}
+	}
+	
+	//foreach (PetAura *petAura, this->petAuras)
+		//petAura->RoundUpdate();
 }
 
 //Adds the status to the list.
@@ -228,17 +254,12 @@ void Pet::AddAura(quint16 auraId, qint8 duration, bool isFresh)
 //Removes all pet auras except the racial passive on the pet.
 void Pet::RemoveAuras()
 {
-	//Mutable iterator to allow modification of the QList.
-	QMutableListIterator<PetAura*> i(petAuras);
-	if (i.hasNext())
-	{
-		i.next();
-		while (i.hasNext())
-			i.remove();
-	}
+	//Ignore the first aura for real pets.
+	for (int i=(speciesId==0)?0:1; i < petAuras.size(); i+=1)
+		delete (petAuras.takeAt(1));
 }
 
-//Return number of auras on the pet
+//Return number of auras on the pet.
 int Pet::GetNumAuras()
 {
 	return petAuras.size();
