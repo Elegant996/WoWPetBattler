@@ -3,15 +3,23 @@
 
 #include <QDataStream>
 
+#include "PetAction.h"
+
 class Move
 {
 public:
-	Move(quint8);
+	Move();
 	~Move(void);
 	Move(const Move&);
 
+	void SetAction(PetAction::Action);
+	void SetHeuristic(float);
+
+	PetAction::Action GetAction();
+	float GetHeuristic();
+
 private:
-	const quint8 move;
+	PetAction::Action action;
 	float heuristic;
 };
 

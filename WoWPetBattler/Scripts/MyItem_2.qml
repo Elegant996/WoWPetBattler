@@ -2,6 +2,7 @@
 import QtQuick 2.0
 import PetType 1.0
 import PetStatus 1.0
+import PetAction 1.0
 
 Item
 {
@@ -27,5 +28,8 @@ Item
         console.log(value);
         console.log("Test: " + myTest.ActivePetIndex);
         console.log("Type: " + PetType.Humanoid);
+        console.log(petStage.GetTeam(1).ActivePet.GetCurrentAction().Action);
+        petStage.GetTeam(1).ActivePet.GetCurrentAction().Action = 1;
+        console.log(petStage.GetTeam(1).ActivePet.GetCurrentAction().Action);
     }
 }

@@ -98,8 +98,8 @@ void WoWPetBattler::on_playButton_clicked()
 	qmlRegisterType<PetStage>();
 	qmlRegisterType<PetTeam>();
 	qmlRegisterType<PetType>("PetType", 1, 0, "PetType");
-	qmlRegisterType<PetAction>();
 	qmlRegisterType<Pet>("PetStatus", 1, 0, "PetStatus");
+	qmlRegisterType<PetAction>("PetAction", 1, 0, "PetAction");
 	qmlRegisterType<PetAbility>();
 	qmlRegisterType<PetAura>();
 

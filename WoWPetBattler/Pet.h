@@ -9,7 +9,6 @@
 #include <QObject>
 #include <QQmlListProperty>
 #include <QQueue>
-#include <QtAlgorithms>
 
 #include "PetAbility.h"
 #include "PetAction.h"
@@ -37,8 +36,8 @@ class Pet : public QObject
 	Q_PROPERTY(quint16 Power READ GetPower WRITE SetPower)
 	Q_PROPERTY(quint16 Speed READ GetSpeed WRITE SetSpeed)
 	Q_PROPERTY(float AccuracyOffset READ GetAccuracyOffset WRITE SetAccuracyOffset)
-	Q_PROPERTY(float AvoidanceModifier READ GetAvoidanceModifier WRITE SetAvoidanceModifier)
-	Q_PROPERTY(float CriticalStrikeModifier READ GetCriticalStrikeModifier WRITE SetCriticalStrikeModifier)
+	Q_PROPERTY(float AvoidanceRating READ GetAvoidanceRating WRITE SetAvoidanceRating)
+	Q_PROPERTY(float CriticalStrikeRating READ GetCriticalStrikeRating WRITE SetCriticalStrikeRating)
 	Q_PROPERTY(float DamageModifier READ GetDamageModifier WRITE SetDamageModifier)
 	Q_PROPERTY(float HealingModifier READ GetHealingModifier WRITE SetHealingModifier)
 	Q_PROPERTY(float DefenseModifier READ GetDefenseModifier WRITE SetDefenseModifier)
@@ -56,9 +55,9 @@ public:
 	~Pet(void);
 	Pet(const Pet&);
 
-	enum PetStatus { First, Second, Stunned, Rooted, Burning, Chilled, Bleeding,
-					Webbed, Blinded, Poisoned, Evading, Burrowed, Resilient, Asleep,
-					Unkillable };
+	enum PetStatus { First, Second, Stunned, Rooted, Burning, Chilled, Polymorphed,
+					Webbed, Blinded, Poisoned, Bleeding, Burrowed, Resilient, Asleep,
+					Flying, Unkillable, Swapping };
 
 	void RoundUpdate();
 
@@ -88,8 +87,8 @@ public:
 	void SetPower(quint16);
 	void SetSpeed(quint16);
 	void SetAccuracyOffset(float);
-	void SetAvoidanceModifier(float);
-	void SetCriticalStrikeModifier(float);
+	void SetAvoidanceRating(float);
+	void SetCriticalStrikeRating(float);
 	void SetDamageModifier(float);
 	void SetHealingModifier(float);
 	void SetDefenseModifier(float);
@@ -112,8 +111,8 @@ public:
 	quint16 GetPower();
 	quint16 GetSpeed();
 	float GetAccuracyOffset();
-	float GetAvoidanceModifier();
-	float GetCriticalStrikeModifier();
+	float GetAvoidanceRating();
+	float GetCriticalStrikeRating();
 	float GetDamageModifier();
 	float GetHealingModifier();
 	float GetDefenseModifier();
@@ -121,7 +120,7 @@ public:
 	quint16 GetBlockDamage();
 	quint16 GetBonusHealing();
 	quint16 GetBlockHealing();
-	PetAction* GetCurrentAction();
+	Q_INVOKABLE PetAction* GetCurrentAction();
 	bool RacialUsed();
 	bool AttackedThisRound();
 
@@ -133,7 +132,7 @@ private:
 	float baseHealth, basePower, baseSpeed;
 	quint16 normalMaxHealth, normalPower, normalSpeed, lastKnownHealth;
 	quint16 currentHealth, currentMaxHealth, currentPower, currentSpeed;
-	float accuracyOffset, avoidanceModifier, criticalStrikeModifier;
+	float accuracyOffset, avoidanceRating, criticalStrikeRating;
 	float damageModifier, healingModifier, defenseModifier;
 	quint16 bonusDamage, blockDamage, bonusHealing, blockHealing;
 

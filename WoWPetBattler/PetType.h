@@ -10,10 +10,10 @@ class PetType : public QObject
 public:
 	static enum Type { Humanoid, Dragonkin, Flying, Undead, Critter, Magic, Elemental, Beast, Aquatic, Mechanical };
 
-	static int GetTypeAuraId(Type);
+	static quint8 GetTypeAuraId(Type);
 
 private:
-	static int auraIds[];
+	static quint8 auraIds[];
 };
 
 #endif

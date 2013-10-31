@@ -4,7 +4,6 @@
 #include <QList>
 #include <QObject>
 #include <QQmlListProperty>
-#include <QtAlgorithms>
 
 #include "Pet.h"
 

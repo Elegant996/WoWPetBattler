@@ -1,11 +1,11 @@
 #include "PetAction.h"
 
 //Constructor
-PetAction::PetAction(quint16 abilityId, qint8 roundsRemaining)
+PetAction::PetAction()
 	: QObject(NULL)
 {
-	this->abilityId = abilityId;
-	this->roundsRemaining = roundsRemaining;
+	this->action = Action::None;
+	this->roundsRemaining = 0;
 }
 
 //Destructor
@@ -17,7 +17,7 @@ PetAction::~PetAction(void)
 PetAction::PetAction(const PetAction& other)
 	: QObject(NULL)
 {
-	this->abilityId = other.abilityId;
+	this->action = other.action;
 	this->roundsRemaining = other.roundsRemaining;
 }
 
@@ -25,13 +25,16 @@ PetAction::PetAction(const PetAction& other)
 void PetAction::RoundUpdate()
 {
 	if (this->roundsRemaining > 0)
+	{
 		this->roundsRemaining -= 1;
+		this->action = (roundsRemaining == 0) ? Action::None : this->action;
+	}
 }
 
-//Set the ability id.
-void PetAction::SetAbilityId(quint16 abilityId)
+//Set the action.
+void PetAction::SetAction(PetAction::Action action)
 {
-	this->abilityId = abilityId;
+	this->action = action;
 }
 
 //Set the rounds remaining.
@@ -40,12 +43,11 @@ void PetAction::SetRoundsRemaining(qint8 roundsRemaining)
 	this->roundsRemaining = roundsRemaining;
 }
 
-//Return the ability id.
-quint16 PetAction::GetAbilityId()
+//Return the action.
+PetAction::Action PetAction::GetAction()
 {
-	return this->abilityId;
+	return this->action;
 }
-
 
 //Return the rounds remaining.
 qint8 PetAction::GetRoundsRemaining()

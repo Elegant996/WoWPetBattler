@@ -11,8 +11,8 @@ PetTeam::PetTeam(void)
 //Destructor
 PetTeam::~PetTeam(void)
 {
-	qDeleteAll(this->pets);
-	this->pets.clear();
+	for (int i=0; i < pets.size(); i+=1)
+		delete (pets.takeAt(0));
 }
 
 //Copy Constructor

@@ -31,6 +31,8 @@ public slots:
 
 private:
 	Move Expectiminimax(PetStage*, int);
+	Move temp(PetStage*, int, int);
+	quint8 CalculatePriority();
 
 	QQmlEngine *engine;
 	QQmlContext *objectContext;

@@ -24,8 +24,9 @@ PetStage::PetStage(void)
 //Destructor
 PetStage::~PetStage(void)
 {
-	qDeleteAll(this->petTeams);
-	this->petTeams.clear();
+	for (int i=0; i < petTeams.size(); i+=1)
+		delete (petTeams.takeAt(0));
+	petTeams.clear();
 }
 
 //Copy Constructor
@@ -80,6 +81,14 @@ void PetStage::RoundUpdate()
 {
 	foreach(PetTeam *petTeam, this->petTeams)
 		petTeam->RoundUpdate();
+}
+
+//Return whether or not the match is over.
+bool PetStage::IsMatchOver()
+{
+	if (petTeams.at(1)->IsTeamDead() || petTeams.at(2)->IsTeamDead())
+		return true;
+	return false;
 }
 
 //Return the desired pet team; 0 for field, 1 for player, 2 for opponent;

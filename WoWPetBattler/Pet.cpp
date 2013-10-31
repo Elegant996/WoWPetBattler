@@ -18,8 +18,8 @@ Pet::Pet()
 	this->currentPower = 0;
 	this->currentSpeed = 0;
 	this->accuracyOffset = 0.00;
-	this->avoidanceModifier = 1.00;
-	this->criticalStrikeModifier = 1.05;
+	this->avoidanceRating = 0.00;
+	this->criticalStrikeRating = 0.05;
 	this->damageModifier = 1.00;
 	this->healingModifier = 1.00;
 	this->defenseModifier = 1.00;
@@ -29,7 +29,7 @@ Pet::Pet()
 	this->blockHealing = 0;
 	this->racialUsed = false;
 	this->attackedThisRound = false;
-	this->currentAction = new PetAction(0, 0);
+	this->currentAction = new PetAction();
 }
 
 Pet::Pet(quint16 speciesId, quint8 breed, quint8 quality, quint8 level)
@@ -61,8 +61,8 @@ Pet::Pet(quint16 speciesId, quint8 breed, quint8 quality, quint8 level)
 	this->currentPower = this->normalPower;
 	this->currentSpeed = this->normalSpeed;
 	this->accuracyOffset = 0.00;
-	this->avoidanceModifier = 1.00;
-	this->criticalStrikeModifier = 1.05;
+	this->avoidanceRating = 0.00;
+	this->criticalStrikeRating = 0.05;
 	this->damageModifier = 1.00;
 	this->healingModifier = 1.00;
 	this->defenseModifier = 1.00;
@@ -72,7 +72,7 @@ Pet::Pet(quint16 speciesId, quint8 breed, quint8 quality, quint8 level)
 	this->blockHealing = 0;
 	this->racialUsed = false;
 	this->attackedThisRound = false;
-	this->currentAction = new PetAction(0, 0);
+	this->currentAction = new PetAction();
 	this->abilityList = species.value(QString("abilities")).toArray();
 	this->petAuras.append(new PetAura(PetType::GetTypeAuraId(type), 0, false));
 }
@@ -82,13 +82,12 @@ Pet::~Pet(void)
 {
 	delete currentAction;
 
-	//qDeleteAll(this->petAbilities);
-	//this->petAbilities.clear();
+	for (int i=0; i < petAbilities.size(); i+=1)
+		delete (petAbilities.takeAt(0));
+	this->petAbilities.clear();
 
 	for (int i=0; i < petAuras.size(); i+=1)
 		delete (petAuras.takeAt(0));
-
-	qDeleteAll(this->petAuras);
 	this->petAuras.clear();
 
 }
@@ -115,8 +114,8 @@ Pet::Pet(const Pet& other)
 	this->currentPower = other.currentPower;
 	this->currentSpeed = other.currentSpeed;
 	this->accuracyOffset = other.accuracyOffset;
-	this->avoidanceModifier = other.avoidanceModifier;
-	this->criticalStrikeModifier = other.criticalStrikeModifier;
+	this->avoidanceRating = other.avoidanceRating;
+	this->criticalStrikeRating = other.criticalStrikeRating;
 	this->damageModifier = other.damageModifier;
 	this->healingModifier = other.healingModifier;
 	this->defenseModifier = other.defenseModifier;
@@ -320,15 +319,15 @@ void Pet::SetAccuracyOffset(float accuracyOffset)
 }
 
 //Set the pet's avoidance modifier.
-void Pet::SetAvoidanceModifier(float avoidanceModifier)
+void Pet::SetAvoidanceRating(float avoidanceRating)
 {
-	this->avoidanceModifier = avoidanceModifier;
+	this->avoidanceRating = avoidanceRating;
 }
 
 //Set the pet's critical strike modifier.
-void Pet::SetCriticalStrikeModifier(float criticalStrikeModifier)
+void Pet::SetCriticalStrikeRating(float criticalStrikeRating)
 {
-	this->criticalStrikeModifier = criticalStrikeModifier;
+	this->criticalStrikeRating = criticalStrikeRating;
 }
 
 //Set the pet's damage modifier.
@@ -457,15 +456,15 @@ float Pet::GetAccuracyOffset()
 }
 
 //Return the pet's avoidance modifier.
-float Pet::GetAvoidanceModifier()
+float Pet::GetAvoidanceRating()
 {
-	return this->avoidanceModifier;
+	return this->avoidanceRating;
 }
 
 //Return the pet's critical strike modifier.
-float Pet::GetCriticalStrikeModifier()
+float Pet::GetCriticalStrikeRating()
 {
-	return this->criticalStrikeModifier;
+	return this->criticalStrikeRating;
 }
 
 //Return the pet's damage modifier.

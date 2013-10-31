@@ -4,7 +4,6 @@
 #include <QList>
 #include <QObject>
 #include <QQmlListProperty>
-#include <QtAlgorithms>
 
 #include "PetTeam.h"
 
@@ -20,6 +19,8 @@ public:
 
 	void Reinitialize();
 	void RoundUpdate();
+
+	bool IsMatchOver();
 
 	Q_INVOKABLE PetTeam* GetTeam(int);
 	//QQmlListProperty<PetTeam> GetTeams();
