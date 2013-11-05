@@ -92,7 +92,7 @@ bool PetStage::IsMatchOver()
 }
 
 //Return the desired pet team; 0 for field, 1 for player, 2 for opponent;
-PetTeam* PetStage::GetTeam(int index)
+PetTeam* PetStage::GetTeam(quint8 index)
 {
 	return this->petTeams.at(index);
 }

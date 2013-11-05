@@ -258,8 +258,14 @@ void Pet::RemoveAuras()
 		delete (petAuras.takeAt(1));
 }
 
+//Remove the aura at the specified index.
+void Pet::RemoveAura(quint8 index)
+{
+	delete (petAuras.takeAt(index-1));
+}
+
 //Return number of auras on the pet.
-int Pet::GetNumAuras()
+quint8 Pet::GetNumAuras()
 {
 	return petAuras.size();
 }

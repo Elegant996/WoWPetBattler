@@ -22,7 +22,7 @@ public:
 
 	bool IsMatchOver();
 
-	Q_INVOKABLE PetTeam* GetTeam(int);
+	Q_INVOKABLE PetTeam* GetTeam(quint8);
 	//QQmlListProperty<PetTeam> GetTeams();
 
 	void QueueState(int);

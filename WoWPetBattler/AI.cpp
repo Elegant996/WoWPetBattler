@@ -3,6 +3,9 @@
 //Constructor
 AI::AI(PetStage *petStage)
 {
+	//Set stage.
+	this->petStage = petStage;
+
 	qmlRegisterType<PetStage>();
 	qmlRegisterType<PetTeam>();
 	qmlRegisterType<Pet>("PetStatus", 1, 0, "PetStatus");
@@ -16,7 +19,7 @@ AI::AI(PetStage *petStage)
 	this->objectContext = new QQmlContext(engine->rootContext());
 	this->component = new QQmlComponent(engine);
 
-	this->petStage = petStage;
+	this->tieBreaker = false;		//Used to decide if more nodes should be created.
 }
 
 //Destructor
@@ -56,14 +59,14 @@ void AI::Run()
 }
 
 //Modified minimax that also uses expected in computation.
-Move AI::Expectiminimax(PetStage* stageNode, int depth)
+/*Move AI::Expectiminimax(PetStage* stageNode, int depth)
 {
-	/*Important for setup procedure
+	Important for setup procedure
 	objectContext->setContextProperty("petStage", stageNode);	
 	component->loadUrl(QUrl::fromLocalFile("Scripts/MyItem.qml"));
 	object = component->create(objectContext);
 	QMetaObject::invokeMethod(object, "printActivePet");
-	*/
+	
 
 	//Who goes first?
 	if (stageNode->GetTeam(1)->GetActivePet()->GetSpeed() > stageNode->GetTeam(2)->GetActivePet()->GetSpeed())
@@ -94,10 +97,12 @@ Move AI::Expectiminimax(PetStage* stageNode, int depth)
 	}
 
 	return Move();
-}
+}*/
 
-Move AI::temp(PetStage* stageNode, int depth, int turnIndex)
+Move AI::Expectiminimax(PetStage* stageNode, quint8 depth, quint8 turnIndex)
 {
+	Move desiredMove;		//Used for returning the desired move.
+
 	if (depth == 0 || stageNode->IsMatchOver())
 	{
 		float score = 0;	//Default score.
@@ -110,138 +115,461 @@ Move AI::temp(PetStage* stageNode, int depth, int turnIndex)
 				score += ((i==1)?-1:1) * (stageNode->GetTeam(i)->GetPet(j)->GetHealth() / stageNode->GetTeam(i)->GetPet(j)->GetMaxHealth())
 							* (52 * stageNode->GetTeam(i)->GetPet(j)->GetLevel() + 100);
 
-		//Create Move object and pass it the score.
-		Move moveValue;
-		moveValue.SetHeuristic(score);
-
-		//Return the moves' value.
-		return moveValue;
+		
+		desiredMove.SetHeuristic(score);	//Pass it the score.		
+		return desiredMove;					//Return the moves' value.
 	}
 
-	if (turnIndex != 0)
+	//Player selects action.
+	if (turnIndex == 1)
 	{
-		//Apply aura effects that take place at the start of the turn.
-		for (quint8 i=0; i < stageNode->GetTeam(turnIndex)->GetNumPets()+1; i+=1)
-			for (quint8 j=1; j < stageNode->GetTeam(turnIndex)->GetPet(i)->GetNumAuras()+1; j+=1)
-			{
-				stageNode->GetTeam(turnIndex)->GetPet(i)->GetAura(j)->GetAuraId();
-				objectContext->setContextProperty("petStage", stageNode);	
-				component->loadUrl(QUrl::fromLocalFile("Scripts/" + (QString)stageNode->GetTeam(turnIndex)->GetPet(i)->GetAura(j)->GetAuraId() + ".qml"));
-				object = component->create(objectContext);
-				//Call ApplyAuraStart; paramters are TeamNumber, PetNumber and AuraDuration.
-				QMetaObject::invokeMethod(object, "ApplyAuraStart", Q_ARG(QVariant, turnIndex), Q_ARG(QVariant, i),
-											Q_ARG(QVariant, stageNode->GetTeam(turnIndex)->GetPet(i)->GetAura(j)->GetDuration()));
-			}
-
-		//Add all available actions to the list.
-		QList<PetStage*> stageMoves;
-		QList<Move> nextMoves;
-
-		//If an action is already in progress, continue to use that action.
-		if (stageNode->GetTeam(turnIndex)->GetActivePet()->GetCurrentAction()->GetRoundsRemaining() > 0)
+		//Apply weather conditions once.
+		for (quint8 i=0; i < stageNode->GetTeam(turnIndex)->GetPet(0)->GetNumAuras(); i+=1)
 		{
-			PetStage *actionNode = new PetStage(*stageNode);
-			stageMoves.append(actionNode);
-
-			Move nextMove;
-			nextMove.SetAction(actionNode->GetTeam(turnIndex)->GetActivePet()->GetCurrentAction()->GetAction());
-			nextMoves.append(nextMove);
-		}
-		else	//There is no active ability, use selection process.
-		{
-			//Check to see if we can select an ability for the current round.
-			if (!stageNode->GetTeam(turnIndex)->GetActivePet()->HasStatus(Pet::Asleep)
-					&& !stageNode->GetTeam(turnIndex)->GetActivePet()->HasStatus(Pet::Polymorphed)
-					&& !stageNode->GetTeam(turnIndex)->GetActivePet()->HasStatus(Pet::Stunned))
-				for (quint8 i=1; i < stageNode->GetTeam(turnIndex)->GetActivePet()->GetNumAbilities()+1; i+=1)
-					//Use the ability if it is off cooldown.
-					if (stageNode->GetTeam(turnIndex)->GetActivePet()->GetAbility(i)->GetCooldown() == 0)
-					{
-						PetStage *actionNode = new PetStage(*stageNode);
-						actionNode->GetTeam(turnIndex)->GetActivePet()->GetCurrentAction()->SetAction((PetAction::Action)i);
-						stageMoves.append(actionNode);
-
-						Move nextMove;
-						nextMove.SetAction((PetAction::Action)i);
-						nextMoves.append(nextMove);
-					}
-		
-			//Check to see if swapping a pet is possible.
-			if (!stageNode->GetTeam(turnIndex)->GetActivePet()->HasStatus(Pet::Rooted))
-				//Swap to each pet that is still able to battle.
-				for (quint8 i=1; i < stageNode->GetTeam(turnIndex)->GetNumPets()+1; i+=1)
-					//Ignore same index an dead pets.
-					if (stageNode->GetTeam(turnIndex)->GetActivePetIndex() != i || !stageNode->GetTeam(turnIndex)->GetPet(i)->IsDead())
-					{
-						PetStage *actionNode = new PetStage(*stageNode);
-						actionNode->GetTeam(turnIndex)->GetActivePet()->GetCurrentAction()->SetAction((PetAction::Action)(i+3));
-						actionNode->GetTeam(turnIndex)->GetActivePet()->GetCurrentAction()->SetRoundsRemaining(1);
-						actionNode->GetTeam(turnIndex)->GetActivePet()->AddStatus(Pet::Swapping);
-						stageMoves.append(actionNode);
-
-						Move nextMove;
-						nextMove.SetAction((PetAction::Action)(i+3));
-						nextMoves.append(nextMove);
-					}
-
-			//Passing is a valid option in some unique cases so we'll add it.
-			PetStage *actionNode = new PetStage(*stageNode);
-			actionNode->GetTeam(turnIndex)->GetActivePet()->GetCurrentAction()->SetAction(PetAction::Pass);
-			actionNode->GetTeam(turnIndex)->GetActivePet()->GetCurrentAction()->SetRoundsRemaining(1);
-			stageMoves.append(actionNode);
-
-			Move nextMove;
-			nextMove.SetAction(PetAction::Action::Pass);
-			nextMoves.append(nextMove);
+			objectContext->setContextProperty("petStage", stageNode);	
+			component->loadUrl(QUrl::fromLocalFile("Scripts/" + (QString)stageNode->GetTeam(turnIndex)->GetPet(0)->GetAura(i)->GetAuraId() + ".qml"));
+			object = component->create(objectContext);
+			//Call ApplyAuraStart; paramters are TeamNumber, PetNumber and AuraDuration.
+			QMetaObject::invokeMethod(object, "ApplyAuraStart", Q_ARG(QVariant, turnIndex), Q_ARG(QVariant, i),
+										Q_ARG(QVariant, stageNode->GetTeam(turnIndex)->GetPet(0)->GetAura(i)->GetDuration()));
 		}
 
-		//Set the action for each move.
-		QList<Move>::iterator iter = nextMoves.begin();
-		for (int i=0; i < stageMoves.size(); i+=1)
-		{
-			PetStage *nextStage = stageMoves.takeAt(0);							//Remove the stageMove from the list.
-			Move currentMove = temp(nextStage, depth-1, (turnIndex+1)%3);		//Set currentMove to call our Expectiminimax again.
-			(*iter).SetHeuristic(currentMove.GetHeuristic());					//Set the heuristic of the move in the nextMoves list.
-			delete (nextStage);													//Delete the stageMove we removed from the list earlier.
-			++iter;																//Increment the iterator to the next index of nextMoves.
-		}
-
-		//Empty stageMoves QList.
-		stageMoves.clear();
-
-		//Re-use iterator.
-		iter = nextMoves.begin();
-		Move desiredMove = (*iter);
-
-		//Maximize.
-		if (turnIndex == 1)
-			for (iter; iter != nextMoves.end(); ++iter)
-				if ((*iter).GetHeuristic() > desiredMove.GetHeuristic())
-					desiredMove = (*iter);
-		//Minimize.
-		else	//turnIndex == 2;
-			for (iter; iter != nextMoves.end(); ++iter)
-				if ((*iter).GetHeuristic() < desiredMove.GetHeuristic())
-					desiredMove = (*iter);
-
-		//Empty the nextMoves QList.
-		nextMoves.clear();
-
-		//Return the best move.
+		//Begin move selection process.
+		desiredMove = SelectAction(stageNode, depth, turnIndex);
+		return desiredMove;
+	}
+	//Opponent selects action.
+	else if (turnIndex == 2)
+	{
+		//Begin move selection process.
+		desiredMove = SelectAction(stageNode, depth, turnIndex);
 		return desiredMove;
 	}
 	//It's time to actually determine what happens when both players have selected a move.
 	else	//turnIndex == 0;
 	{
 		//Determine who goes first.
-		quint8 startingTeam = CalculatePriority();
+		quint8 currentTeam = CalculatePriority(stageNode);
 
-		return Move();
+		float heuristic = 0.00;
+
+		//In the case that there is a tie for speed, split the value in half and weigh each outcome.
+		if (currentTeam == 3)
+		{
+			heuristic += 0.5 * ActionOutcomes(stageNode, depth, 1, true);
+			heuristic += 0.5 * ActionOutcomes(stageNode, depth, 2, true);
+		}
+		//We know who's going first already, use that team.
+		else
+			heuristic = ActionOutcomes(stageNode, depth, currentTeam, true);
+
+		desiredMove.SetHeuristic(heuristic);
+		return desiredMove;
 	}
 }
 
-//Determine who goes first when evaluating the round.
-quint8 AI::CalculatePriority()
+//Selects the action that the pet/team will use.
+Move AI::SelectAction(PetStage *stageNode, quint8 depth, quint8 turnIndex)
 {
-	return 0;
+	//Apply aura effects that take place at the start of the turn.
+	for (quint8 i=0; i < stageNode->GetTeam(turnIndex)->GetNumPets()+1; i+=1)
+		for (quint8 j=1; j < stageNode->GetTeam(turnIndex)->GetPet(i)->GetNumAuras()+1; j+=1)
+		{
+			objectContext->setContextProperty("petStage", stageNode);	
+			component->loadUrl(QUrl::fromLocalFile("Scripts/" + (QString)stageNode->GetTeam(turnIndex)->GetPet(i)->GetAura(j)->GetAuraId() + ".qml"));
+			object = component->create(objectContext);
+			//Call ApplyAuraStart; paramters are TeamNumber, PetNumber and AuraDuration.
+			QMetaObject::invokeMethod(object, "ApplyAuraStart", Q_ARG(QVariant, turnIndex), Q_ARG(QVariant, i),
+										Q_ARG(QVariant, stageNode->GetTeam(turnIndex)->GetPet(i)->GetAura(j)->GetDuration()));
+		}
+
+	//Add all available actions to the list.
+	QList<PetStage*> stageMoves;
+	QList<Move> nextMoves;
+
+	//If an action is already in progress, continue to use that action.
+	if (stageNode->GetTeam(turnIndex)->GetActivePet()->GetCurrentAction()->GetRoundsRemaining() > 0)
+	{
+		//Copy the node and add it to the list.
+		PetStage *actionNode = new PetStage(*stageNode);
+		stageMoves.append(actionNode);
+
+		//Set the action and add the move to the list.
+		Move nextMove;
+		nextMove.SetAction(actionNode->GetTeam(turnIndex)->GetActivePet()->GetCurrentAction()->GetAction());
+		nextMoves.append(nextMove);
+	}
+	else	//There is no active ability, use selection process.
+	{
+		//Check to see if we can select an ability for the current round.
+		if (!stageNode->GetTeam(turnIndex)->GetActivePet()->HasStatus(Pet::Asleep)
+				&& !stageNode->GetTeam(turnIndex)->GetActivePet()->HasStatus(Pet::Polymorphed)
+				&& !stageNode->GetTeam(turnIndex)->GetActivePet()->HasStatus(Pet::Stunned))
+			for (quint8 i=1; i < stageNode->GetTeam(turnIndex)->GetActivePet()->GetNumAbilities()+1; i+=1)
+				//Use the ability if it is off cooldown.
+				if (stageNode->GetTeam(turnIndex)->GetActivePet()->GetAbility(i)->GetCooldown() == 0)
+				{
+					//"Pre-use" the ability to determine it's priority later.
+					objectContext->setContextProperty("petStage", stageNode);	
+					component->loadUrl(QUrl::fromLocalFile("Scripts/" + (QString)stageNode->GetTeam(i)->GetActivePet()->GetAbility(i)->GetAbilityId() + ".qml"));
+					object = component->create(objectContext);
+					//Call PreUseAbility; paramters are TeamNumber. This is used to make the move tell us it's priority.
+					QMetaObject::invokeMethod(object, "PreUseAbility", Q_ARG(QVariant, i));
+
+					//Copy the node and add it to the list.
+					PetStage *actionNode = new PetStage(*stageNode);
+					actionNode->GetTeam(turnIndex)->GetActivePet()->GetCurrentAction()->SetAction((PetAction::Action)i);
+					stageMoves.append(actionNode);
+
+					//Set the action and add the move to the list.
+					Move nextMove;
+					nextMove.SetAction((PetAction::Action)i);
+					nextMoves.append(nextMove);
+				}
+		
+		//Check to see if swapping a pet is possible.
+		if (!stageNode->GetTeam(turnIndex)->GetActivePet()->HasStatus(Pet::Rooted))
+			//Swap to each pet that is still able to battle.
+			for (quint8 i=1; i < stageNode->GetTeam(turnIndex)->GetNumPets()+1; i+=1)
+				//Ignore same index an dead pets.
+				if (stageNode->GetTeam(turnIndex)->GetActivePetIndex() != i || !stageNode->GetTeam(turnIndex)->GetPet(i)->IsDead())
+				{
+					//Copy the node and add it to the list.
+					PetStage *actionNode = new PetStage(*stageNode);
+					actionNode->GetTeam(turnIndex)->GetActivePet()->GetCurrentAction()->SetAction((PetAction::Action)(i+3));
+					actionNode->GetTeam(turnIndex)->GetActivePet()->GetCurrentAction()->SetRoundsRemaining(1);
+					actionNode->GetTeam(turnIndex)->GetActivePet()->AddStatus(Pet::Swapping);
+					stageMoves.append(actionNode);
+
+					//Set the action and add the move to the list.
+					Move nextMove;
+					nextMove.SetAction((PetAction::Action)(i+3));
+					nextMoves.append(nextMove);
+				}
+
+		//Passing is a valid option in some unique cases so we'll add it.
+		PetStage *actionNode = new PetStage(*stageNode);
+		actionNode->GetTeam(turnIndex)->GetActivePet()->GetCurrentAction()->SetAction(PetAction::Pass);
+		actionNode->GetTeam(turnIndex)->GetActivePet()->GetCurrentAction()->SetRoundsRemaining(1);
+		stageMoves.append(actionNode);
+
+		//Set the action and add the move to the list.
+		Move nextMove;
+		nextMove.SetAction(PetAction::Action::Pass);
+		nextMoves.append(nextMove);
+	}
+
+	//Set the action for each move.
+	QList<Move>::iterator iter = nextMoves.begin();
+	for (int i=0; i < stageMoves.size(); i+=1)
+	{
+		PetStage *nextStage = stageMoves.takeAt(0);								//Remove the stageMove from the list.
+		Move currentMove = Expectiminimax(nextStage, depth, (turnIndex+1)%3);	//Set currentMove to call our Expectiminimax again.
+		(*iter).SetHeuristic(currentMove.GetHeuristic());						//Set the heuristic of the move in the nextMoves list.
+		delete (nextStage);														//Delete the stageMove we removed from the list earlier.
+		++iter;																	//Increment the iterator to the next index of nextMoves.
+	}
+
+	//Empty stageMoves QList.
+	stageMoves.clear();
+
+	//Re-use iterator.
+	iter = nextMoves.begin();
+	Move desiredMove = (*iter);
+
+	//Maximize.
+	if (turnIndex == 1)
+		for (iter; iter != nextMoves.end(); ++iter)
+			if ((*iter).GetHeuristic() > desiredMove.GetHeuristic())
+				desiredMove = (*iter);
+	//Minimize.
+	else	//turnIndex == 2;
+		for (iter; iter != nextMoves.end(); ++iter)
+			if ((*iter).GetHeuristic() < desiredMove.GetHeuristic())
+				desiredMove = (*iter);
+
+	//Empty the nextMoves QList.
+	nextMoves.clear();
+
+	//Return the best move.
+	return desiredMove;
+}
+
+//Determine who goes first when evaluating the round.
+quint8 AI::CalculatePriority(PetStage *stageNode)
+{
+	//If either team is swapping pets, they get priority.
+	for (quint8 i=1; i < 3; i+=1)
+		if (stageNode->GetTeam(i)->GetActivePet()->HasStatus(Pet::Swapping))
+			return i;
+
+	//If either team is passing return the opposite team. Both teams passing will not affect this.
+	for (quint8 i=1; i < 3; i+=1)
+		if (stageNode->GetTeam(i)->GetActivePet()->GetCurrentAction()->GetAction() == PetAction::Pass)
+			return (i % 2) + 1;
+
+	//Check for priority and see if anyone has to go first.
+	if (stageNode->GetTeam(1)->GetActivePet()->HasStatus(Pet::First))
+		if (stageNode->GetTeam(2)->GetActivePet()->HasStatus(Pet::First))
+			if (stageNode->GetTeam(1)->GetActivePet()->GetSpeed() > stageNode->GetTeam(2)->GetActivePet()->GetSpeed())
+				return 1;
+			else if (stageNode->GetTeam(1)->GetActivePet()->GetSpeed() < stageNode->GetTeam(2)->GetActivePet()->GetSpeed())
+				return 2;
+			else
+				return (tieBreaker) ? 3 : ((qrand() % 2) + 1);		//If no tie breaking randomize it.
+		else
+			return 1;
+	//Continue checking to see if anyone has to go first.
+	else if (stageNode->GetTeam(2)->GetActivePet()->HasStatus(Pet::First))
+		return 2;
+
+	//Check for priority and see if anyone has to go second.
+	if (stageNode->GetTeam(1)->GetActivePet()->HasStatus(Pet::Second))
+		if (stageNode->GetTeam(2)->GetActivePet()->HasStatus(Pet::Second))
+			if (stageNode->GetTeam(1)->GetActivePet()->GetSpeed() > stageNode->GetTeam(2)->GetActivePet()->GetSpeed())
+				return 2;
+			else if (stageNode->GetTeam(1)->GetActivePet()->GetSpeed() < stageNode->GetTeam(2)->GetActivePet()->GetSpeed())
+				return 1;
+			else
+				return (tieBreaker) ? 3 : ((qrand() % 2) + 1);		//If no tie breaking randomize it.
+		else
+			return 1;
+	//Continue checking to see if anyone has to go second.
+	else if (stageNode->GetTeam(2)->GetActivePet()->HasStatus(Pet::Second))
+		return 1;
+
+	//All priorities handled, proceed based on speed.
+	if (stageNode->GetTeam(1)->GetActivePet()->GetSpeed() > stageNode->GetTeam(2)->GetActivePet()->GetSpeed())
+		return 2;
+	else if (stageNode->GetTeam(1)->GetActivePet()->GetSpeed() < stageNode->GetTeam(2)->GetActivePet()->GetSpeed())
+		return 1;
+	else
+		return (tieBreaker) ? 3 : ((qrand() % 2) + 1);		//If no tie breaking randomize it.
+}
+
+//Uses the first action during round playback. Note: Actions as a result of death happen in scripts but real deaths happen here.
+float AI::ActionOutcomes(PetStage *stageNode, quint8 depth, quint8 currentTeam, bool firstCall)
+{
+	float heuristic = 0.00;	//Used for holding heuristic.
+
+	//Pet swap occuring.
+	if (stageNode->GetTeam(currentTeam)->GetActivePet()->GetCurrentAction()->GetAction() > 3
+			&& stageNode->GetTeam(currentTeam)->GetActivePet()->GetCurrentAction()->GetAction() < 7)		
+	{
+		PetStage *currentStage = new PetStage(*stageNode);
+		currentStage->GetTeam(currentTeam)->SetActivePet(currentStage->GetTeam(currentTeam)->GetActivePet()->GetCurrentAction()->GetAction());
+		//TODO: Call other teams move.
+	}
+	//Normal ability usage.
+	else if (stageNode->GetTeam(currentTeam)->GetActivePet()->GetCurrentAction()->GetAction() > 0
+			&& stageNode->GetTeam(currentTeam)->GetActivePet()->GetCurrentAction()->GetAction() < 4)
+	{
+		quint16 abilityId = stageNode->GetTeam(currentTeam)->GetActivePet()->GetAbility(stageNode->GetTeam(currentTeam)->GetActivePet()->GetCurrentAction()->GetAction())->GetAbilityId();
+		objectContext->setContextProperty("petStage", stageNode);	
+		component->loadUrl(QUrl::fromLocalFile("Scripts/" + (QString)abilityId + ".qml"));
+		object = component->create(objectContext);
+
+		//Check current team's opponent's pet's avoidance rating and if it is in between 0 and 1.
+		//This is important as guaranteed dodge or none will not affect the move outcome in later steps.
+		float avoidanceRating = stageNode->GetTeam((currentTeam%2)+1)->GetActivePet()->GetAvoidanceRating();
+		if (avoidanceRating > 0.00 && avoidanceRating < 1.00)
+		{
+			float accuracyRating = 0;
+			QMetaObject::invokeMethod(object, "GetAccuracyRating", Q_RETURN_ARG(QVariant, (QVariant)accuracyRating), Q_ARG(QVariant, currentTeam));
+
+			//Determine if ability can miss.
+			if (accuracyRating > 0.00 && accuracyRating < 1.00)
+			{
+				float criticalRating = 0;
+				QMetaObject::invokeMethod(object, "GetCriticalRating", Q_RETURN_ARG(QVariant, (QVariant)criticalRating), Q_ARG(QVariant, currentTeam));
+
+				//Determine if the ability can crit.
+				if (criticalRating > 0.00 && criticalRating < 1.00)
+				{	//8 possible outcomes, does (not) avoid, does (not) hit, does (not) crit.
+					heuristic += UseAction(stageNode, depth, currentTeam, firstCall, avoidanceRating, accuracyRating, criticalRating, true, true, true);
+					heuristic += UseAction(stageNode, depth, currentTeam, firstCall, avoidanceRating, accuracyRating, 1-criticalRating, true, true, false);
+					heuristic += UseAction(stageNode, depth, currentTeam, firstCall, avoidanceRating, 1-accuracyRating, criticalRating, true, false, true);
+					heuristic += UseAction(stageNode, depth, currentTeam, firstCall, avoidanceRating, 1-accuracyRating, 1-criticalRating, true, false, false);
+					heuristic += UseAction(stageNode, depth, currentTeam, firstCall, 1-avoidanceRating, accuracyRating, criticalRating, false, true, true);
+					heuristic += UseAction(stageNode, depth, currentTeam, firstCall, 1-avoidanceRating, accuracyRating, 1-criticalRating, false, true, false);
+					heuristic += UseAction(stageNode, depth, currentTeam, firstCall, 1-avoidanceRating, 1-accuracyRating, criticalRating, false, false, true);
+					heuristic += UseAction(stageNode, depth, currentTeam, firstCall, 1-avoidanceRating, 1-accuracyRating, 1-criticalRating, false, false, false);
+				}
+				else	//Ability is either guaranteed to crit or not crit at all.
+				{	//4 possible outcomes, does (not) avoid, does (not) hit, does (not) crit.
+					bool isCritting = (criticalRating <= 0.00) ? false : true;
+					heuristic += UseAction(stageNode, depth, currentTeam, firstCall, avoidanceRating, accuracyRating, 1.00, true, true, isCritting);
+					heuristic += UseAction(stageNode, depth, currentTeam, firstCall, avoidanceRating, 1-accuracyRating, 1.00, true, false, isCritting);
+					heuristic += UseAction(stageNode, depth, currentTeam, firstCall, 1-avoidanceRating, accuracyRating, 1.00, false, true, isCritting);
+					heuristic += UseAction(stageNode, depth, currentTeam, firstCall, 1-avoidanceRating, 1-accuracyRating, 1.00, false, false, isCritting);
+				}
+			}
+			else	//We are going to hit no matter what or not at all.
+			{
+				bool isHitting = (accuracyRating <= 0.00) ? false : true;
+				float criticalRating = 0;
+				QMetaObject::invokeMethod(object, "GetCriticalRating", Q_RETURN_ARG(QVariant, (QVariant)criticalRating), Q_ARG(QVariant, currentTeam));
+
+				//Determine if the ability can crit.
+				if (criticalRating > 0.00 && criticalRating < 1.00)
+				{	//4 possible outcomes, does (not) avoid, does (not) hit, does (not) crit.
+					heuristic += UseAction(stageNode, depth, currentTeam, firstCall, avoidanceRating, 1.00, criticalRating, true, isHitting, true);
+					heuristic += UseAction(stageNode, depth, currentTeam, firstCall, avoidanceRating, 1.00, 1-criticalRating, true, isHitting, false);
+					heuristic += UseAction(stageNode, depth, currentTeam, firstCall, 1-avoidanceRating, 1.00, criticalRating, false, isHitting, true);
+					heuristic += UseAction(stageNode, depth, currentTeam, firstCall, 1-avoidanceRating, 1.00, 1-criticalRating, false, isHitting, false);
+				}
+				else	//Ability is either guaranteed to crit or not crit at all.
+				{	//2 possible outcomes, does (not) avoid, does (not) hit, does (not) crit.
+					bool isCritting = (criticalRating <= 0.00) ? false : true;
+					heuristic += UseAction(stageNode, depth, currentTeam, firstCall, avoidanceRating, 1.00, 1.00, true, isHitting, isCritting);
+					heuristic += UseAction(stageNode, depth, currentTeam, firstCall, 1-avoidanceRating, 1.00, 1.00, false, isHitting, isCritting);
+				}
+			}
+		}
+		else	//We are either avoiding or not avoiding.
+		{
+			bool isAvoiding = (avoidanceRating <= 0.00) ? false : true;
+			float accuracyRating = 0;
+			QMetaObject::invokeMethod(object, "GetAccuracyRating", Q_RETURN_ARG(QVariant, (QVariant)accuracyRating), Q_ARG(QVariant, currentTeam));
+
+			//Determine if ability can miss.
+			if (accuracyRating > 0.00 && accuracyRating < 1.00)
+			{
+				float criticalRating = 0;
+				QMetaObject::invokeMethod(object, "GetCriticalRating", Q_RETURN_ARG(QVariant, (QVariant)criticalRating), Q_ARG(QVariant, currentTeam));
+
+				//Determine if the ability can crit.
+				if (criticalRating > 0.00 && criticalRating < 1.00)
+				{	//4 possible outcomes, does (not) avoid, does (not) hit, does (not) crit.
+					heuristic += UseAction(stageNode, depth, currentTeam, firstCall, 1.00, accuracyRating, criticalRating, isAvoiding, true, true);
+					heuristic += UseAction(stageNode, depth, currentTeam, firstCall, 1.00, accuracyRating, 1-criticalRating, isAvoiding, true, false);
+					heuristic += UseAction(stageNode, depth, currentTeam, firstCall, 1.00, 1-accuracyRating, criticalRating, isAvoiding, false, true);
+					heuristic += UseAction(stageNode, depth, currentTeam, firstCall, 1.00, 1-accuracyRating, 1-criticalRating, isAvoiding, false, false);
+				}
+				else	//Ability is either guaranteed to crit or not crit at all.
+				{	//2 possible outcomes, does (not) avoid, does (not) hit, does (not) crit.
+					bool isCritting = (criticalRating <= 0.00) ? false : true;
+					heuristic += UseAction(stageNode, depth, currentTeam, firstCall, 1.00, accuracyRating, 1.00, isAvoiding, true, isCritting);
+					heuristic += UseAction(stageNode, depth, currentTeam, firstCall, 1.00, 1-accuracyRating, 1.00, isAvoiding, false, isCritting);
+				}
+			}
+			else	//We are going to hit no matter what or not at all.
+			{
+				bool isHitting = (accuracyRating <= 0.00) ? false : true;
+				float criticalRating = 0;
+				QMetaObject::invokeMethod(object, "GetCriticalRating", Q_RETURN_ARG(QVariant, (QVariant)criticalRating), Q_ARG(QVariant, currentTeam));
+
+				//Determine if the ability can crit.
+				if (criticalRating > 0.00 && criticalRating < 1.00)
+				{	//2 possible outcomes, does (not) avoid, does (not) hit, does (not) crit.
+					heuristic += UseAction(stageNode, depth, currentTeam, firstCall, 1.00, 1.00, criticalRating, isAvoiding, isHitting, true);
+					heuristic += UseAction(stageNode, depth, currentTeam, firstCall, 1.00, 1.00, 1-criticalRating, isAvoiding, isHitting, false);
+				}
+				else	//Ability is either guaranteed to crit or not crit at all.
+				{	//1 possible outcome, does (not) avoid, does (not) hit, does (not) crit.
+					bool isCritting = (criticalRating <= 0.00) ? false : true;
+					heuristic += UseAction(stageNode, depth, currentTeam, firstCall, 1.00, 1.00, 1.00, isAvoiding, isHitting, isCritting);
+				}
+			}
+		}
+	}
+
+	return heuristic;
+}
+
+float AI::UseAction(PetStage* stageNode, quint8 depth, quint8 currentTeam, bool firstCall,
+						 float avoidanceRating, float hitRating, float critRating,
+						 bool isAvoiding, bool isHitting, bool isCritting)
+{
+	float heuristic = 0.00;		//Used for holding heuristic.
+
+	PetStage *outcome = new PetStage(*stageNode);
+	objectContext->setContextProperty("petStage", outcome);
+	object = component->create(objectContext);
+	//Parameters are currentTeam, priority, isAvoiding, isHitting and isCritting.
+	QMetaObject::invokeMethod(object, "UseAbility", Q_ARG(QVariant, currentTeam), Q_ARG(QVariant, ((firstCall)?1:2)),
+								Q_ARG(QVariant, isAvoiding), Q_ARG(QVariant, isHitting), Q_ARG(QVariant, isCritting));
+
+	//If the pet died as a result of the battle.
+	if (outcome->GetTeam((currentTeam%2)+1)->GetActivePet()->IsDead())
+	{
+		//Pet is dead, remove its current action.
+		outcome->GetTeam((currentTeam%2)+1)->GetActivePet()->RemoveAuras();
+		outcome->GetTeam((currentTeam%2)+1)->GetActivePet()->GetCurrentAction()->SetAction(PetAction::None);
+		outcome->GetTeam((currentTeam%2)+1)->GetActivePet()->GetCurrentAction()->SetRoundsRemaining(0);
+
+		//Attempt to find a new pet to substitute if the team is not dead.
+		if (!outcome->GetTeam((currentTeam%2)+1)->IsTeamDead())
+		{
+			QList<PetStage*> substituteStages;
+			//Find a pet that is alive.
+			for (quint8 i=1; i < outcome->GetTeam((currentTeam%2)+1)->GetNumPets()+1; i+=1)
+				if (!outcome->GetTeam((currentTeam%2)+1)->GetPet(i)->IsDead())
+				{
+					PetStage *substituteStage = new PetStage(*outcome);
+					substituteStage->GetTeam((currentTeam%2)+1)->SetActivePet(i);
+					substituteStage->GetTeam((currentTeam%2)+1)->GetActivePet()->GetCurrentAction()->SetAction(PetAction::None);
+					substituteStage->GetTeam((currentTeam%2)+1)->GetActivePet()->GetCurrentAction()->SetRoundsRemaining(0);
+					//TODO: Pet swap has occured; Minefield, etc..
+					for (quint8 j=1; j < substituteStage->GetTeam((currentTeam%2)+1)->GetPet(0)->GetNumAuras()+1; j+=1)
+						if (substituteStage->GetTeam((currentTeam%2)+1)->GetPet(0)->GetAura(j)->OnSwapIn())
+						{
+							//TODO:Use the aura.
+							substituteStage->GetTeam((currentTeam%2)+1)->GetPet(0)->RemoveAura(j);		//Remove the aura.
+						}
+				}
+							
+			quint8 tempSize = substituteStages.size();		//Temporary size variable for dividing.
+			for (quint8 i=0; i < substituteStages.size(); i+=1)
+			{
+				//If it is the first time this function was called we must still process the other team's action.
+				if (firstCall)
+					//If there is more than one option divide by the size (max 2 pets to choose from).
+					heuristic += avoidanceRating * hitRating * critRating * ActionOutcomes(substituteStages.at(i), depth, (currentTeam%2)+1, false) / tempSize;
+				else
+					heuristic += avoidanceRating * hitRating * critRating * EndTurn(outcome, depth);
+				delete (substituteStages.takeAt(0));
+			}
+			substituteStages.clear();
+		}
+		else	//No living pet found, let's just move on.
+			//If it is the first time this function was called we must still process the other team's action.
+			if (firstCall)
+				heuristic += avoidanceRating * hitRating * critRating * ActionOutcomes(outcome, depth, (currentTeam%2)+1, false);
+			else
+				heuristic += avoidanceRating * hitRating * critRating * EndTurn(outcome, depth);
+	}
+	else
+	{
+		//If it is the first time this function was called we must still process the other team's action.
+		if (firstCall)
+			heuristic += avoidanceRating * hitRating * critRating * ActionOutcomes(outcome, depth, (currentTeam%2)+1, false);
+		else
+			heuristic += avoidanceRating * hitRating * critRating * EndTurn(outcome, depth);
+	}
+					
+	delete outcome;
+
+	return heuristic;
+}
+
+//Apply auras at the end of the turn.
+float AI::EndTurn(PetStage* stageNode, quint8 depth)
+{
+	for (quint8 i=0; i < 3; i+=1)															//For each team...
+		for (quint8 j=0; j < stageNode->GetTeam(i)->GetNumPets()+1; j+=1)					//For each pet...
+			for (quint8 k=0; k < stageNode->GetTeam(i)->GetPet(j)->GetNumAuras()+1; k+=1)	//For each aura...
+			{
+				objectContext->setContextProperty("petStage", stageNode);	
+				component->loadUrl(QUrl::fromLocalFile("Scripts/" + (QString)stageNode->GetTeam(i)->GetPet(j)->GetAura(k)->GetAuraId() + ".qml"));
+				object = component->create(objectContext);
+				//Call ApplyAuraStart; paramters are TeamNumber, PetNumber and AuraDuration.
+				QMetaObject::invokeMethod(object, "ApplyAuraEnd", Q_ARG(QVariant, i), Q_ARG(QVariant, j),
+											Q_ARG(QVariant, stageNode->GetTeam(i)->GetPet(j)->GetAura(k)->GetDuration()));
+			}
+
+	//Call Expectiminimax again, reduce depth by 1 as we are proceeding into the next turn.
+	Move nextTurn = Expectiminimax(stageNode, depth-1, 1);
+	//Return heuristic.
+	return nextTurn.GetHeuristic();
 }

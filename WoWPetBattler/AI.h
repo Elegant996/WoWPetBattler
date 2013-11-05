@@ -30,17 +30,22 @@ public slots:
 	void Run();
 
 private:
-	Move Expectiminimax(PetStage*, int);
-	Move temp(PetStage*, int, int);
-	quint8 CalculatePriority();
+	Move Expectiminimax(PetStage*, quint8, quint8);
+	Move SelectAction(PetStage*, quint8, quint8);
+	quint8 CalculatePriority(PetStage*);
+	float ActionOutcomes(PetStage*, quint8, quint8, bool);
+	float UseAction(PetStage*, quint8, quint8, bool, float, float, float, bool, bool, bool);
+	float EndTurn(PetStage*, quint8);
+
+	PetStage *petStage;
+	Robot::Keyboard keyboard;
 
 	QQmlEngine *engine;
 	QQmlContext *objectContext;
 	QQmlComponent *component;
 	QObject *object;
 
-	PetStage *petStage;
-	Robot::Keyboard keyboard;
+	bool tieBreaker;
 };
 
 #endif
