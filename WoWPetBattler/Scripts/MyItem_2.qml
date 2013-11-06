@@ -32,4 +32,9 @@ Item
         petStage.GetTeam(1).ActivePet.GetCurrentAction().Action = 1;
         console.log(petStage.GetTeam(1).ActivePet.GetCurrentAction().Action);
     }
+
+    function testFunction()
+    {
+        return 5;
+    }
 }

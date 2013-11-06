@@ -116,11 +116,16 @@ void WoWPetBattler::on_playButton_clicked()
 
 	QMetaObject::invokeMethod(object, "printActivePet");
 
-	objectContext->setContextProperty("petStage", petStage2);	
+	objectContext->setContextProperty("petStage", petStage2);
 	component.loadUrl(QUrl::fromLocalFile("Scripts/MyItem_2.qml"));
 	object = component.create(objectContext);
 
 	QMetaObject::invokeMethod(object, "printActivePet", Q_ARG(QVariant, 566));
+
+	QVariant testValue = 0;
+	QMetaObject::invokeMethod(object, "testFunction", Q_RETURN_ARG(QVariant, testValue));
+
+	qDebug() << testValue.toInt();
 
 	if (component.status() == 3)
 		qDebug() << component.errors();

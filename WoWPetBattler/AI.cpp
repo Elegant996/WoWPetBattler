@@ -59,46 +59,6 @@ void AI::Run()
 }
 
 //Modified minimax that also uses expected in computation.
-/*Move AI::Expectiminimax(PetStage* stageNode, int depth)
-{
-	Important for setup procedure
-	objectContext->setContextProperty("petStage", stageNode);	
-	component->loadUrl(QUrl::fromLocalFile("Scripts/MyItem.qml"));
-	object = component->create(objectContext);
-	QMetaObject::invokeMethod(object, "printActivePet");
-	
-
-	//Who goes first?
-	if (stageNode->GetTeam(1)->GetActivePet()->GetSpeed() > stageNode->GetTeam(2)->GetActivePet()->GetSpeed())
-	{
-	}
-	else if (stageNode->GetTeam(1)->GetActivePet()->GetSpeed() < stageNode->GetTeam(2)->GetActivePet()->GetSpeed())
-	{
-	}
-	else	//It's a tie.
-	{
-		int index = (qrand() % 2) + 1;	//Decide pet team index randomly, as the game will do the same.
-	}
-
-	//Create a list of all possible moves that can be made at this node.
-	QList<PetStage*> stageMove;
-	if (stageNode->SelectAbility())
-	{
-	}
-	else if (stageNode->SelectPet())
-	{
-		for (int i=0; i <stageNode->GetTeam(1)->GetNumPets(); i+=1)
-			if (stageNode->GetTeam(1)->GetPet(i)->GetHealth() > 0)
-			{
-				PetStage *tempStage = new PetStage(*stageNode);
-				tempStage->GetTeam(1)->SetActivePet(i);
-				stageMove.append(tempStage);
-			}
-	}
-
-	return Move();
-}*/
-
 Move AI::Expectiminimax(PetStage* stageNode, quint8 depth, quint8 turnIndex)
 {
 	Move desiredMove;		//Used for returning the desired move.
@@ -365,23 +325,26 @@ float AI::ActionOutcomes(PetStage *stageNode, quint8 depth, quint8 currentTeam, 
 			&& stageNode->GetTeam(currentTeam)->GetActivePet()->GetCurrentAction()->GetAction() < 4)
 	{
 		quint16 abilityId = stageNode->GetTeam(currentTeam)->GetActivePet()->GetAbility(stageNode->GetTeam(currentTeam)->GetActivePet()->GetCurrentAction()->GetAction())->GetAbilityId();
-		objectContext->setContextProperty("petStage", stageNode);	
+		float avoidanceRating, accuracyRating, criticalRating;
+		objectContext->setContextProperty("petStage", stageNode);
 		component->loadUrl(QUrl::fromLocalFile("Scripts/" + (QString)abilityId + ".qml"));
 		object = component->create(objectContext);
 
 		//Check current team's opponent's pet's avoidance rating and if it is in between 0 and 1.
 		//This is important as guaranteed dodge or none will not affect the move outcome in later steps.
-		float avoidanceRating = stageNode->GetTeam((currentTeam%2)+1)->GetActivePet()->GetAvoidanceRating();
+		avoidanceRating = stageNode->GetTeam((currentTeam%2)+1)->GetActivePet()->GetAvoidanceRating();
 		if (avoidanceRating > 0.00 && avoidanceRating < 1.00)
 		{
-			float accuracyRating = 0;
-			QMetaObject::invokeMethod(object, "GetAccuracyRating", Q_RETURN_ARG(QVariant, (QVariant)accuracyRating), Q_ARG(QVariant, currentTeam));
+			QVariant variantAccuracyRating;
+			QMetaObject::invokeMethod(object, "GetAccuracyRating", Q_RETURN_ARG(QVariant, variantAccuracyRating), Q_ARG(QVariant, currentTeam));
+			accuracyRating = variantAccuracyRating.toFloat();
 
 			//Determine if ability can miss.
 			if (accuracyRating > 0.00 && accuracyRating < 1.00)
 			{
-				float criticalRating = 0;
-				QMetaObject::invokeMethod(object, "GetCriticalRating", Q_RETURN_ARG(QVariant, (QVariant)criticalRating), Q_ARG(QVariant, currentTeam));
+				QVariant variantCriticalRating;
+				QMetaObject::invokeMethod(object, "GetCriticalRating", Q_RETURN_ARG(QVariant, variantCriticalRating), Q_ARG(QVariant, currentTeam));
+				criticalRating = variantCriticalRating.toFloat();
 
 				//Determine if the ability can crit.
 				if (criticalRating > 0.00 && criticalRating < 1.00)
@@ -407,8 +370,9 @@ float AI::ActionOutcomes(PetStage *stageNode, quint8 depth, quint8 currentTeam, 
 			else	//We are going to hit no matter what or not at all.
 			{
 				bool isHitting = (accuracyRating <= 0.00) ? false : true;
-				float criticalRating = 0;
-				QMetaObject::invokeMethod(object, "GetCriticalRating", Q_RETURN_ARG(QVariant, (QVariant)criticalRating), Q_ARG(QVariant, currentTeam));
+				QVariant variantCriticalRating;
+				QMetaObject::invokeMethod(object, "GetCriticalRating", Q_RETURN_ARG(QVariant, variantCriticalRating), Q_ARG(QVariant, currentTeam));
+				criticalRating = variantCriticalRating.toFloat();
 
 				//Determine if the ability can crit.
 				if (criticalRating > 0.00 && criticalRating < 1.00)
@@ -429,14 +393,16 @@ float AI::ActionOutcomes(PetStage *stageNode, quint8 depth, quint8 currentTeam, 
 		else	//We are either avoiding or not avoiding.
 		{
 			bool isAvoiding = (avoidanceRating <= 0.00) ? false : true;
-			float accuracyRating = 0;
-			QMetaObject::invokeMethod(object, "GetAccuracyRating", Q_RETURN_ARG(QVariant, (QVariant)accuracyRating), Q_ARG(QVariant, currentTeam));
+			QVariant variantAccuracyRating;
+			QMetaObject::invokeMethod(object, "GetAccuracyRating", Q_RETURN_ARG(QVariant, variantAccuracyRating), Q_ARG(QVariant, currentTeam));
+			accuracyRating = variantAccuracyRating.toFloat();
 
 			//Determine if ability can miss.
 			if (accuracyRating > 0.00 && accuracyRating < 1.00)
 			{
-				float criticalRating = 0;
-				QMetaObject::invokeMethod(object, "GetCriticalRating", Q_RETURN_ARG(QVariant, (QVariant)criticalRating), Q_ARG(QVariant, currentTeam));
+				QVariant variantCriticalRating;
+				QMetaObject::invokeMethod(object, "GetCriticalRating", Q_RETURN_ARG(QVariant, variantCriticalRating), Q_ARG(QVariant, currentTeam));
+				criticalRating = variantCriticalRating.toFloat();
 
 				//Determine if the ability can crit.
 				if (criticalRating > 0.00 && criticalRating < 1.00)
@@ -456,8 +422,9 @@ float AI::ActionOutcomes(PetStage *stageNode, quint8 depth, quint8 currentTeam, 
 			else	//We are going to hit no matter what or not at all.
 			{
 				bool isHitting = (accuracyRating <= 0.00) ? false : true;
-				float criticalRating = 0;
-				QMetaObject::invokeMethod(object, "GetCriticalRating", Q_RETURN_ARG(QVariant, (QVariant)criticalRating), Q_ARG(QVariant, currentTeam));
+				QVariant variantCriticalRating;
+				QMetaObject::invokeMethod(object, "GetCriticalRating", Q_RETURN_ARG(QVariant, variantCriticalRating), Q_ARG(QVariant, currentTeam));
+				criticalRating = variantCriticalRating.toFloat();
 
 				//Determine if the ability can crit.
 				if (criticalRating > 0.00 && criticalRating < 1.00)
@@ -510,12 +477,13 @@ float AI::UseAction(PetStage* stageNode, quint8 depth, quint8 currentTeam, bool 
 					substituteStage->GetTeam((currentTeam%2)+1)->SetActivePet(i);
 					substituteStage->GetTeam((currentTeam%2)+1)->GetActivePet()->GetCurrentAction()->SetAction(PetAction::None);
 					substituteStage->GetTeam((currentTeam%2)+1)->GetActivePet()->GetCurrentAction()->SetRoundsRemaining(0);
-					//TODO: Pet swap has occured; Minefield, etc..
+					//Pet swap has occured; Use Minefield, etc..
 					for (quint8 j=1; j < substituteStage->GetTeam((currentTeam%2)+1)->GetPet(0)->GetNumAuras()+1; j+=1)
 						if (substituteStage->GetTeam((currentTeam%2)+1)->GetPet(0)->GetAura(j)->OnSwapIn())
 						{
-							//TODO:Use the aura.
-							substituteStage->GetTeam((currentTeam%2)+1)->GetPet(0)->RemoveAura(j);		//Remove the aura.
+							QMetaObject::invokeMethod(object, "ApplyAura", Q_ARG(QVariant, (currentTeam%2)+1));		//Use the aura; parameters are teamIndex.
+							substituteStage->GetTeam((currentTeam%2)+1)->GetPet(0)->RemoveAura(j);					//Remove the aura.
+							break;																					//There should not be more than 1.
 						}
 				}
 							
