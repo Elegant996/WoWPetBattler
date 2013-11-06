@@ -325,7 +325,7 @@ float AI::ActionOutcomes(PetStage *stageNode, quint8 depth, quint8 currentTeam, 
 			&& stageNode->GetTeam(currentTeam)->GetActivePet()->GetCurrentAction()->GetAction() < 4)
 	{
 		quint16 abilityId = stageNode->GetTeam(currentTeam)->GetActivePet()->GetAbility(stageNode->GetTeam(currentTeam)->GetActivePet()->GetCurrentAction()->GetAction())->GetAbilityId();
-		float avoidanceRating, accuracyRating, criticalRating;
+		float avoidanceRating, accuracyRating, criticalRating, chanceOnHitRating;
 		objectContext->setContextProperty("petStage", stageNode);
 		component->loadUrl(QUrl::fromLocalFile("Scripts/" + (QString)abilityId + ".qml"));
 		object = component->create(objectContext);
@@ -444,6 +444,7 @@ float AI::ActionOutcomes(PetStage *stageNode, quint8 depth, quint8 currentTeam, 
 	return heuristic;
 }
 
+//Uses action given certain conditions.
 float AI::UseAction(PetStage* stageNode, quint8 depth, quint8 currentTeam, bool firstCall,
 						 float avoidanceRating, float hitRating, float critRating,
 						 bool isAvoiding, bool isHitting, bool isCritting)
