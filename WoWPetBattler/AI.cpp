@@ -84,14 +84,14 @@ Move AI::Expectiminimax(PetStage* stageNode, quint8 depth, quint8 turnIndex)
 	if (turnIndex == 1)
 	{
 		//Apply weather conditions once.
-		for (quint8 i=0; i < stageNode->GetTeam(turnIndex)->GetPet(0)->GetNumAuras(); i+=1)
+		for (quint8 i=0; i < stageNode->GetTeam(0)->GetPet(0)->GetNumAuras(); i+=1)
 		{
 			objectContext->setContextProperty("petStage", stageNode);	
-			component->loadUrl(QUrl::fromLocalFile("Scripts/" + (QString)stageNode->GetTeam(turnIndex)->GetPet(0)->GetAura(i)->GetAuraId() + ".qml"));
+			component->loadUrl(QUrl::fromLocalFile("Scripts/" + (QString)stageNode->GetTeam(0)->GetPet(0)->GetAura(i)->GetAuraId() + ".qml"));
 			object = component->create(objectContext);
 			//Call ApplyAuraStart; paramters are TeamNumber, PetNumber and AuraDuration.
-			QMetaObject::invokeMethod(object, "ApplyAuraStart", Q_ARG(QVariant, turnIndex), Q_ARG(QVariant, i),
-										Q_ARG(QVariant, stageNode->GetTeam(turnIndex)->GetPet(0)->GetAura(i)->GetDuration()));
+			QMetaObject::invokeMethod(object, "ApplyAuraStart", Q_ARG(QVariant, 0), Q_ARG(QVariant, 0),
+										Q_ARG(QVariant, stageNode->GetTeam(0)->GetPet(0)->GetAura(i)->GetDuration()));
 		}
 
 		//Begin move selection process.
