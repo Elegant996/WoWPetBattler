@@ -9,11 +9,11 @@ Item
     property int petPos: 2;
     property variant petPos2: 4;
     property string test: "Hello";
-    property variant myTest;
+    property variant myTest: petStage.GetTeam(1);
 
     function printActivePet(value)
     {
-        myTest = petStage.GetTeam(1);
+        //myTest = petStage.GetTeam(1);
         console.log("Override");
         console.log(petStage);
         console.log(petStage.GetTeam(1));
@@ -31,6 +31,7 @@ Item
         console.log(petStage.GetTeam(1).ActivePet.GetCurrentAction().Action);
         petStage.GetTeam(1).ActivePet.GetCurrentAction().Action = 1;
         console.log(petStage.GetTeam(1).ActivePet.GetCurrentAction().Action);
+        console.log("myTest: " + myTest);
     }
 
     function testFunction()

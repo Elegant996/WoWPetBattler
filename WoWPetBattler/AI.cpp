@@ -174,7 +174,7 @@ Move AI::SelectAction(PetStage *stageNode, quint8 depth, quint8 turnIndex)
 					component->loadUrl(QUrl::fromLocalFile("Scripts/" + (QString)stageNode->GetTeam(i)->GetActivePet()->GetAbility(i)->GetAbilityId() + ".qml"));
 					object = component->create(objectContext);
 					//Call PreUseAbility; paramters are TeamNumber. This is used to make the move tell us it's priority.
-					QMetaObject::invokeMethod(object, "PreUseAbility", Q_ARG(QVariant, i));
+					QMetaObject::invokeMethod(object, "PreUseAbility", Q_ARG(QVariant, turnIndex));
 
 					//Copy the node and add it to the list.
 					PetStage *actionNode = new PetStage(*stageNode);
@@ -422,10 +422,6 @@ float AI::ActionOutcomes(PetStage *stageNode, quint8 depth, quint8 currentTeam, 
 				//Determine if the ability can crit.
 				if (criticalRating > 0.00 && criticalRating < 1.00)
 				{	
-					QVariant variantChanceOnHitRating;
-					QMetaObject::invokeMethod(object, "GetChanceOnHitRating", Q_RETURN_ARG(QVariant, variantChanceOnHitRating), Q_ARG(QVariant, currentTeam));
-					chanceOnHitRating = variantChanceOnHitRating.toFloat();
-
 					//Determine if ability has a chance on hit ability that can proc.
 					if (chanceOnHitRating > 0.00 && chanceOnHitRating < 1.00)
 					{	//8 possible outcomes, does (not) avoid, does (not) hit, does (not) crit, chance on hit does (not) proc.
