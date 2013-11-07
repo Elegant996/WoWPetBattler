@@ -147,8 +147,27 @@ Move AI::SelectAction(PetStage *stageNode, quint8 depth, quint8 turnIndex)
 	QList<PetStage*> stageMoves;
 	QList<Move> nextMoves;
 
+	//Check of the pet is dead.
+	if (stageNode->GetTeam(turnIndex)->GetActivePet()->IsDead())
+		//Swap to each pet that is still able to battle.
+		for (quint8 i=1; i < stageNode->GetTeam(turnIndex)->GetNumPets()+1; i+=1)
+			//Ignore same index an dead pets.
+			if (stageNode->GetTeam(turnIndex)->GetActivePetIndex() != i || !stageNode->GetTeam(turnIndex)->GetPet(i)->IsDead())
+			{
+				//Copy the node and add it to the list.
+				PetStage *actionNode = new PetStage(*stageNode);
+				actionNode->GetTeam(turnIndex)->GetActivePet()->GetCurrentAction()->SetAction((PetAction::Action)(i+3));
+				actionNode->GetTeam(turnIndex)->GetActivePet()->GetCurrentAction()->SetRoundsRemaining(1);
+				actionNode->GetTeam(turnIndex)->GetActivePet()->AddStatus(Pet::Swapping);
+				stageMoves.append(actionNode);
+
+				//Set the action and add the move to the list.
+				Move nextMove;
+				nextMove.SetAction((PetAction::Action)(i+3));
+				nextMoves.append(nextMove);
+			}
 	//If an action is already in progress, continue to use that action.
-	if (stageNode->GetTeam(turnIndex)->GetActivePet()->GetCurrentAction()->GetRoundsRemaining() > 0)
+	else if (stageNode->GetTeam(turnIndex)->GetActivePet()->GetCurrentAction()->GetRoundsRemaining() > 0)
 	{
 		//Copy the node and add it to the list.
 		PetStage *actionNode = new PetStage(*stageNode);
