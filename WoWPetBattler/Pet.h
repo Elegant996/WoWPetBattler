@@ -42,10 +42,10 @@ class Pet : public QObject
 	Q_PROPERTY(float DamageModifier READ GetDamageModifier WRITE SetDamageModifier)
 	Q_PROPERTY(float HealingModifier READ GetHealingModifier WRITE SetHealingModifier)
 	Q_PROPERTY(float DefenseModifier READ GetDefenseModifier WRITE SetDefenseModifier)
-	Q_PROPERTY(quint16 BonusDamage READ GetBonusDamage WRITE SetBonusDamage)
-	Q_PROPERTY(quint16 BlockDamage READ GetBlockDamage WRITE SetBlockDamage)
-	Q_PROPERTY(quint16 BonusHealing READ GetBonusHealing WRITE SetBonusHealing)
-	Q_PROPERTY(quint16 BlockHealing READ GetBlockHealing WRITE SetBlockHealing)
+	Q_PROPERTY(int BonusDamage READ GetBonusDamage WRITE SetBonusDamage)
+	Q_PROPERTY(int BlockDamage READ GetBlockDamage WRITE SetBlockDamage)
+	Q_PROPERTY(int BonusHealing READ GetBonusHealing WRITE SetBonusHealing)
+	Q_PROPERTY(int BlockHealing READ GetBlockHealing WRITE SetBlockHealing)
 	Q_PROPERTY(PetAction* CurrentAction READ GetCurrentAction)
 	Q_PROPERTY(bool RacialUsed READ RacialUsed WRITE RacialUsed)
 	Q_PROPERTY(bool AttackedThisRound READ AttackedThisRound WRITE AttackedThisRound)
@@ -94,10 +94,10 @@ public:
 	void SetDamageModifier(float);
 	void SetHealingModifier(float);
 	void SetDefenseModifier(float);
-	void SetBonusDamage(quint16);
-	void SetBlockDamage(quint16);
-	void SetBonusHealing(quint16);
-	void SetBlockHealing(quint16);
+	void SetBonusDamage(int);
+	void SetBlockDamage(int);
+	void SetBonusHealing(int);
+	void SetBlockHealing(int);
 	void RacialUsed(bool);
 	void AttackedThisRound(bool);
 
@@ -119,10 +119,10 @@ public:
 	float GetDamageModifier();
 	float GetHealingModifier();
 	float GetDefenseModifier();
-	quint16 GetBonusDamage();
-	quint16 GetBlockDamage();
-	quint16 GetBonusHealing();
-	quint16 GetBlockHealing();
+	int GetBonusDamage();
+	int GetBlockDamage();
+	int GetBonusHealing();
+	int GetBlockHealing();
 	Q_INVOKABLE PetAction* GetCurrentAction();
 	bool RacialUsed();
 	bool AttackedThisRound();
@@ -137,7 +137,7 @@ private:
 	quint16 currentHealth, currentMaxHealth, currentPower, currentSpeed;
 	float accuracyOffset, avoidanceRating, criticalStrikeRating;
 	float damageModifier, healingModifier, defenseModifier;
-	quint16 bonusDamage, blockDamage, bonusHealing, blockHealing;
+	int bonusDamage, blockDamage, bonusHealing, blockHealing;
 
 	bool racialUsed, attackedThisRound;
 	PetAction *currentAction;

@@ -159,6 +159,18 @@ void Pet::RoundUpdate()
 			i -= 1; //To correct the loop.
 		}
 	}
+
+	this->accuracyOffset = 0.00;
+	this->avoidanceRating = 0.00;
+	this->criticalStrikeRating = 0.05;
+	this->damageModifier = 1.00;
+	this->healingModifier = 1.00;
+	this->defenseModifier = 1.00;
+	this->bonusDamage = 0;
+	this->blockDamage = 0;
+	this->bonusHealing = 0;
+	this->blockHealing = 0;
+	this->attackedThisRound = false;
 }
 
 //Adds the status to the list.
@@ -343,25 +355,25 @@ void Pet::SetDefenseModifier(float defenseModifier)
 }
 
 //Set the pet's bonus damage.
-void Pet::SetBonusDamage(quint16 bonusDamage)
+void Pet::SetBonusDamage(int bonusDamage)
 {
 	this->bonusDamage = bonusDamage;
 }
 
 //Set the pet's block damage.
-void Pet::SetBlockDamage(quint16 blockDamage)
+void Pet::SetBlockDamage(int blockDamage)
 {
 	this->blockDamage = blockDamage;
 }
 
 //Set the pet's bonus healing.
-void Pet::SetBonusHealing(quint16 bonusHealing)
+void Pet::SetBonusHealing(int bonusHealing)
 {
 	this->bonusHealing = bonusHealing;
 }
 
 //Set the pet's block healing.
-void Pet::SetBlockHealing(quint16 blockHealing)
+void Pet::SetBlockHealing(int blockHealing)
 {
 	this->blockHealing = blockHealing;
 }
@@ -486,25 +498,25 @@ float Pet::GetDefenseModifier()
 }
 
 //Return the pet's bonus damage.
-quint16 Pet::GetBonusDamage()
+int Pet::GetBonusDamage()
 {
 	return this->bonusDamage;
 }
 
 //Return the pet's block damage.
-quint16 Pet::GetBlockDamage()
+int Pet::GetBlockDamage()
 {
 	return this->blockDamage;
 }
 
 //Return the pet's bonus healing.
-quint16 Pet::GetBonusHealing()
+int Pet::GetBonusHealing()
 {
 	return this->bonusHealing;
 }
 
 //Return the pet's block healing.
-quint16 Pet::GetBlockHealing()
+int Pet::GetBlockHealing()
 {
 	return this->blockHealing;
 }

@@ -702,10 +702,6 @@ float AI::EndTurn(PetStage* stageNode, quint8 depth)
 				//Catch any exceptions and report them.
 				if (component->status() == 3)
 					qDebug() << component->errors();
-				
-				//Catch any exceptions and report them.
-				if (component->status() == 3)
-					qDebug() << component->errors();
 			}
 
 
@@ -782,8 +778,10 @@ float AI::EndTurn(PetStage* stageNode, quint8 depth)
 	{
 		for (quint8 i=0; i < substituteStages.size(); i+=1)
 		{
+			//Update the round.
+			substituteStages.at(i)->RoundUpdate();
 			//Call Expectiminimax again, reduce depth by 1 as we are proceeding into the next turn.
-			nextTurn = Expectiminimax(stageNode, depth-1, 1);
+			nextTurn = Expectiminimax(substituteStages.at(i), depth-1, 1);
 			//Add the heuristic to our return value.
 			heuristic += nextTurn.GetHeuristic() / tempSize;
 
@@ -792,8 +790,12 @@ float AI::EndTurn(PetStage* stageNode, quint8 depth)
 		substituteStages.clear();
 	}
 	else
+	{
+		//Update the round.
+		stageNode->RoundUpdate();
 		//Call Expectiminimax again, reduce depth by 1 as we are proceeding into the next turn.
 		nextTurn = Expectiminimax(stageNode, depth-1, 1);
+	}
 
 	//Return heuristic.
 	return nextTurn.GetHeuristic();
