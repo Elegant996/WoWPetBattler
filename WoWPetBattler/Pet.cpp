@@ -148,17 +148,8 @@ void Pet::RoundUpdate()
 	foreach (PetAbility *petAbility, this->petAbilities)
 		petAbility->RoundUpdate();
 
-	//Update each aura.
-	/*QMutableListIterator<PetAura*> i(this->petAuras);
-	while (i.hasNext())
-	{
-		PetAura* petAura = i.next();
-		petAura->RoundUpdate();
-		if (petAura->GetDuration() == 0)
-			i.remove();
-	}*/
-
 	//TODO: Test this!
+	//Update each aura and remove expired ones.
 	for (int i=0; i < petAuras.size(); i+=1)
 	{
 		petAuras.at(i)->RoundUpdate();
@@ -168,9 +159,6 @@ void Pet::RoundUpdate()
 			i -= 1; //To correct the loop.
 		}
 	}
-	
-	//foreach (PetAura *petAura, this->petAuras)
-		//petAura->RoundUpdate();
 }
 
 //Adds the status to the list.
@@ -441,6 +429,12 @@ quint16 Pet::GetHealth()
 quint16 Pet::GetMaxHealth()
 {
 	return this->currentMaxHealth;
+}
+
+//Return pet's current heath as a percentage.
+float Pet::GetHealthPercentage()
+{
+	return (float)currentHealth / (float)currentMaxHealth;
 }
 
 //Return pet's current power.

@@ -27,7 +27,7 @@ public:
 	void AddPet(quint16, quint8, quint8, quint8);
 
 	void SetActivePet(quint8);
-	Pet* GetActivePet();
+	Q_INVOKABLE Pet* GetActivePet();
 	quint8 GetActivePetIndex();
 
 	int GetNumPets();

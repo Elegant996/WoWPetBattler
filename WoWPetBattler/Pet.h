@@ -33,6 +33,7 @@ class Pet : public QObject
 	Q_PROPERTY(quint16 LastKnownHealth READ GetLastKnownHealth WRITE SetLastKnownHealth)
 	Q_PROPERTY(quint16 Health READ GetHealth WRITE SetHealth)
 	Q_PROPERTY(quint16 MaxHealth READ GetMaxHealth WRITE SetMaxHealth)
+	Q_PROPERTY(float HealthPercentage READ GetHealthPercentage)
 	Q_PROPERTY(quint16 Power READ GetPower WRITE SetPower)
 	Q_PROPERTY(quint16 Speed READ GetSpeed WRITE SetSpeed)
 	Q_PROPERTY(float AccuracyOffset READ GetAccuracyOffset WRITE SetAccuracyOffset)
@@ -109,6 +110,7 @@ public:
 	quint16 GetLastKnownHealth();
 	quint16 GetHealth();
 	quint16 GetMaxHealth();
+	float GetHealthPercentage();
 	quint16 GetPower();
 	quint16 GetSpeed();
 	float GetAccuracyOffset();
