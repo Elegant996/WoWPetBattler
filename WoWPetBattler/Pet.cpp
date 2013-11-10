@@ -82,14 +82,15 @@ Pet::~Pet(void)
 {
 	delete currentAction;
 
-	for (int i=0; i < petAbilities.size(); i+=1)
-		delete (petAbilities.takeAt(0));
+	this->petStatuses.clear();
+
+	while (!this->petAbilities.isEmpty())
+		delete (this->petAbilities.takeAt(0));
 	this->petAbilities.clear();
 
-	for (int i=0; i < petAuras.size(); i+=1)
-		delete (petAuras.takeAt(0));
+	while (!this->petAuras.isEmpty())
+		delete (this->petAuras.takeAt(0));
 	this->petAuras.clear();
-
 }
 
 //Copy Constructor
@@ -277,8 +278,9 @@ void Pet::AddAura(quint16 auraId, qint8 duration, bool isFresh, quint16 power)
 void Pet::RemoveAuras()
 {
 	//Ignore the first aura for real pets.
-	for (int i=(speciesId==0)?0:1; i < petAuras.size(); i+=1)
-		delete (petAuras.takeAt(1));
+	quint8 auraIndex = (speciesId==0)?0:1;
+	while (petAuras.size() != auraIndex)
+		delete (petAuras.takeAt(auraIndex));
 }
 
 //Remove the aura at the specified index.

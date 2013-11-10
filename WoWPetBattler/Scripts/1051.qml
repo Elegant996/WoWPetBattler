@@ -1,4 +1,4 @@
-// Arcane Storm - Ability
+// Acid Rain - Ability
 import QtQuick 2.0
 
 import PetAction 1.0
@@ -61,23 +61,36 @@ Item
                         isHitting, isCritting, isProcing)
     {
         var numHits = 0;
-        var scaleFactor = 0.40;
-        var baseDamage = 8;
+        var scaleFactor = 0.45;
+        var baseDamage = 9;
         var normalDamage = Math.round(baseDamage + petStage.GetTeam(teamIndex).ActivePet.Power * scaleFactor);
         var damage = Math.round((normalDamage - petStage.GetTeam((teamIndex%2)+1).ActivePet.BlockDamage)
-                        * petType.GetEffectiveness(PetType.Magic, petStage.GetTeam((teamIndex%2)+1).Type)
+                        * petType.GetEffectiveness(PetType.Aquatic, petStage.GetTeam((teamIndex%2)+1).Type)
                         * petStage.GetTeam((teamIndex%2)+1).ActivePet.DefenseModifier
                         * petStage.GetTeam(teamIndex).ActivePet.DamageModifier);
 
+        //Used below.
+        var randomPetIndex = Math.floor((Math.random()*petStage.GetTeam((teamIndex%2)+1).NumPets)+1);
+
         //Check whether it is avoid/crit/hit/proc.
-        if (!isAvoiding && isHitting)
-        {
-            numHits += 1;
-            if (isCritting)
-                petHelper.CheckDamage(petStage, (teamIndex%2)+1, petStage.GetTeam((teamIndex%2)+1).ActivePetIndex, 2*damage, false);
-            else
-                petHelper.CheckDamage(petStage, (teamIndex%2)+1, petStage.GetTeam((teamIndex%2)+1).ActivePetIndex, damage, false);
-        }
+        if (!isAvoiding)
+            for (var i=1; i < petStage.GetTeam((teamIndex%2)+1).NumPets+1; i++)
+            {
+                numHits += 1;
+                if (isCritting && i == randomPetIndex)
+                    petHelper.CheckDamage(petStage, (teamIndex%2)+1, i, 2*damage, false);
+                else
+                    petHelper.CheckDamage(petStage, (teamIndex%2)+1, i, damage, false);
+            }
+        else
+            for (var i=2; i < petStage.GetTeam((teamIndex%2)+1).NumPets+1; i++)
+            {
+                numHits += 1;
+                if (isCritting && i == randomPetIndex)
+                    petHelper.CheckDamage(petStage, (teamIndex%2)+1, i, 2*damage, false);
+                else
+                    petHelper.CheckDamage(petStage, (teamIndex%2)+1, i, damage, false);
+            }
 
         //Remove any other weather effects.
         if (petStage.GetTeam(0).GetPet(0).NumAuras > 0)
@@ -132,7 +145,13 @@ Item
             petStage.GetTeam(0).RemoveAura(1);
         }
 
-        petStage.GetTeam(0).AddAura(590, 9, true, petStage.GetTeam(teamIndex).ActivePet.Power);
+        //Increase damage done by all Aquatic pets.
+        for (var i=1; i < 3; i++)
+            for (var j=1; j < petStage.GetTeam(teamIndex).NumPets+1; j++)
+                if (petStage.GetTeam(i).GetPet(j).Type == PetType.Aquatic)
+                    petStage.GetTeam(i).GetPet(j).DamageModifier += 0.25;
+
+        petStage.GetTeam(0).AddAura(229, 9, true, petStage.GetTeam(teamIndex).ActivePet.Power);
 
         return numHits;
     }

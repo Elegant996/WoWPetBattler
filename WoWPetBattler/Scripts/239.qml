@@ -1,8 +1,10 @@
 // Flying - Racial
 import QtQuick 2.0
-import PetType 1.0
-import PetStatus 1.0
+
 import PetAction 1.0
+import PetHelper 1.0
+import PetStatus 1.0
+import PetType 1.0
 
 Item
 {
@@ -31,12 +33,12 @@ Item
     }
 
     //Apply the aura's effect at the start of the turn.
-    function ApplyAuraStart(teamIndex, curPet, auraIndex, duration)
+    function ApplyAuraStart(teamIndex, petIndex, auraIndex, duration)
     {
-        if (petStage.GetTeam(curTeam).GetPet(curPet).HealthPercentage > 0.50)
+        if (petStage.GetTeam(curTeam).GetPet(petIndex).HealthPercentage > 0.50)
         {
-            petStage.GetTeam(curTeam).GetPet(curPet).Speed *= 1.5;
-            petStage.GetTeam(curTeam).GetPet(curPet).RacialUsed = true;
+            petStage.GetTeam(curTeam).GetPet(petIndex).Speed *= 1.5;
+            petStage.GetTeam(curTeam).GetPet(petIndex).RacialUsed = true;
         }
     }
 
@@ -47,7 +49,7 @@ Item
     }
 
     //Apply the aura's effect at the end of the turn.
-    function ApplyAuraEnd(teamIndex, curPet, duration, isFresh)
+    function ApplyAuraEnd(teamIndex, petIndex, duration, isFresh)
     {
 
     }

@@ -1,8 +1,10 @@
 // Arcane Storm - Weather
 import QtQuick 2.0
-import PetType 1.0
-import PetStatus 1.0
+
 import PetAction 1.0
+import PetHelper 1.0
+import PetStatus 1.0
+import PetType 1.0
 
 Item
 {
@@ -31,9 +33,9 @@ Item
     }
 
     //Apply the aura's effect at the start of the turn.
-    function ApplyAuraStart(teamIndex, curPet, auraIndex, duration)
+    function ApplyAuraStart(teamIndex, petIndex, auraIndex, duration)
     {
-        petStage.GetTeam(curTeam).GetPet(curPet).DamageModifier += 0.50;
+
     }
 
     //Applies the aura effect to the active pet.
@@ -43,7 +45,7 @@ Item
     }
 
     //Apply the aura's effect at the end of the turn.
-    function ApplyAuraEnd(teamIndex, curPet, duration, isFresh)
+    function ApplyAuraEnd(teamIndex, petIndex, duration, isFresh)
     {
 
     }

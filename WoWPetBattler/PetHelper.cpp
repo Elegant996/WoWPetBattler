@@ -1,6 +1,6 @@
 #include "PetHelper.h"
 
-//Checks the damage to see if it will trigger a Magic pet's racial.
+//Checks the damage dealt.
 void PetHelper::CheckDamage(PetStage *petStage, quint8 teamIndex, quint8 petIndex, quint16 damage, bool useLightning)
 {
 	Pet *curPet = petStage->GetTeam(teamIndex)->GetPet(petIndex);
@@ -33,6 +33,17 @@ void PetHelper::CheckDamage(PetStage *petStage, quint8 teamIndex, quint8 petInde
 
 	//Set flag for other team's active pet having attacked.
 	petStage->GetTeam((teamIndex%2)+1)->GetActivePet()->AttackedThisRound(true);
+}
+
+//Check the healing done.
+void PetHelper::CheckHealing(PetStage *petStage, quint8 teamIndex, quint8 petIndex, quint16 healing)
+{
+	Pet *curPet = petStage->GetTeam(teamIndex)->GetPet(petIndex);
+
+	if (curPet->GetHealth() + healing > curPet->GetMaxHealth())
+		curPet->SetHealth(curPet->GetMaxHealth());
+	else
+		curPet->SetHealth(curPet->GetHealth() + healing);
 }
 
 //Checks whether the Dragonkin racial should proc.
@@ -120,4 +131,13 @@ void PetHelper::CheckAuraPower(PetStage* petStage, PetAura *curAura, quint8 team
 					if (petStage->GetTeam(teamIndex)->GetPet(i)->GetAbility(j)->GetAbilityId() == abilityId)
 						curAura->SetPower(petStage->GetTeam(teamIndex)->GetPet(i)->GetPower());
 	}
+}
+
+//Checks if a weather effect can decrease the duration of a harmful effect.
+void PetHelper::CheckCleansingRain(PetStage* petStage, quint8 teamIndex, quint8 petIndex, quint16 auraId, qint8 duration, bool isFresh, quint16 power)
+{
+	if (petStage->GetTeam(0)->GetPet(0)->GetNumAuras() > 0 && petStage->GetTeam(0)->GetPet(0)->GetAura(1)->GetAuraId() == 229)
+		petStage->GetTeam(teamIndex)->GetPet(petIndex)->AddAura(auraId, duration-1, isFresh, power);
+	else
+		petStage->GetTeam(teamIndex)->GetPet(petIndex)->AddAura(auraId, duration, isFresh, power);
 }

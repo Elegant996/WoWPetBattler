@@ -102,6 +102,7 @@ void WoWPetBattler::on_playButton_clicked()
 	qmlRegisterType<PetAction>("PetAction", 1, 0, "PetAction");
 	qmlRegisterType<PetAbility>();
 	qmlRegisterType<PetAura>();
+	qmlRegisterType<PetHelper>("PetHelper", 1, 0, "PetHelper");
 
 	PetStage *petStage2 = new PetStage(*petStage);
 
@@ -133,6 +134,8 @@ void WoWPetBattler::on_playButton_clicked()
 	delete object;
 
 	delete objectContext;
+
+	delete petStage2;
 
 	/*	
 	if (ui.playButton->isChecked())

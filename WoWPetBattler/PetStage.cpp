@@ -24,9 +24,9 @@ PetStage::PetStage(void)
 //Destructor
 PetStage::~PetStage(void)
 {
-	for (int i=0; i < petTeams.size(); i+=1)
-		delete (petTeams.takeAt(0));
-	petTeams.clear();
+	while (!this->petTeams.isEmpty())
+		delete (this->petTeams.takeAt(0));
+	this->petTeams.clear();
 }
 
 //Copy Constructor

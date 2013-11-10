@@ -11,8 +11,9 @@ PetTeam::PetTeam(void)
 //Destructor
 PetTeam::~PetTeam(void)
 {
-	for (int i=0; i < pets.size(); i+=1)
-		delete (pets.takeAt(0));
+	while (!this->pets.isEmpty())
+		delete (this->pets.takeAt(0));
+	this->pets.clear();
 }
 
 //Copy Constructor
@@ -20,8 +21,6 @@ PetTeam::PetTeam(const PetTeam& other)
 	: QObject(NULL)
 {
 	this->activePet = other.activePet;
-	//foreach (Pet *myPet, other.pet)
-		//this->pet.append(new Pet(*myPet));
 
 	for (int i=0; i < other.pets.size(); i+=1)
 		this->pets.append(new Pet(*other.pets.at(i)));

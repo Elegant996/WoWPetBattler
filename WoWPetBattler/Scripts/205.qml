@@ -1,8 +1,10 @@
 // Blizzard - Weather
 import QtQuick 2.0
-import PetType 1.0
-import PetStatus 1.0
+
 import PetAction 1.0
+import PetHelper 1.0
+import PetStatus 1.0
+import PetType 1.0
 
 Item
 {
@@ -31,7 +33,7 @@ Item
     }
 
     //Apply the aura's effect at the start of the turn.
-    function ApplyAuraStart(teamIndex, curPet, auraIndex, duration)
+    function ApplyAuraStart(teamIndex, petIndex, auraIndex, duration)
     {
         //Add Chilled status to all pets.
         for (var i=1; i < 3; i++)
@@ -46,7 +48,7 @@ Item
     }
 
     //Apply the aura's effect at the end of the turn.
-    function ApplyAuraEnd(teamIndex, curPet, duration, isFresh)
+    function ApplyAuraEnd(teamIndex, petIndex, duration, isFresh)
     {
 
     }

@@ -3,6 +3,7 @@ import QtQuick 2.0
 import PetType 1.0
 import PetStatus 1.0
 import PetAction 1.0
+import PetHelper 1.0
 
 Item
 {
@@ -10,6 +11,12 @@ Item
     property variant petPos2: 4;
     property string test: "Hello";
     property variant myTest: petStage.GetTeam(1);
+
+    //Used to allow access to static functions in PetType class.
+    //PetType { id: petType }
+
+    //Used to allow access to static functions in PetHelper class.
+    PetHelper { id: petHelper }
 
     function printActivePet(value)
     {
@@ -31,16 +38,14 @@ Item
         console.log(petStage.GetTeam(1).ActivePet.GetCurrentAction().Action);
         petStage.GetTeam(1).ActivePet.GetCurrentAction().Action = 1;
         console.log(petStage.GetTeam(1).ActivePet.GetCurrentAction().Action);
-        console.log(petType.GetEffectiveness(0, 1));
+        petStage.GetTeam(1).GetPet(1).Health -= 500;
+        console.log(petStage.GetTeam(1).GetPet(1).Health);
+        petHelper.CheckDamage(petStage, 1, 1, 25, false);
+        console.log(petStage.GetTeam(1).GetPet(1).Health);
     }
 
     function testFunction()
     {
         return 5;
-    }
-
-    PetType
-    {
-        id: petType
     }
 }

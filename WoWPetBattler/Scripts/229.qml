@@ -1,4 +1,4 @@
-// Beast - Racial
+// Cleansing Rain - Weather
 import QtQuick 2.0
 
 import PetAction 1.0
@@ -35,11 +35,11 @@ Item
     //Apply the aura's effect at the start of the turn.
     function ApplyAuraStart(teamIndex, petIndex, auraIndex, duration)
     {
-        if (petStage.GetTeam(curTeam).GetPet(petIndex).Health < 0.50)
-        {
-            petStage.GetTeam(curTeam).GetPet(petIndex).DamageModifier += 0.25;
-            petStage.GetTeam(curTeam).GetPet(petIndex).RacialUsed = true;
-        }
+        //Increase damage done by all Aquatic pets.
+        for (var i=1; i < 3; i++)
+            for (var j=1; j < petStage.GetTeam(teamIndex).NumPets+1; j++)
+                if (petStage.GetTeam(i).GetPet(j).Type == PetType.Aquatic)
+                    petStage.GetTeam(i).GetPet(j).DamageModifier += 0.25;
     }
 
     //Applies the aura effect to the active pet.

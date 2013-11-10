@@ -1,8 +1,10 @@
 // Humanoid - Racial
 import QtQuick 2.0
-import PetType 1.0
-import PetStatus 1.0
+
 import PetAction 1.0
+import PetHelper 1.0
+import PetStatus 1.0
+import PetType 1.0
 
 Item
 {
@@ -31,7 +33,7 @@ Item
     }
 
     //Apply the aura's effect at the start of the turn.
-    function ApplyAuraStart(teamIndex, curPet, auraIndex, duration)
+    function ApplyAuraStart(teamIndex, petIndex, auraIndex, duration)
     {
 
     }
@@ -43,12 +45,12 @@ Item
     }
 
     //Apply the aura's effect at the end of the turn.
-    function ApplyAuraEnd(teamIndex, curPet, duration, isFresh)
+    function ApplyAuraEnd(teamIndex, petIndex, duration, isFresh)
     {
         //If the pet attacked this round increase it health.
-        if (petStage.GetTeam(curTeam).GetTeam(curPet).AttackedThisRound)
-            petStage.GetTeam(curTeam).GetTeam(curPet).Health += petStage.GetTeam(curTeam).GetTeam(curPet).Health
-                    * petStage.GetTeam(curTeam).GetTeam(curPet).HealingModifier * 0.04;
+        if (petStage.GetTeam(curTeam).GetTeam(petIndex).AttackedThisRound)
+            petStage.GetTeam(curTeam).GetTeam(petIndex).Health += petStage.GetTeam(curTeam).GetTeam(petIndex).Health
+                    * petStage.GetTeam(curTeam).GetTeam(petIndex).HealingModifier * 0.04;
     }
 
     //Grants the pet any special statuses the ability has.
