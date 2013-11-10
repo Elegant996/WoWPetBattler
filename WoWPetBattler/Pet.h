@@ -36,6 +36,7 @@ class Pet : public QObject
 	Q_PROPERTY(float HealthPercentage READ GetHealthPercentage)
 	Q_PROPERTY(quint16 Power READ GetPower WRITE SetPower)
 	Q_PROPERTY(quint16 Speed READ GetSpeed WRITE SetSpeed)
+	Q_PROPERTY(quint8 NumAuras READ GetNumAuras)
 	Q_PROPERTY(float AccuracyOffset READ GetAccuracyOffset WRITE SetAccuracyOffset)
 	Q_PROPERTY(float AvoidanceRating READ GetAvoidanceRating WRITE SetAvoidanceRating)
 	Q_PROPERTY(float CriticalStrikeRating READ GetCriticalStrikeRating WRITE SetCriticalStrikeRating)
@@ -63,6 +64,7 @@ public:
 	void RoundUpdate();
 
 	Q_INVOKABLE void AddStatus(PetStatus);
+	Q_INVOKABLE void RemoveStatus(PetStatus);
 	Q_INVOKABLE bool HasStatus(PetStatus);
 	Q_INVOKABLE int GetNumStatuses();
 	Q_INVOKABLE PetStatus GetStatus(quint8);
@@ -75,10 +77,12 @@ public:
 	//QQmlListProperty<PetAbility> GetAbilities();
 
 	Q_INVOKABLE void AddAura(quint16, qint8, bool);
+	Q_INVOKABLE void AddAura(quint16, qint8, bool, quint16);
 	Q_INVOKABLE void RemoveAura(quint8);
 	void RemoveAuras();
 	Q_INVOKABLE quint8 GetNumAuras();
 	Q_INVOKABLE PetAura* GetAura(quint8);
+	Q_INVOKABLE PetAura* GetLastAura();
 	//QQmlListProperty<PetAura> GetAuras();
 
 	bool IsDead();

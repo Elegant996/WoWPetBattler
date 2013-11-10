@@ -1,4 +1,4 @@
-// Template.qml
+//Undead - Racial
 import QtQuick 2.0
 import PetType 1.0
 import PetStatus 1.0
@@ -41,7 +41,9 @@ Item
     //Apply the aura's effect at the end of the turn.
     function ApplyAuraEnd(curTeam, curPet, duration, isFresh)
     {
-
+        //If the pet is currently staving off death, kill him.
+        if (duration == 1 && !isFresh)
+            petStage.GetTeam(curTeam).GetPet(curPet).Health = 0;
     }
 
     //Grants the pet any special statuses the ability has.

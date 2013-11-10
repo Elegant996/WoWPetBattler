@@ -8,6 +8,7 @@
 #include <Robot.h>
 
 #include "Move.h"
+#include "PetHelper.h"
 #include "PetStage.h"
 
 class AI :

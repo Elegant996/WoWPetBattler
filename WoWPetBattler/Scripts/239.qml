@@ -1,4 +1,4 @@
-// Template.qml
+//Flying - Racial
 import QtQuick 2.0
 import PetType 1.0
 import PetStatus 1.0
@@ -29,7 +29,11 @@ Item
     //Apply the aura's effect at the start of the turn.
     function ApplyAuraStart(curTeam, curPet, duration)
     {
-
+        if (petStage.GetTeam(curTeam).GetPet(curPet).HealthPercentage > 0.50)
+        {
+            petStage.GetTeam(curTeam).GetPet(curPet).Speed *= 1.5;
+            petStage.GetTeam(curTeam).GetPet(curPet).RacialUsed = true;
+        }
     }
 
     //Applies the aura effect to the active pet.

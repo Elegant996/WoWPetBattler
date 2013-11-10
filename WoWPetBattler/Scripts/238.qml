@@ -1,4 +1,4 @@
-// Template.qml
+//Humanoid - Racial
 import QtQuick 2.0
 import PetType 1.0
 import PetStatus 1.0
@@ -41,7 +41,10 @@ Item
     //Apply the aura's effect at the end of the turn.
     function ApplyAuraEnd(curTeam, curPet, duration, isFresh)
     {
-
+        //If the pet attacked this round increase it health.
+        if (petStage.GetTeam(curTeam).GetTeam(curPet).AttackedThisRound)
+            petStage.GetTeam(curTeam).GetTeam(curPet).Health += petStage.GetTeam(curTeam).GetTeam(curPet).Health
+                    * petStage.GetTeam(curTeam).GetTeam(curPet).HealingModifier * 0.04;
     }
 
     //Grants the pet any special statuses the ability has.

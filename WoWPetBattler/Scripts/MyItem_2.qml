@@ -31,11 +31,16 @@ Item
         console.log(petStage.GetTeam(1).ActivePet.GetCurrentAction().Action);
         petStage.GetTeam(1).ActivePet.GetCurrentAction().Action = 1;
         console.log(petStage.GetTeam(1).ActivePet.GetCurrentAction().Action);
-        console.log("myTest: " + myTest);
+        console.log(petType.GetEffectiveness(0, 1));
     }
 
     function testFunction()
     {
         return 5;
+    }
+
+    PetType
+    {
+        id: petType
     }
 }

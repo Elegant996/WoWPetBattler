@@ -13,6 +13,7 @@ class PetTeam : public QObject
 	//Q_PROPERTY(QQmlListProperty<Pet> Pets READ GetPets)
 	Q_PROPERTY(Pet* ActivePet READ GetActivePet)
 	Q_PROPERTY(quint8 ActivePetIndex READ GetActivePetIndex WRITE SetActivePet)
+	Q_PROPERTY(quint8 NumPets READ GetNumPets)
 
 public:
 	PetTeam(void);
@@ -30,8 +31,8 @@ public:
 	Q_INVOKABLE Pet* GetActivePet();
 	quint8 GetActivePetIndex();
 
-	int GetNumPets();
-	Pet* GetPet(quint8);
+	Q_INVOKABLE quint8 GetNumPets();
+	Q_INVOKABLE Pet* GetPet(quint8);
 	//QQmlListProperty<Pet> GetPets();
 
 private:

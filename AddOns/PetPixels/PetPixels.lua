@@ -57,7 +57,6 @@ function events:CHAT_MSG_PET_BATTLE_COMBAT_LOG(...)
 				break;
 			end
 		end
-	end
 	--Determine what ability our opponent (PvP only) just used and verify it against what we know.
 	elseif (isPVPBattle() and power == C_PetBattles.GetPower(enemyTeam, teamsActivePet[enemyTeam]) and speed == C_PetBattles.GetSpeed(enemyTeam, teamsActivePet[enemyTeam])) then
 		local idTable, _ = C_PetJournal.GetPetAbilityList(C_PetBattles.GetPetSpeciesID(enemyTeam, teamsActivePet[enemyTeam]));
@@ -69,6 +68,7 @@ function events:CHAT_MSG_PET_BATTLE_COMBAT_LOG(...)
 				break;
 			end
 		end
+	end
 end
 
 function events:PET_BATTLE_HEALTH_CHANGED(...)

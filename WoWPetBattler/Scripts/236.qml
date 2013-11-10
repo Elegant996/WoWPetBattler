@@ -1,4 +1,4 @@
-// Template.qml
+//Critter - Racial
 import QtQuick 2.0
 import PetType 1.0
 import PetStatus 1.0

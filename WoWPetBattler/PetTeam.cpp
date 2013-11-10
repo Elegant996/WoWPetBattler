@@ -76,7 +76,7 @@ quint8 PetTeam::GetActivePetIndex()
 }
 
 //Get the number of pets on the team.
-int PetTeam::GetNumPets()
+quint8 PetTeam::GetNumPets()
 {
 	return this->pets.size()-1;
 }

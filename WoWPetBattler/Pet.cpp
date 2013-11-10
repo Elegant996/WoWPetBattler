@@ -160,6 +160,7 @@ void Pet::RoundUpdate()
 		}
 	}
 
+	this->currentSpeed = this->normalSpeed;
 	this->accuracyOffset = 0.00;
 	this->avoidanceRating = 0.00;
 	this->criticalStrikeRating = 0.05;
@@ -178,6 +179,12 @@ void Pet::AddStatus(Pet::PetStatus status)
 {
 	if (!petStatuses.contains(status))
 		petStatuses.append(status);
+}
+
+//Remove the status from the list.
+void Pet::RemoveStatus(Pet::PetStatus status)
+{
+	petStatuses.removeOne(status);
 }
 
 //Return whether or not the pet has a specific status.
@@ -250,6 +257,22 @@ void Pet::AddAura(quint16 auraId, qint8 duration, bool isFresh)
 	this->petAuras.append(new PetAura(auraId, duration, isFresh));
 }
 
+//Add an aura to the current pet.
+void Pet::AddAura(quint16 auraId, qint8 duration, bool isFresh, quint16 power)
+{
+	//Check to see if petAuras is empty, if not check to see if it exists already and overwrite.
+	if (!petAuras.isEmpty())
+		for (int i=0; i < this->petAuras.size(); i+=1)
+			if (auraId == this->petAuras.at(i)->GetAuraId())
+			{
+				this->petAuras.at(i)->UpdateAura(duration, isFresh, power);
+				return;
+			}
+
+	//If it doesn't exist, add it.
+	this->petAuras.append(new PetAura(auraId, duration, isFresh, power));
+}
+
 //Removes all pet auras except the racial passive on the pet.
 void Pet::RemoveAuras()
 {
@@ -274,6 +297,12 @@ quint8 Pet::GetNumAuras()
 PetAura* Pet::GetAura(quint8 index)
 {
 	return this->petAuras.at(index-1);
+}
+
+//Return the last aura applied.
+PetAura* Pet::GetLastAura()
+{
+	return this->petAuras.last();
 }
 
 //For QML purposes.
