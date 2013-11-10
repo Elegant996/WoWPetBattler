@@ -27,6 +27,7 @@ public:
 
 	quint16 GetAbilityId();
 	qint8 GetCooldown();
+	qint8 GetRounds();
 	bool IsVerified();
 
 private:

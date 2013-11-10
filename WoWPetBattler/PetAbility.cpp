@@ -83,6 +83,12 @@ qint8 PetAbility::GetCooldown()
 	return this->currentCooldown;
 }
 
+//Return the number of rounds the ability will persist for.
+qint8 PetAbility::GetRounds()
+{
+	return this->rounds;
+}
+
 //Return whether or not the ability is verified.
 bool PetAbility::IsVerified()
 {

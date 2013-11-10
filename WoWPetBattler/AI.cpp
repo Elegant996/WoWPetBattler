@@ -357,6 +357,11 @@ float AI::ActionOutcomes(PetStage *stageNode, quint8 depth, quint8 currentTeam, 
 		stageNode->GetTeam(currentTeam)->GetActivePet()->GetAbility(stageNode->GetTeam(currentTeam)
 			->GetActivePet()->GetCurrentAction()->GetAction())->UseAbility();
 
+		//Set the number of rounds the ability will persist for.
+		stageNode->GetTeam(currentTeam)->GetActivePet()->GetCurrentAction()->SetRoundsRemaining(
+			stageNode->GetTeam(currentTeam)->GetActivePet()->GetAbility(stageNode->GetTeam(currentTeam)
+			->GetActivePet()->GetCurrentAction()->GetAction())->GetRounds());
+
 		//Set variables to be used.
 		quint16 abilityId = stageNode->GetTeam(currentTeam)->GetActivePet()->GetAbility(stageNode->GetTeam(currentTeam)->GetActivePet()->GetCurrentAction()->GetAction())->GetAbilityId();
 		float avoidanceRating, accuracyRating, criticalRating, chanceOnHitRating;
