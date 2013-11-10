@@ -1,4 +1,4 @@
-// Call Lightning - Ability
+// Call Blizzard - Ability
 import QtQuick 2.0
 import PetType 1.0
 import PetStatus 1.0
@@ -63,7 +63,7 @@ Item
         var baseDamage = 25;
         var normalDamage = Math.round(baseDamage + petStage.GetTeam(teamIndex).ActivePet.Power * scaleFactor);
         var damage = Math.round((normalDamage - petStage.GetTeam((teamIndex%2)+1).ActivePet.BlockDamage)
-                        * petType.GetEffectiveness(PetType.Machine, petStage.GetTeam((teamIndex%2)+1).Type)
+                        * petType.GetEffectiveness(PetType.Elemental, petStage.GetTeam((teamIndex%2)+1).Type)
                         * petStage.GetTeam((teamIndex%2)+1).ActivePet.DefenseModifier
                         * petStage.GetTeam(teamIndex).ActivePet.DamageModifier);
 
@@ -85,11 +85,6 @@ Item
                 for (var i=1; i < 3; i++)
                     for (var j=1; j < petStage.GetTeam(teamIndex).NumPets+1; j++)
                         petStage.GetTeam(i).GetPet(j).RemoveStatus(PetStatus.Burning);
-            //Blizzard
-            else if (petStage.GetTeam(0).GetPet(0).GetAura(1).AuraId == 205)
-                for (var i=1; i < 3; i++)
-                    for (var j=1; j < petStage.GetTeam(teamIndex).NumPets+1; j++)
-                        petStage.GetTeam(i).GetPet(j).RemoveStatus(PetStatus.Chilled);
             //Sunlight
             else if (petStage.GetTeam(0).GetPet(0).GetAura(1).AuraId == 403)
                 for (var i=1; i < 3; i++)
@@ -130,7 +125,12 @@ Item
             petStage.GetTeam(0).RemoveAura(1);
         }
 
-        petStage.GetTeam(0).AddAura(203, 5, true, petStage.GetTeam(teamIndex).ActivePet.Power);
+        petStage.GetTeam(0).AddAura(205, 9, true, petStage.GetTeam(teamIndex).ActivePet.Power);
+
+        //Add Chilled status to all pets.
+        for (var i=1; i < 3; i++)
+            for (var j=1; j < petTeam.GetTeam(teamIndex).NumPets+1; j++)
+                petStage.GetTeam(i).GetPet(j).AddStatus(PetStatus.Chilled);
 
         return numHits;
     }

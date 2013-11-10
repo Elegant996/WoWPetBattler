@@ -83,17 +83,17 @@ Item
             //Scorched Earth
             if (petStage.GetTeam(0).GetPet(0).GetAura(1).AuraId == 171)
                 for (var i=1; i < 3; i++)
-                    for (var j=1; j < petTeam.GetTeam(teamIndex).NumPets+1; j++)
+                    for (var j=1; j < petStage.GetTeam(teamIndex).NumPets+1; j++)
                         petStage.GetTeam(i).GetPet(j).RemoveStatus(PetStatus.Burning);
             //Blizzard
             else if (petStage.GetTeam(0).GetPet(0).GetAura(1).AuraId == 205)
                 for (var i=1; i < 3; i++)
-                    for (var j=1; j < petTeam.GetTeam(teamIndex).NumPets+1; j++)
+                    for (var j=1; j < petStage.GetTeam(teamIndex).NumPets+1; j++)
                         petStage.GetTeam(i).GetPet(j).RemoveStatus(PetStatus.Chilled);
             //Sunlight
             else if (petStage.GetTeam(0).GetPet(0).GetAura(1).AuraId == 403)
                 for (var i=1; i < 3; i++)
-                    for (var j=1; j < petTeam.GetTeam(teamIndex).NumPets+1; j++)
+                    for (var j=1; j < petStage.GetTeam(teamIndex).NumPets+1; j++)
                     {
                         petStage.GetTeam(i).GetPet(j).Health /= 1.5;
                         petStage.GetTeam(i).GetPet(j).HealingModifier -= 0.25;
@@ -101,7 +101,7 @@ Item
             //Darkness
             else if (petStage.GetTeam(0).GetPet(0).GetAura(1).AuraId == 257)
                 for (var i=1; i < 3; i++)
-                    for (var j=1; j < petTeam.GetTeam(teamIndex).NumPets+1; j++)
+                    for (var j=1; j < petStage.GetTeam(teamIndex).NumPets+1; j++)
                     {
                         petStage.GetTeam(i).GetPet(j).RemoveStatus(PetStatus.Blinded);
                         petStage.GetTeam(i).GetPet(j).AccuracyOffset += 0.10;
@@ -110,7 +110,7 @@ Item
             //Sandstorm
             else if (petStage.GetTeam(0).GetPet(0).GetAura(1).AuraId == 257)
                 for (var i=1; i < 3; i++)
-                    for (var j=1; j < petTeam.GetTeam(teamIndex).NumPets+1; j++)
+                    for (var j=1; j < petStage.GetTeam(teamIndex).NumPets+1; j++)
                     {
                         petStage.GetTeam(i).GetPet(j).AccuracyOffset += 0.10;
                         petStage.GetTeam(i).GetPet(j).BlockDamage -= 5 + petStage.GetTeam(0).GetAura(1).Power * 0.25;
@@ -118,8 +118,14 @@ Item
             //Moonlight
             else if (petStage.GetTeam(0).GetPet(0).GetAura(1).AuraId == 596)
                 for (var i=1; i < 3; i++)
-                    for (var j=1; j < petTeam.GetTeam(teamIndex).NumPets+1; j++)
+                    for (var j=1; j < petStage.GetTeam(teamIndex).NumPets+1; j++)
                         petStage.GetTeam(i).GetPet(j).HealingModifier -= 0.25;
+            //Cleansing Rain
+            else if (petStage.GetTeam(0).GetPet(0).GetAura(1).AuraId == 229)
+                for (var i=1; i < 3; i++)
+                    for (var j=1; j < petStage.GetTeam(teamIndex).NumPets+1; j++)
+                        if (petStage.GetTeam(i).GetPet(j).Type == PetType.Aquatic)
+                            petStage.GetTeam(i).GetPet(j).DamageModifier -= 0.25;
 
             petStage.GetTeam(0).RemoveAura(1);
         }

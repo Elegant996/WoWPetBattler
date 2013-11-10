@@ -1,4 +1,4 @@
-// Lightning Storm - Weather
+// Blizzard - Weather
 import QtQuick 2.0
 import PetType 1.0
 import PetStatus 1.0
@@ -33,7 +33,10 @@ Item
     //Apply the aura's effect at the start of the turn.
     function ApplyAuraStart(teamIndex, curPet, auraIndex, duration)
     {
-
+        //Add Chilled status to all pets.
+        for (var i=1; i < 3; i++)
+            for (var j=1; j < petTeam.GetTeam(teamIndex).NumPets+1; j++)
+                petStage.GetTeam(i).GetPet(j).AddStatus(PetStatus.Chilled);
     }
 
     //Applies the aura effect to the active pet.
