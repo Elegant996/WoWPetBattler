@@ -59,11 +59,11 @@ Item
                         isHitting, isCritting, isProcing)
     {
         var numHits = 0;
-        var scaleFactor = 0.40;
-        var baseDamage = 8;
+        var scaleFactor = 1.25;
+        var baseDamage = 25;
         var normalDamage = Math.round(baseDamage + petStage.GetTeam(teamIndex).ActivePet.Power * scaleFactor);
         var damage = Math.round((normalDamage - petStage.GetTeam((teamIndex%2)+1).ActivePet.BlockDamage)
-                        * petType.GetEffectiveness(PetType.Magic, petStage.GetTeam((teamIndex%2)+1).Type)
+                        * petType.GetEffectiveness(PetType.Machine, petStage.GetTeam((teamIndex%2)+1).Type)
                         * petStage.GetTeam((teamIndex%2)+1).ActivePet.DefenseModifier
                         * petStage.GetTeam(teamIndex).ActivePet.DamageModifier);
 
@@ -124,7 +124,7 @@ Item
             petStage.GetTeam(0).RemoveAura(1);
         }
 
-        petStage.GetTeam(0).AddAura(590, 9, true, petStage.GetTeam(teamIndex).ActivePet.Power);
+        petStage.GetTeam(0).AddAura(203, 5, true, petStage.GetTeam(teamIndex).ActivePet.Power);
 
         return numHits;
     }

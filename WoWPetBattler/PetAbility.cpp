@@ -53,10 +53,16 @@ void PetAbility::RoundUpdate()
 		usedThisTurn = false;
 }
 
-//Update the cooldown of the ability.
-void PetAbility::SetCooldown(qint8 CD)
+//Set the abilities cooldown.
+void PetAbility::UseAbility()
 {
-	this->currentCooldown = CD;
+	this->currentCooldown = this->cooldown;
+}
+
+//Update the cooldown of the ability.
+void PetAbility::SetCooldown(qint8 cooldown)
+{
+	this->currentCooldown = cooldown;
 }
 
 //Confirm whether we know this ability is known.

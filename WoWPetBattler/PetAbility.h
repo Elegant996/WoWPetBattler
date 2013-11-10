@@ -20,6 +20,8 @@ public:
 
 	void RoundUpdate();
 
+	void UseAbility();
+
 	void SetCooldown(qint8);
 	void IsVerified(bool);
 

@@ -353,6 +353,10 @@ float AI::ActionOutcomes(PetStage *stageNode, quint8 depth, quint8 currentTeam, 
 	else if (stageNode->GetTeam(currentTeam)->GetActivePet()->GetCurrentAction()->GetAction() > 0
 			&& stageNode->GetTeam(currentTeam)->GetActivePet()->GetCurrentAction()->GetAction() < 4)
 	{
+		//Put the ability on cooldown.
+		stageNode->GetTeam(currentTeam)->GetActivePet()->GetAbility(stageNode->GetTeam(currentTeam)
+			->GetActivePet()->GetCurrentAction()->GetAction())->UseAbility();
+
 		//Set variables to be used.
 		quint16 abilityId = stageNode->GetTeam(currentTeam)->GetActivePet()->GetAbility(stageNode->GetTeam(currentTeam)->GetActivePet()->GetCurrentAction()->GetAction())->GetAbilityId();
 		float avoidanceRating, accuracyRating, criticalRating, chanceOnHitRating;
