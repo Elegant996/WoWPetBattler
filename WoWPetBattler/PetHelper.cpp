@@ -1,91 +1,114 @@
 #include "PetHelper.h"
 
 //Checks the damage to see if it will trigger a Magic pet's racial.
-void PetHelper::CheckRacialsDamage(PetStage *petStage, quint8 curTeam, quint16 damage)
+void PetHelper::CheckDamage(PetStage *petStage, quint8 teamIndex, quint8 petIndex, quint16 damage)
 {
-	Pet *curActivePet = petStage->GetTeam(curTeam)->GetActivePet();
+	Pet *curPet = petStage->GetTeam(teamIndex)->GetPet(petIndex);
 
-	if (curActivePet->GetType() == PetType::Magic && damage > curActivePet->GetMaxHealth() * 0.35)
-		curActivePet->SetHealth(curActivePet->GetHealth() - curActivePet->GetMaxHealth() * 0.35);
+	//Use Magic racial if applicable
+	if (curPet->GetType() == PetType::Magic && damage > (int)(curPet->GetMaxHealth() * 0.35))
+		//Check if health is greater than 35%.
+		if (curPet->GetHealthPercentage() > 0.35)
+			curPet->SetHealth(curPet->GetHealth() - curPet->GetMaxHealth() * 0.35);
+		else
+		{	//Set health to 0 and check racial procs for attacking team.
+			curPet->SetHealth(0);
+			CheckRacialsProc(petStage, (teamIndex%2)+1);
+		}
 	else
-		curActivePet->SetHealth(curActivePet->GetHealth() - damage);
+		//Check if the pet can sustain the hit.
+		if (curPet->GetHealth() - damage > 0)
+			curPet->SetHealth(curPet->GetHealth() - damage);
+		else
+		{	//Pet can't sustain the hit, set health to 0 and check racials.
+			curPet->SetHealth(0);
+			CheckRacials(curPet);
+		}
 }
 
 //Checks whether the Dragonkin racial should proc.
-void PetHelper::CheckRacialsProc(PetStage *petStage, quint8 curTeam)
+void PetHelper::CheckRacialsProc(PetStage *petStage, quint8 teamIndex)
 {
-	Pet *curActivePet = petStage->GetTeam(curTeam)->GetActivePet();
+	Pet *curPet = petStage->GetTeam(teamIndex)->GetActivePet();
 
 	//Check if active pet is Dragonkin type and has brought the other team's pet below 50%.
-	if (curActivePet->GetType() == PetType::Dragonkin
-                && petStage->GetTeam((curTeam%2)+1)->GetActivePet()->GetHealthPercentage() < 0.50
-                && !curActivePet->RacialUsed())
+	if (curPet->GetType() == PetType::Dragonkin
+                && petStage->GetTeam((teamIndex%2)+1)->GetActivePet()->GetHealthPercentage() < 0.50
+                && !curPet->RacialUsed())
 	{
-		curActivePet->RacialUsed(true);				//Racial now used.
-		curActivePet->AddAura(245, 1, true);		//Will replace persisting racial.
+		curPet->RacialUsed(true);				//Racial now used.
+		curPet->AddAura(245, 1, true);		//Will replace persisting racial.
     }
 }
 
 //Called by everything else to handle racial effects.
-void PetHelper::CheckRacials(PetStage *petStage, quint8 curTeam)
+void PetHelper::CheckRacials(Pet *curPet)
 {
-	Pet *curActivePet = petStage->GetTeam(curTeam)->GetActivePet();
-
 	//Check if active pet is Flying type is now below 50% and racial is active.
-	if (curActivePet->GetType() == PetType::Flying)
+	if (curPet->GetType() == PetType::Flying)
 	{
-		if (curActivePet->GetHealthPercentage() > 0.50 && !curActivePet->RacialUsed())
+		if (curPet->GetHealthPercentage() > 0.50 && !curPet->RacialUsed())
 		{
-			curActivePet->SetSpeed(curActivePet->GetSpeed() * 1.5);
-			curActivePet->RacialUsed(true);
+			curPet->SetSpeed(curPet->GetSpeed() * 1.5);
+			curPet->RacialUsed(true);
 		}
-		else if (curActivePet->GetHealthPercentage() <= 0.50 && curActivePet->RacialUsed())
+		else if (curPet->GetHealthPercentage() <= 0.50 && curPet->RacialUsed())
 		{
-			curActivePet->SetSpeed(curActivePet->GetSpeed() / 1.5);
-			curActivePet->RacialUsed(false);
+			curPet->SetSpeed(curPet->GetSpeed() / 1.5);
+			curPet->RacialUsed(false);
 		}
 	}
 	//Check if active pet is Beast type and is now above/below 25% health and racial is active/inactive.
-	else if (curActivePet->GetType() == PetType::Beast)
+	else if (curPet->GetType() == PetType::Beast)
 	{
 		//Disable the racial.
-		if (curActivePet->GetHealthPercentage() >= 0.50 && curActivePet->RacialUsed())
+		if (curPet->GetHealthPercentage() >= 0.50 && curPet->RacialUsed())
 		{
-			curActivePet->SetDamageModifier(curActivePet->GetDamageModifier() / 1.25);
-			curActivePet->RacialUsed(false);
+			curPet->SetDamageModifier(curPet->GetDamageModifier() / 1.25);
+			curPet->RacialUsed(false);
 		}
-		else if (curActivePet->GetHealthPercentage() < 0.50	&& !curActivePet->RacialUsed())
+		else if (curPet->GetHealthPercentage() < 0.50	&& !curPet->RacialUsed())
 		{
-			curActivePet->SetDamageModifier(curActivePet->GetDamageModifier() * 1.25);
-			curActivePet->RacialUsed(true);
+			curPet->SetDamageModifier(curPet->GetDamageModifier() * 1.25);
+			curPet->RacialUsed(true);
 		}
 	}
 	//Check if active pet is Undead type and has just died.
-	else if (curActivePet->IsDead())
+	else if (curPet->IsDead())
 	{
-		if (curActivePet->GetType() == PetType::Undead && !curActivePet->RacialUsed())
+		if (curPet->GetType() == PetType::Undead && !curPet->RacialUsed())
 		{
-			curActivePet->SetHealth(1);							//Ensures pet is alive.
-			curActivePet->RacialUsed(true);						//Racial now used.
-			curActivePet->AddStatus(Pet::Unkillable);			//Pet can't die.
-			curActivePet->AddAura(242, 1, true);				//Will replace persisting racial.
+			curPet->SetHealth(1);							//Ensures pet is alive.
+			curPet->RacialUsed(true);						//Racial now used.
+			curPet->AddStatus(Pet::Unkillable);			//Pet can't die.
+			curPet->AddAura(242, 1, true);				//Will replace persisting racial.
 		}
-		else if (curActivePet->GetType() == PetType::Mechanical)
+		else if (curPet->GetType() == PetType::Mechanical)
 		{
-			curActivePet->SetHealth(curActivePet->GetMaxHealth() * 0.20);	//Set pet's new health value.
-			curActivePet->RacialUsed(true);									//Racial now used.
-			curActivePet->AddAura(244, 1, true);							//Will replace persisting racial.
+			curPet->SetHealth(curPet->GetMaxHealth() * 0.20);	//Set pet's new health value.
+			curPet->RacialUsed(true);									//Racial now used.
+			curPet->AddAura(244, 1, true);							//Will replace persisting racial.
 		}
 	}
 }
 
 //Finds the power of the first pet who most likely cast the aura.
-void PetHelper::CheckAuraPower(PetStage* petStage, PetAura *curAura, quint8 curTeam, quint8 abilityId)
+void PetHelper::CheckAuraPower(PetStage* petStage, PetAura *curAura, quint8 teamIndex, quint8 abilityId)
 {
-	if (curTeam == 3)
-		for (quint8 i=1; i < curTeam; i+=1)
+	//Find the first pet with has the ability and use it's power.
+	if (teamIndex == 3)
+	{	//Check both teams.
+		for (quint8 i=1; i < teamIndex; i+=1)
 			for (quint8 j=1; j < petStage->GetTeam(i)->GetNumPets()+1; j+=1)
 				for (quint8 k=1; k < petStage->GetTeam(i)->GetPet(j)->GetNumAbilities()+1; k+=1)
 					 if (petStage->GetTeam(i)->GetPet(j)->GetAbility(k)->GetAbilityId() == abilityId)
 						 curAura->SetPower(petStage->GetTeam(i)->GetPet(j)->GetPower());
+	}
+	else
+	{	//We know which team to check already.
+		for (quint8 i=1; i < petStage->GetTeam(teamIndex)->GetNumPets()+1; i+=1)
+			for (quint8 j=1; j < petStage->GetTeam(teamIndex)->GetPet(i)->GetNumAbilities()+1; j+=1)
+					if (petStage->GetTeam(teamIndex)->GetPet(i)->GetAbility(j)->GetAbilityId() == abilityId)
+						curAura->SetPower(petStage->GetTeam(teamIndex)->GetPet(i)->GetPower());
+	}
 }

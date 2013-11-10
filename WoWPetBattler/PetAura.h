@@ -16,6 +16,7 @@ class PetAura : public QObject
 	Q_PROPERTY(bool IsFresh READ IsFresh WRITE IsFresh)
 	Q_PROPERTY(bool IsObject READ IsObject WRITE IsObject)
 	Q_PROPERTY(bool OnSwapIn READ OnSwapIn WRITE OnSwapIn)
+	Q_PROPERTY(quint16 Power READ GetPower WRITE SetPower)
 	Q_PROPERTY(quint8 Charges READ GetCharges WRITE SetCharges)
 
 public:
