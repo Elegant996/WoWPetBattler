@@ -1,4 +1,4 @@
-// Template.qml
+// Arcane Storm - Ability
 import QtQuick 2.0
 import PetType 1.0
 import PetStatus 1.0
@@ -33,8 +33,7 @@ Item
     //Apply the aura's effect at the start of the turn.
     function ApplyAuraStart(teamIndex, curPet, auraIndex, duration)
     {
-        //if (petStage.GetTeam(teamIndex).GetPet(curPet).GetAura(auraIndex).GetPower() == 0)
-            //petHelper.CheckAuraPower(petStage, petStage.GetTeam(teamIndex).GetPet(curPet).GetAura(auraIndex), team, abilityId);
+
     }
 
     //Applies the aura effect to the active pet.
