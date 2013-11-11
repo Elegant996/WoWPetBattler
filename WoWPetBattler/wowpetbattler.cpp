@@ -102,7 +102,10 @@ void WoWPetBattler::on_playButton_clicked()
 	qmlRegisterType<PetAura>();
 	qmlRegisterType<PetHelper>("PetHelper", 1, 0, "PetHelper");
 
-	QQmlContext *objectContext = new QQmlContext(engine.rootContext());
+	Move testMove;
+	testMove = ai->Expectiminimax(petStage, 1, 1);
+
+	/*QQmlContext *objectContext = new QQmlContext(engine.rootContext());
 	objectContext->setContextProperty("petStage", petStage);	
 
 	QQmlComponent component(&engine, QUrl::fromLocalFile("Scripts/564.qml"));
@@ -121,7 +124,7 @@ void WoWPetBattler::on_playButton_clicked()
 
 	delete object;
 
-	delete objectContext;
+	delete objectContext;*/
 
 	/*	
 	if (ui.playButton->isChecked())

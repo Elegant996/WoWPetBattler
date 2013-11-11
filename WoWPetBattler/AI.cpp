@@ -88,15 +88,17 @@ Move AI::Expectiminimax(PetStage* stageNode, quint8 depth, quint8 turnIndex)
 		for (quint8 i=0; i < stageNode->GetTeam(0)->GetPet(0)->GetNumAuras(); i+=1)
 		{
 			objectContext->setContextProperty("petStage", stageNode);	
-			component->loadUrl(QUrl::fromLocalFile("Scripts/" + (QString)stageNode->GetTeam(0)->GetPet(0)->GetAura(i)->GetAuraId() + ".qml"));
+			component->loadUrl(QUrl::fromLocalFile("Scripts/" + QString::number(stageNode->GetTeam(0)->GetPet(0)->GetAura(i)->GetAuraId()) + ".qml"));
+			//Catch any exceptions and report them.
+			if (component->status() == 3)
+				emit OutputToGUI(component->errorString());
 			object = component->create(objectContext);
 			//Call ApplyAuraStart; paramters are TeamNumber, PetNumber, AuraIndex and AuraDuration.
 			QMetaObject::invokeMethod(object, "applyAuraStart", Q_ARG(QVariant, 0), Q_ARG(QVariant, 0), Q_ARG(QVariant, 1),
 										Q_ARG(QVariant, stageNode->GetTeam(0)->GetPet(0)->GetAura(i)->GetDuration()));
 			//Catch any exceptions and report them.
 			if (component->status() == 3)
-				while (!component->errors().isEmpty())
-					emit OutputToGUI(component->errors().takeAt(0).toString());
+				emit OutputToGUI(component->errorString());
 		}
 
 		//Begin move selection process.
@@ -141,15 +143,17 @@ Move AI::SelectAction(PetStage *stageNode, quint8 depth, quint8 turnIndex)
 		for (quint8 j=1; j < stageNode->GetTeam(turnIndex)->GetPet(i)->GetNumAuras()+1; j+=1)
 		{
 			objectContext->setContextProperty("petStage", stageNode);	
-			component->loadUrl(QUrl::fromLocalFile("Scripts/" + (QString)stageNode->GetTeam(turnIndex)->GetPet(i)->GetAura(j)->GetAuraId() + ".qml"));
+			component->loadUrl(QUrl::fromLocalFile("Scripts/" + QString::number(stageNode->GetTeam(turnIndex)->GetPet(i)->GetAura(j)->GetAuraId()) + ".qml"));
+			//Catch any exceptions and report them.
+			if (component->status() == 3)
+				emit OutputToGUI(component->errorString());
 			object = component->create(objectContext);
 			//Call ApplyAuraStart; paramters are TeamNumber, PetNumber, AuraIndex and AuraDuration.
 			QMetaObject::invokeMethod(object, "applyAuraStart", Q_ARG(QVariant, turnIndex), Q_ARG(QVariant, i), Q_ARG(QVariant, j),
 										Q_ARG(QVariant, stageNode->GetTeam(turnIndex)->GetPet(i)->GetAura(j)->GetDuration()));
 			//Catch any exceptions and report them.
 			if (component->status() == 3)
-				while (!component->errors().isEmpty())
-					emit OutputToGUI(component->errors().takeAt(0).toString());
+				emit OutputToGUI(component->errorString());
 		}
 
 	//Add all available actions to the list.
@@ -199,7 +203,10 @@ Move AI::SelectAction(PetStage *stageNode, quint8 depth, quint8 turnIndex)
 				{
 					//"Pre-use" the ability to determine it's priority later.
 					objectContext->setContextProperty("petStage", stageNode);	
-					component->loadUrl(QUrl::fromLocalFile("Scripts/" + (QString)stageNode->GetTeam(i)->GetActivePet()->GetAbility(i)->GetAbilityId() + ".qml"));
+					component->loadUrl(QUrl::fromLocalFile("Scripts/" + QString::number(stageNode->GetTeam(turnIndex)->GetActivePet()->GetAbility(i)->GetAbilityId()) + ".qml"));
+					//Catch any exceptions and report them.
+					if (component->status() == 3)
+						emit OutputToGUI(component->errorString());
 					object = component->create(objectContext);
 					//Call PreUseAbility; paramters are TeamNumber. This is used to make the move tell us it's priority.
 					QMetaObject::invokeMethod(object, "preUseAbility", Q_ARG(QVariant, turnIndex));
@@ -252,7 +259,7 @@ Move AI::SelectAction(PetStage *stageNode, quint8 depth, quint8 turnIndex)
 
 	//Set the action for each move.
 	QList<Move>::iterator iter = nextMoves.begin();
-	for (int i=0; i < stageMoves.size(); i+=1)
+	while (stageMoves.isEmpty())
 	{
 		PetStage *nextStage = stageMoves.takeAt(0);								//Remove the stageMove from the list.
 		Move currentMove = Expectiminimax(nextStage, depth, (turnIndex+1)%3);	//Set currentMove to call our Expectiminimax again.
@@ -341,7 +348,7 @@ quint8 AI::CalculatePriority(PetStage *stageNode)
 //Uses the first action during round playback. Note: Actions as a result of death happen in scripts but real deaths happen here.
 float AI::ActionOutcomes(PetStage *stageNode, quint8 depth, quint8 currentTeam, bool firstCall)
 {
-	float heuristic = 0.00;	//Used for holding heuristic.
+	float heuristic = 0.00;		//Used for holding heuristic.
 
 	//Pet swap occuring.
 	if (stageNode->GetTeam(currentTeam)->GetActivePet()->GetCurrentAction()->GetAction() > 3
@@ -371,7 +378,10 @@ float AI::ActionOutcomes(PetStage *stageNode, quint8 depth, quint8 currentTeam, 
 
 		//Set script.
 		objectContext->setContextProperty("petStage", stageNode);
-		component->loadUrl(QUrl::fromLocalFile("Scripts/" + (QString)abilityId + ".qml"));
+		component->loadUrl(QUrl::fromLocalFile("Scripts/" + QString::number(abilityId) + ".qml"));
+		//Catch any exceptions and report them.
+		if (component->status() == 3)
+			emit OutputToGUI(component->errorString());
 		object = component->create(objectContext);
 
 		//Set QVariants based on script info.
@@ -381,8 +391,7 @@ float AI::ActionOutcomes(PetStage *stageNode, quint8 depth, quint8 currentTeam, 
 
 		//Catch any exceptions and report them.
 		if (component->status() == 3)
-			while (!component->errors().isEmpty())
-				emit OutputToGUI(component->errors().takeAt(0).toString());
+			emit OutputToGUI(component->errorString());
 
 		//Set ratings based on pet info and QVariants.
 		avoidanceRating = stageNode->GetTeam((currentTeam%2)+1)->GetActivePet()->GetAvoidanceRating();
@@ -624,8 +633,7 @@ float AI::UseAction(PetStage* stageNode, quint8 depth, quint8 currentTeam, bool 
 								Q_ARG(QVariant, firstCall), Q_ARG(QVariant, isAvoiding), Q_ARG(QVariant, isHitting), Q_ARG(QVariant, isCritting), Q_ARG(QVariant, isProcing));
 	//Catch any exceptions and report them.
 	if (component->status() == 3)
-			while (!component->errors().isEmpty())
-				emit OutputToGUI(component->errors().takeAt(0).toString());
+		emit OutputToGUI(component->errorString());
 
 	//Convert QVariant for number of hits.
 	numHits = variantNumHits.toFloat();
@@ -657,8 +665,7 @@ float AI::UseAction(PetStage* stageNode, quint8 depth, quint8 currentTeam, bool 
 							QMetaObject::invokeMethod(object, "applyAura", Q_ARG(QVariant, (currentTeam%2)+1));		//Use the aura; parameters are teamIndex.
 							//Catch any exceptions and report them.
 							if (component->status() == 3)
-								while (!component->errors().isEmpty())
-									emit OutputToGUI(component->errors().takeAt(0).toString());
+								emit OutputToGUI(component->errorString());
 							substituteStage->GetTeam((currentTeam%2)+1)->GetPet(0)->RemoveAura(j);					//Remove the aura.
 							break;																					//There should not be more than 1.
 						}
@@ -703,7 +710,7 @@ float AI::UseAction(PetStage* stageNode, quint8 depth, quint8 currentTeam, bool 
 float AI::EndTurn(PetStage* stageNode, quint8 depth)
 {
 	Move nextTurn;						//Used calling Expectiminimax.
-	float heuristic = 0;				//What will be returned.
+	float heuristic = 0.00;				//What will be returned.
 	QList<PetStage*> substituteStages;	//Used for when the pet dies and we have other options.
 
 	for (quint8 i=0; i < 3; i+=1)															//For each team...
@@ -711,15 +718,17 @@ float AI::EndTurn(PetStage* stageNode, quint8 depth)
 			for (quint8 k=1; k < stageNode->GetTeam(i)->GetPet(j)->GetNumAuras()+1; k+=1)	//For each aura...
 			{
 				objectContext->setContextProperty("petStage", stageNode);	
-				component->loadUrl(QUrl::fromLocalFile("Scripts/" + (QString)stageNode->GetTeam(i)->GetPet(j)->GetAura(k)->GetAuraId() + ".qml"));
+				component->loadUrl(QUrl::fromLocalFile("Scripts/" + QString::number(stageNode->GetTeam(i)->GetPet(j)->GetAura(k)->GetAuraId()) + ".qml"));
+				//Catch any exceptions and report them.
+				if (component->status() == 3)
+					emit OutputToGUI(component->errorString());
 				object = component->create(objectContext);
 				//Call ApplyAuraEnd; paramters are TeamNumber, PetNumber and AuraDuration.
 				QMetaObject::invokeMethod(object, "applyAuraEnd", Q_ARG(QVariant, i), Q_ARG(QVariant, j), Q_ARG(QVariant, k),
 					Q_ARG(QVariant, stageNode->GetTeam(i)->GetPet(j)->GetAura(k)->GetDuration()));
 				//Catch any exceptions and report them.
 				if (component->status() == 3)
-				while (!component->errors().isEmpty())
-					emit OutputToGUI(component->errors().takeAt(0).toString());
+					emit OutputToGUI(component->errorString());
 			}
 
 
@@ -760,8 +769,7 @@ float AI::EndTurn(PetStage* stageNode, quint8 depth)
 										QMetaObject::invokeMethod(object, "applyAura", Q_ARG(QVariant, i));		//Use the aura; parameters are teamIndex.
 										//Catch any exceptions and report them.
 										if (component->status() == 3)
-										while (!component->errors().isEmpty())
-											emit OutputToGUI(component->errors().takeAt(0).toString());
+											emit OutputToGUI(component->errorString());
 										substituteStage->GetTeam(i)->GetPet(0)->RemoveAura(l);					//Remove the aura.
 										break;																	//There should not be more than 1.
 									}
@@ -780,8 +788,7 @@ float AI::EndTurn(PetStage* stageNode, quint8 depth)
 									QMetaObject::invokeMethod(object, "applyAura", Q_ARG(QVariant, i));		//Use the aura; parameters are teamIndex.
 									//Catch any exceptions and report them.
 									if (component->status() == 3)
-										while (!component->errors().isEmpty())
-											emit OutputToGUI(component->errors().takeAt(0).toString());
+										emit OutputToGUI(component->errorString());
 									substituteStage->GetTeam(i)->GetPet(0)->RemoveAura(k);					//Remove the aura.
 									break;																	//There should not be more than 1.
 								}

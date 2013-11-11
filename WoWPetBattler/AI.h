@@ -23,6 +23,8 @@ public:
 	void QueueUp();
 	void AcceptQueue();
 
+	Move Expectiminimax(PetStage*, quint8, quint8);
+
 signals:
 	void OutputToGUI(QString, QString);
 	void OutputToGUI(QString);
@@ -31,7 +33,7 @@ public slots:
 	void Run();
 
 private:
-	Move Expectiminimax(PetStage*, quint8, quint8);
+	//Move Expectiminimax(PetStage*, quint8, quint8);
 	Move SelectAction(PetStage*, quint8, quint8);
 	quint8 CalculatePriority(PetStage*);
 	float ActionOutcomes(PetStage*, quint8, quint8, bool);
