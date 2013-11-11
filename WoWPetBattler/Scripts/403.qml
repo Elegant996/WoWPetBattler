@@ -1,4 +1,4 @@
-// Aquatic - Racial
+// Sunny Day - Weather
 import QtQuick 2.0
 
 import PetAction 1.0
@@ -47,7 +47,11 @@ Item
     //Apply the aura's effect at the end of the turn.
     function applyAuraEnd(teamIndex, petIndex, auraIndex, duration)
     {
-
+        //Cancel Sunny Day effects if duration is about to expire.
+        if (duration == 1)
+            for (var i=1; i < 3; i++)
+                for (var j=1; j < petStage.GetTeam(i).NumPets+1; j++)
+                    petStage.GetTeam(i).GetPet(j).MaxHealth = petStage.GetTeam(i).GetPet(j).NormalMaxHealth;
     }
 
     //Grants the pet any special statuses the ability has.

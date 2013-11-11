@@ -52,10 +52,8 @@ WoWPetBattler::WoWPetBattler(QWidget *parent)
 	petStage->GetTeam(2)->GetPet(3)->AddAbility(true, 1, 0);
 	petStage->GetTeam(2)->GetPet(3)->AddAbility(true, 1, 0);
 
-	petStage->GetTeam(1)->SetActivePet(1);
+	petStage->GetTeam(1)->SetActivePet(3);
 	petStage->GetTeam(2)->SetActivePet(1);
-
-	petStage->GetTeam(1)->GetPet(2)->AddStatus(Pet::PetStatus::Rooted);
 }
 
 //Destructor
@@ -104,38 +102,26 @@ void WoWPetBattler::on_playButton_clicked()
 	qmlRegisterType<PetAura>();
 	qmlRegisterType<PetHelper>("PetHelper", 1, 0, "PetHelper");
 
-	PetStage *petStage2 = new PetStage(*petStage);
 
 	QQmlContext *objectContext = new QQmlContext(engine.rootContext());
 	objectContext->setContextProperty("petStage", petStage);	
 
-	QQmlComponent component(&engine, QUrl::fromLocalFile("Scripts/MyItem.qml"));
+	QQmlComponent component(&engine, QUrl::fromLocalFile("Scripts/1051.qml"));
 	QObject *object = component.create(objectContext);
 
 	if (component.status() == 3)
 		qDebug() << component.errors();
 
-	QMetaObject::invokeMethod(object, "printActivePet");
+	qDebug() << petStage->GetTeam(2)->GetActivePet()->GetHealth();
 
-	objectContext->setContextProperty("petStage", petStage2);
-	component.loadUrl(QUrl::fromLocalFile("Scripts/MyItem_2.qml"));
-	object = component.create(objectContext);
+	QMetaObject::invokeMethod(object, "useAbility", Q_ARG(QVariant, 1), Q_ARG(QVariant, 1), Q_ARG(QVariant, false),
+								Q_ARG(QVariant, true), Q_ARG(QVariant, false), Q_ARG(QVariant, false));
 
-	QMetaObject::invokeMethod(object, "printActivePet", Q_ARG(QVariant, 566));
-
-	QVariant testValue = 0;
-	QMetaObject::invokeMethod(object, "testFunction", Q_RETURN_ARG(QVariant, testValue));
-
-	qDebug() << testValue.toInt();
-
-	if (component.status() == 3)
-		qDebug() << component.errors();
+	qDebug() << petStage->GetTeam(2)->GetActivePet()->GetHealth();
 
 	delete object;
 
 	delete objectContext;
-
-	delete petStage2;
 
 	/*	
 	if (ui.playButton->isChecked())

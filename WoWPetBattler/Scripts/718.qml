@@ -1,4 +1,4 @@
-// Aquatic - Racial
+// Mudslide - Weather
 import QtQuick 2.0
 
 import PetAction 1.0
@@ -41,7 +41,9 @@ Item
     //Applies the aura effect to the active pet.
     function applyAura(teamIndex)
     {
-
+        //Root the pet if not a critter.
+        if (petStage.GetTeam(teamIndex).ActivePet.Type != PetType.Critter)
+            petStage.GetTeam(teamIndex).ActivePet.AddAura(248, 3, true);
     }
 
     //Apply the aura's effect at the end of the turn.

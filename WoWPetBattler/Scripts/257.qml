@@ -1,4 +1,4 @@
-// Aquatic - Racial
+// Darkness - Weather
 import QtQuick 2.0
 
 import PetAction 1.0
@@ -35,7 +35,15 @@ Item
     //Apply the aura's effect at the start of the turn.
     function applyAuraStart(teamIndex, petIndex, auraIndex, duration)
     {
-
+        //Apply Darkness effects.
+        for (var i=1; i < 3; i++)
+            for (var j=1; j < petStage.GetTeam(i).NumPets+1; j++)
+                if (petStage.GetTeam(i).GetPet(j).Type != PetType.Elemetal)
+                {
+                    petStage.GetTeam(i).GetPet(j).AddStatus(PetStatus.Blinded);
+                    petStage.GetTeam(i).GetPet(j).AccuracyOffset -= 0.10;
+                    petStage.GetTeam(i).GetPet(j).HealingModifier -= 0.50;
+                }
     }
 
     //Applies the aura effect to the active pet.

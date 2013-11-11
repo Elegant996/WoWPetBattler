@@ -23,10 +23,7 @@ Pet::Pet()
 	this->damageModifier = 1.00;
 	this->healingModifier = 1.00;
 	this->defenseModifier = 1.00;
-	this->bonusDamage = 0;
-	this->blockDamage = 0;
-	this->bonusHealing = 0;
-	this->blockHealing = 0;
+	this->damageOffset = 0;
 	this->racialUsed = false;
 	this->attackedThisRound = false;
 	this->currentAction = new PetAction();
@@ -66,10 +63,7 @@ Pet::Pet(quint16 speciesId, quint8 breed, quint8 quality, quint8 level)
 	this->damageModifier = 1.00;
 	this->healingModifier = 1.00;
 	this->defenseModifier = 1.00;
-	this->bonusDamage = 0;
-	this->blockDamage = 0;
-	this->bonusHealing = 0;
-	this->blockHealing = 0;
+	this->damageOffset = 0;
 	this->racialUsed = false;
 	this->attackedThisRound = false;
 	this->currentAction = new PetAction();
@@ -120,10 +114,7 @@ Pet::Pet(const Pet& other)
 	this->damageModifier = other.damageModifier;
 	this->healingModifier = other.healingModifier;
 	this->defenseModifier = other.defenseModifier;
-	this->bonusDamage = other.bonusDamage;
-	this->blockDamage = other.blockDamage;
-	this->bonusHealing = other.bonusHealing;
-	this->blockHealing = other.blockHealing;
+	this->damageOffset = other.damageOffset;
 	this->racialUsed = other.racialUsed;
 	this->attackedThisRound = other.attackedThisRound;
 	this->currentAction = new PetAction(*other.currentAction);
@@ -168,10 +159,7 @@ void Pet::RoundUpdate()
 	this->damageModifier = 1.00;
 	this->healingModifier = 1.00;
 	this->defenseModifier = 1.00;
-	this->bonusDamage = 0;
-	this->blockDamage = 0;
-	this->bonusHealing = 0;
-	this->blockHealing = 0;
+	this->damageOffset = 0;
 	this->attackedThisRound = false;
 }
 
@@ -385,28 +373,10 @@ void Pet::SetDefenseModifier(float defenseModifier)
 	this->defenseModifier = defenseModifier;
 }
 
-//Set the pet's bonus damage.
-void Pet::SetBonusDamage(int bonusDamage)
+//Set the pet's damage offset.
+void Pet::SetDamageOffset(int damageOffset)
 {
-	this->bonusDamage = bonusDamage;
-}
-
-//Set the pet's block damage.
-void Pet::SetBlockDamage(int blockDamage)
-{
-	this->blockDamage = blockDamage;
-}
-
-//Set the pet's bonus healing.
-void Pet::SetBonusHealing(int bonusHealing)
-{
-	this->bonusHealing = bonusHealing;
-}
-
-//Set the pet's block healing.
-void Pet::SetBlockHealing(int blockHealing)
-{
-	this->blockHealing = blockHealing;
+	this->damageOffset = damageOffset;
 }
 
 //Set whether or not the racial has been used.
@@ -528,28 +498,10 @@ float Pet::GetDefenseModifier()
 	return this->defenseModifier;
 }
 
-//Return the pet's bonus damage.
-int Pet::GetBonusDamage()
+//Return the pet's damage offset.
+int Pet::GetDamageOffset()
 {
-	return this->bonusDamage;
-}
-
-//Return the pet's block damage.
-int Pet::GetBlockDamage()
-{
-	return this->blockDamage;
-}
-
-//Return the pet's bonus healing.
-int Pet::GetBonusHealing()
-{
-	return this->bonusHealing;
-}
-
-//Return the pet's block healing.
-int Pet::GetBlockHealing()
-{
-	return this->blockHealing;
+	return this->damageOffset;
 }
 
 //Return the pet's current action.

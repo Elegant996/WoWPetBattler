@@ -1,4 +1,4 @@
-// Aquatic - Racial
+// Scorched Earth - Weather
 import QtQuick 2.0
 
 import PetAction 1.0
@@ -35,7 +35,15 @@ Item
     //Apply the aura's effect at the start of the turn.
     function applyAuraStart(teamIndex, petIndex, auraIndex, duration)
     {
+        //Find power if it is 0.
+        if (petStage.GetTeam(teamIndex).GetPet(petIndex).GetAura(auraIndex).Power == 0)
+            petHelper.CheckAuraPower(petStage, petStage.GetTeam(teamIndex).GetPet(petIndex).GetAura(auraIndex), 3, 172);
 
+        //Apply Scorched Earth effects.
+        for (var i=1; i < 3; i++)
+            for (var j=1; j < petStage.GetTeam(i).NumPets+1; j++)
+                if (petStage.GetTeam(i).GetPet(j).Type != PetType.Elemetal)
+                    petStage.GetTeam(i).GetPet(j).AddStatus(PetStatus.Burning);
     }
 
     //Applies the aura effect to the active pet.
@@ -47,7 +55,21 @@ Item
     //Apply the aura's effect at the end of the turn.
     function applyAuraEnd(teamIndex, petIndex, auraIndex, duration)
     {
+        var scaleFactor = 0.2;
+        var baseDamage = 4;
+        var attackType = PetType.Elemental;
+        var normalDamage = Math.round(baseDamage + petStage.GetTeam(teamIndex).ActivePet.Power * scaleFactor);
 
+        //Apply the weather effect to each team.
+        for (var i=1; i < 3; i++)
+        {
+            var damage = Math.round((normalDamage - petStage.GetTeam(i).ActivePet.DamageOffset)
+                                    * petType.GetEffectiveness(attackType, petStage.GetTeam(i).Type)
+                                    * petStage.GetTeam(i).ActivePet.DefenseModifier);
+
+            if (petStage.GetTeam(i).ActivePet.Type != PetType.Elemetal)
+                petHelper.CheckDamage(petStage, i, petStage.GetTeam(i).ActivePetIndex, damage, false);
+        }
     }
 
     //Grants the pet any special statuses the ability has.

@@ -1,4 +1,4 @@
-// Acid Rain - Ability
+// Starfall - Ability
 import QtQuick 2.0
 
 import PetAction 1.0
@@ -61,16 +61,18 @@ Item
                         isHitting, isCritting, isProcing)
     {
         var numHits = 0;
-        var scaleFactor = 0.45;
-        var baseDamage = 9;
-        var attackType = PetType.Aquatic;
+        var scaleFactor = 0.25;
+        var baseDamage = 5;
+        var baseHealing = 5;
+        var attackType = PetType.Dragonkin;
         var normalDamage = Math.round(baseDamage + petStage.GetTeam(teamIndex).ActivePet.Power * scaleFactor);
+        var normalHealing = Math.round(baseHealing + petStage.GetTeam(teamIndex).ActivePet.Power * scaleFactor);
 
         //Used below.
         var randomPetIndex = Math.floor((Math.random()*petStage.GetTeam((teamIndex%2)+1).NumPets)+1);
 
         //Check whether it is avoid/crit/hit/proc.
-        if (!isAvoiding)
+        if (!isAvoiding && isHitting)
             for (var i=1; i < petStage.GetTeam((teamIndex%2)+1).NumPets+1; i++)
             {
                 var damage = Math.round((normalDamage - petStage.GetTeam((teamIndex%2)+1).GetPet(i).DamageOffset)
@@ -84,7 +86,7 @@ Item
                 else
                     petHelper.CheckDamage(petStage, (teamIndex%2)+1, i, damage, false);
             }
-        else
+        else if (isAvoiding)
             for (var i=2; i < petStage.GetTeam((teamIndex%2)+1).NumPets+1; i++)
             {
                 var damage = Math.round((normalDamage - petStage.GetTeam((teamIndex%2)+1).GetPet(i).DamageOffset)
@@ -98,6 +100,15 @@ Item
                 else
                     petHelper.CheckDamage(petStage, (teamIndex%2)+1, i, damage, false);
             }
+
+        //Now handle healing aspect.
+        for (var i=1; i < petStage.GetTeam(teamIndex).NumPets+1; i++)
+        {
+            var healing = Math.round((normalHealing + petStage.GetTeam(teamIndex).GetPet(i).BonusHealing)
+                            * petStage.GetTeam(teamIndex).GetPet(i).HealingModifier);
+
+            petHelper.CheckHealing(petStage, teamIndex, i, healing);
+        }
 
         //Remove any other weather effects.
         if (petStage.GetTeam(0).GetPet(0).NumAuras > 0)
@@ -152,13 +163,12 @@ Item
             petStage.GetTeam(0).GetPet(0).RemoveAura(1);
         }
 
-        //Increase damage done by all Aquatic pets.
+        //Apply Moonlight effects.
         for (var i=1; i < 3; i++)
             for (var j=1; j < petStage.GetTeam(teamIndex).NumPets+1; j++)
-                if (petStage.GetTeam(i).GetPet(j).Type == PetType.Aquatic)
-                    petStage.GetTeam(i).GetPet(j).DamageModifier += 0.25;
+                petStage.GetTeam(i).GetPet(j).HealingModifier += 0.25;
 
-        petStage.GetTeam(0).GetPet(0).AddAura(229, 9, true, petStage.GetTeam(teamIndex).ActivePet.Power);
+        petStage.GetTeam(0).GetPet(0).AddAura(596, 9, true, petStage.GetTeam(teamIndex).ActivePet.Power);
 
         return numHits;
     }

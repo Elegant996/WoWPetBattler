@@ -15,37 +15,37 @@ Item
     PetHelper { id: petHelper }
 
     //Returns the accuracy of the pet given the move.
-    function GetAccuracyRating(teamIndex)
+    function getAccuracyRating(teamIndex)
     {
         return 1;
     }
 
     //Returns the critical strike rating of the pet given the move.
-    function GetCriticalRating(teamIndex)
+    function getCriticalRating(teamIndex)
     {
         return 0;
     }
 
     //Returns the chance on hit rating if the move has any.
-    function GetChanceOnHitRating(teamIndex)
+    function getChanceOnHitRating(teamIndex)
     {
         return 0;
     }
 
     //Apply the aura's effect at the start of the turn.
-    function ApplyAuraStart(teamIndex, petIndex, auraIndex, duration)
+    function applyAuraStart(teamIndex, petIndex, auraIndex, duration)
     {
 
     }
 
     //Applies the aura effect to the active pet.
-    function ApplyAura(teamIndex)
+    function applyAura(teamIndex)
     {
 
     }
 
     //Apply the aura's effect at the end of the turn.
-    function ApplyAuraEnd(teamIndex, petIndex, duration, isFresh)
+    function applyAuraEnd(teamIndex, petIndex, auraIndex, duration)
     {
         //If the pet attacked this round increase it health.
         if (petStage.GetTeam(curTeam).GetTeam(petIndex).AttackedThisRound)
@@ -54,13 +54,13 @@ Item
     }
 
     //Grants the pet any special statuses the ability has.
-    function PreUseAbility(teamIndex)
+    function preuseAbility(teamIndex)
     {
 
     }
 
     //Applies the ability and returns the number of hits made.
-    function UseAbility(teamIndex, priority, isAvoiding,
+    function useAbility(teamIndex, priority, isAvoiding,
                         isHitting, isCritting, isProcing)
     {
        return 0;

@@ -1,4 +1,4 @@
-// Aquatic - Racial
+// Sandstorm - Weather
 import QtQuick 2.0
 
 import PetAction 1.0
@@ -35,7 +35,18 @@ Item
     //Apply the aura's effect at the start of the turn.
     function applyAuraStart(teamIndex, petIndex, auraIndex, duration)
     {
+        //Find power if it is 0.
+        if (petStage.GetTeam(teamIndex).GetPet(petIndex).GetAura(auraIndex).Power == 0)
+            petHelper.CheckAuraPower(petStage, petStage.GetTeam(teamIndex).GetPet(petIndex).GetAura(auraIndex), 3, 453);
 
+        //Apply Sandstorm effects.
+        for (var i=1; i < 3; i++)
+            for (var j=1; j < petStage.GetTeam(i).NumPets+1; j++)
+            {
+                if (petStage.GetTeam(i).GetPet(j).Type != PetType.Elemetal)
+                    petStage.GetTeam(i).GetPet(j).AccuracyOffset -= 0.10;
+                petStage.GetTeam(i).GetPet(j).DamageOffset += 5 + petStage.GetTeam(teamIndex).ActivePet.Power * 0.25;
+            }
     }
 
     //Applies the aura effect to the active pet.

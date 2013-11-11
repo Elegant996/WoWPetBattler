@@ -1,4 +1,4 @@
-// Acid Rain - Ability
+// Sunlight - Ability
 import QtQuick 2.0
 
 import PetAction 1.0
@@ -61,9 +61,9 @@ Item
                         isHitting, isCritting, isProcing)
     {
         var numHits = 0;
-        var scaleFactor = 0.45;
-        var baseDamage = 9;
-        var attackType = PetType.Aquatic;
+        var scaleFactor = 0.50;
+        var baseDamage = 10;
+        var attackType = PetType.Elemental;
         var normalDamage = Math.round(baseDamage + petStage.GetTeam(teamIndex).ActivePet.Power * scaleFactor);
 
         //Used below.
@@ -152,13 +152,15 @@ Item
             petStage.GetTeam(0).GetPet(0).RemoveAura(1);
         }
 
-        //Increase damage done by all Aquatic pets.
+        //Apply Sunny Day effects.
         for (var i=1; i < 3; i++)
             for (var j=1; j < petStage.GetTeam(teamIndex).NumPets+1; j++)
-                if (petStage.GetTeam(i).GetPet(j).Type == PetType.Aquatic)
-                    petStage.GetTeam(i).GetPet(j).DamageModifier += 0.25;
+            {
+                petStage.GetTeam(i).GetPet(j).MaxHealth *= 1.5;
+                petStage.GetTeam(i).GetPet(j).HealingModifier += 0.25;
+            }
 
-        petStage.GetTeam(0).GetPet(0).AddAura(229, 9, true, petStage.GetTeam(teamIndex).ActivePet.Power);
+        petStage.GetTeam(0).GetPet(0).AddAura(403, 9, true, petStage.GetTeam(teamIndex).ActivePet.Power);
 
         return numHits;
     }

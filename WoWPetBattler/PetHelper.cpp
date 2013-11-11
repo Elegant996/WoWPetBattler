@@ -141,3 +141,16 @@ void PetHelper::CheckCleansingRain(PetStage* petStage, quint8 teamIndex, quint8 
 	else
 		petStage->GetTeam(teamIndex)->GetPet(petIndex)->AddAura(auraId, duration, isFresh, power);
 }
+
+//Checks to see if there is a bonus to be gained from weather and applies it.
+float PetHelper::CheckWeatherBonus(PetStage *petStage, PetType::Type petType)
+{
+	if (petType == PetType::Magic && petStage->GetTeam(0)->GetPet(0)->GetNumAuras() > 0
+			&& petStage->GetTeam(0)->GetPet(0)->GetAura(1)->GetAuraId() == 596)
+		return 0.10;
+	else if (petType == PetType::Mechanical && petStage->GetTeam(0)->GetPet(0)->GetNumAuras() > 0
+			&& petStage->GetTeam(0)->GetPet(0)->GetAura(1)->GetAuraId() == 203)
+		return 0.25;
+	else
+		return 0;
+}

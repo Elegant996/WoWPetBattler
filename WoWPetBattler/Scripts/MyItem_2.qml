@@ -40,7 +40,8 @@ Item
         console.log(petStage.GetTeam(1).ActivePet.GetCurrentAction().Action);
         petStage.GetTeam(1).GetPet(1).Health -= 500;
         console.log(petStage.GetTeam(1).GetPet(1).Health);
-        petHelper.CheckDamage(petStage, 1, 1, 25, false);
+        var myVar = 25;
+        petHelper.CheckDamage(petStage, 1, 1, myVar, false);
         console.log(petStage.GetTeam(1).GetPet(1).Health);
     }
 

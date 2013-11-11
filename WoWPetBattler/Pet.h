@@ -43,10 +43,7 @@ class Pet : public QObject
 	Q_PROPERTY(float DamageModifier READ GetDamageModifier WRITE SetDamageModifier)
 	Q_PROPERTY(float HealingModifier READ GetHealingModifier WRITE SetHealingModifier)
 	Q_PROPERTY(float DefenseModifier READ GetDefenseModifier WRITE SetDefenseModifier)
-	Q_PROPERTY(int BonusDamage READ GetBonusDamage WRITE SetBonusDamage)
-	Q_PROPERTY(int BlockDamage READ GetBlockDamage WRITE SetBlockDamage)
-	Q_PROPERTY(int BonusHealing READ GetBonusHealing WRITE SetBonusHealing)
-	Q_PROPERTY(int BlockHealing READ GetBlockHealing WRITE SetBlockHealing)
+	Q_PROPERTY(int DamageOffset READ GetDamageOffset WRITE SetDamageOffset)
 	Q_PROPERTY(PetAction* CurrentAction READ GetCurrentAction)
 	Q_PROPERTY(bool RacialUsed READ RacialUsed WRITE RacialUsed)
 	Q_PROPERTY(bool AttackedThisRound READ AttackedThisRound WRITE AttackedThisRound)
@@ -98,10 +95,7 @@ public:
 	void SetDamageModifier(float);
 	void SetHealingModifier(float);
 	void SetDefenseModifier(float);
-	void SetBonusDamage(int);
-	void SetBlockDamage(int);
-	void SetBonusHealing(int);
-	void SetBlockHealing(int);
+	void SetDamageOffset(int);
 	void RacialUsed(bool);
 	void AttackedThisRound(bool);
 
@@ -123,10 +117,7 @@ public:
 	float GetDamageModifier();
 	float GetHealingModifier();
 	float GetDefenseModifier();
-	int GetBonusDamage();
-	int GetBlockDamage();
-	int GetBonusHealing();
-	int GetBlockHealing();
+	int GetDamageOffset();
 	Q_INVOKABLE PetAction* GetCurrentAction();
 	bool RacialUsed();
 	bool AttackedThisRound();
@@ -141,7 +132,7 @@ private:
 	quint16 currentHealth, currentMaxHealth, currentPower, currentSpeed;
 	float accuracyOffset, avoidanceRating, criticalStrikeRating;
 	float damageModifier, healingModifier, defenseModifier;
-	int bonusDamage, blockDamage, bonusHealing, blockHealing;
+	int damageOffset;
 
 	bool racialUsed, attackedThisRound;
 	PetAction *currentAction;
