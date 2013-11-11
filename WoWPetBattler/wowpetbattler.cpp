@@ -52,7 +52,7 @@ WoWPetBattler::WoWPetBattler(QWidget *parent)
 	petStage->GetTeam(2)->GetPet(3)->AddAbility(true, 1, 0);
 	petStage->GetTeam(2)->GetPet(3)->AddAbility(true, 1, 0);
 
-	petStage->GetTeam(1)->SetActivePet(3);
+	petStage->GetTeam(1)->SetActivePet(1);
 	petStage->GetTeam(2)->SetActivePet(1);
 }
 
@@ -102,11 +102,10 @@ void WoWPetBattler::on_playButton_clicked()
 	qmlRegisterType<PetAura>();
 	qmlRegisterType<PetHelper>("PetHelper", 1, 0, "PetHelper");
 
-
 	QQmlContext *objectContext = new QQmlContext(engine.rootContext());
 	objectContext->setContextProperty("petStage", petStage);	
 
-	QQmlComponent component(&engine, QUrl::fromLocalFile("Scripts/1051.qml"));
+	QQmlComponent component(&engine, QUrl::fromLocalFile("Scripts/564.qml"));
 	QObject *object = component.create(objectContext);
 
 	if (component.status() == 3)
@@ -115,7 +114,7 @@ void WoWPetBattler::on_playButton_clicked()
 
 	qDebug() << petStage->GetTeam(2)->GetActivePet()->GetHealth();
 
-	QMetaObject::invokeMethod(object, "useAbility", Q_ARG(QVariant, 1), Q_ARG(QVariant, 1), Q_ARG(QVariant, false),
+	QMetaObject::invokeMethod(object, "useAbility", Q_ARG(QVariant, 1), Q_ARG(QVariant, 2), Q_ARG(QVariant, true), Q_ARG(QVariant, false),
 								Q_ARG(QVariant, true), Q_ARG(QVariant, false), Q_ARG(QVariant, false));
 
 	qDebug() << petStage->GetTeam(2)->GetActivePet()->GetHealth();

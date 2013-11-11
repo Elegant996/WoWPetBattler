@@ -1,4 +1,4 @@
-// Template
+// Swarm - Ability
 import QtQuick 2.0
 
 import PetAction 1.0
@@ -35,8 +35,7 @@ Item
     //Apply the aura's effect at the start of the turn.
     function applyAuraStart(teamIndex, petIndex, auraIndex, duration)
     {
-        if (petStage.GetTeam(teamIndex).GetPet(petIndex).GetAura(auraIndex).GetPower() == 0)
-            petHelper.CheckAuraPower(petStage, petStage.GetTeam(teamIndex).GetPet(petIndex).GetAura(auraIndex), team, abilityId);
+
     }
 
     //Applies the aura effect to the active pet.
@@ -54,17 +53,18 @@ Item
     //Grants the pet any special statuses the ability has.
     function preUseAbility(teamIndex)
     {
-
+        //This ability goes first.
+        petStage.GetTeam(teamIndex).ActivePet.AddStatus(PetStatus.First);
     }
 
     //Applies the ability and returns the number of hits made.
-    function useAbility(teamIndex, priority, isAvoiding,
+    function useAbility(teamIndex, curRound, isFirst, isAvoiding,
                         isHitting, isCritting, isProcing)
     {
         var numHits = 0;
-        var scaleFactor = 0.00;
-        var baseDamage = 0;
-        var attackType = PetType.Humanoid;
+        var scaleFactor = 0.45;
+        var baseDamage = 9;
+        var attackType = PetType.Critter;
         var normalDamage = Math.round(baseDamage + petStage.GetTeam(teamIndex).ActivePet.Power * scaleFactor);
         var damage = Math.round((normalDamage - petStage.GetTeam((teamIndex%2)+1).ActivePet.DamageOffset)
                         * petType.GetEffectiveness(attackType, petStage.GetTeam((teamIndex%2)+1).ActivePet.Type)
@@ -76,12 +76,14 @@ Item
         {
             numHits += 1;
             if (isCritting)
-                petHelper.CheckDamage(petStage, (teamIndex%2)+1, petStage.GetTeam((teamIndex%2)+1).ActivePetIndex, 2*damage, false);
+                petHelper.CheckDamage(petStage, (teamIndex%2)+1, petStage.GetTeam((teamIndex%2)+1).ActivePetIndex, 2*damage, true, true);
             else
-                petHelper.CheckDamage(petStage, (teamIndex%2)+1, petStage.GetTeam((teamIndex%2)+1).ActivePetIndex, damage, false);
+                petHelper.CheckDamage(petStage, (teamIndex%2)+1, petStage.GetTeam((teamIndex%2)+1).ActivePetIndex, damage, true, true);
+
+            //Debuff the pet we're fighting to take increased damage.
+            petStage.GetTeam((teamIndex%2)+1).ActivePet.DefenseModifier += 1.00;
+            petStage.GetTeam((teamIndex%2)+1).ActivePet.AddAura(542, 2, true);
         }
-
-
 
         return numHits;
     }

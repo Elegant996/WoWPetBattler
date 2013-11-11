@@ -17,7 +17,7 @@ Item
     //Returns the accuracy of the pet given the move.
     function getAccuracyRating(teamIndex)
     {
-        return 1;
+        return 0;
     }
 
     //Returns the critical strike rating of the pet given the move.
@@ -60,7 +60,7 @@ Item
     }
 
     //Applies the ability and returns the number of hits made.
-    function useAbility(teamIndex, priority, isAvoiding,
+    function useAbility(teamIndex, curRound, isFirst, isAvoiding,
                         isHitting, isCritting, isProcing)
     {
        return 0;

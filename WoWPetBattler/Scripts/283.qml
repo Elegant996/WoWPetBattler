@@ -1,4 +1,4 @@
-// Critter - Racial
+// Survival - Ability
 import QtQuick 2.0
 
 import PetAction 1.0
@@ -17,7 +17,7 @@ Item
     //Returns the accuracy of the pet given the move.
     function getAccuracyRating(teamIndex)
     {
-        return 1;
+        return 0;
     }
 
     //Returns the critical strike rating of the pet given the move.
@@ -51,7 +51,7 @@ Item
     }
 
     //Grants the pet any special statuses the ability has.
-    function preuseAbility(teamIndex)
+    function preUseAbility(teamIndex)
     {
 
     }
@@ -60,6 +60,10 @@ Item
     function useAbility(teamIndex, curRound, isFirst, isAvoiding,
                         isHitting, isCritting, isProcing)
     {
-       return 0;
+        //Pet is Unkillable.
+        petStage.GetTeam(teamIndex).ActivePet.AddStatus(PetStatus.Unkillable);
+        petStage.GetTeam(teamIndex).ActivePet.AddAura(284, 1, true);
+
+        return 0;
     }
 }

@@ -56,7 +56,7 @@ public:
 
 	enum PetStatus { First, Second, Stunned, Rooted, Burning, Chilled, Polymorphed,
 					Webbed, Blinded, Poisoned, Bleeding, Burrowed, Resilient, Asleep,
-					Flying, Unkillable, Swapping };
+					Flying, Unkillable, Swapping, Underwater };
 
 	void RoundUpdate();
 

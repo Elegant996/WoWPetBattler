@@ -1,4 +1,4 @@
-// Critter - Racial
+// Immolation - Aura
 import QtQuick 2.0
 
 import PetAction 1.0
@@ -17,7 +17,7 @@ Item
     //Returns the accuracy of the pet given the move.
     function getAccuracyRating(teamIndex)
     {
-        return 1;
+        return 0;
     }
 
     //Returns the critical strike rating of the pet given the move.
@@ -35,7 +35,10 @@ Item
     //Apply the aura's effect at the start of the turn.
     function applyAuraStart(teamIndex, petIndex, auraIndex, duration)
     {
+        if (petStage.GetTeam(teamIndex).GetPet(petIndex).GetAura(auraIndex).Power == 0)
+            petHelper.CheckAuraPower(petStage, petStage.GetTeam(teamIndex).GetPet(petIndex).GetAura(auraIndex), teamIndex, 409);
 
+        petStage.GetTeam(teamIndex).GetPet(petIndex).AttackedThisRound = true;
     }
 
     //Applies the aura effect to the active pet.
@@ -47,11 +50,22 @@ Item
     //Apply the aura's effect at the end of the turn.
     function applyAuraEnd(teamIndex, petIndex, auraIndex, duration)
     {
+        if(Math.random() < petStage.GetTeam((teamIndex%2)+1).ActivePet.AvoidanceRating)
+            return;
 
+        var scaleFactor = 0.25;
+        var baseDamage = 5;
+        var attackType = PetType.Elemental;
+        var normalDamage = Math.round(baseDamage + petStage.GetTeam(teamIndex).GetPet(petIndex).GetAura(auraIndex).Power * scaleFactor);
+        var damage = Math.round((normalDamage - petStage.GetTeam((teamIndex%2)+1).ActivePet.DamageOffset)
+                        * petType.GetEffectiveness(attackType, petStage.GetTeam((teamIndex%2)+1).ActivePet.Type)
+                        * petStage.GetTeam((teamIndex%2)+1).ActivePet.DefenseModifier);
+
+        petHelper.CheckDamage(petStage, (teamIndex%2)+1, petStage.GetTeam((teamIndex%2)+1).ActivePetIndex, 2*damage, false, false);
     }
 
     //Grants the pet any special statuses the ability has.
-    function preuseAbility(teamIndex)
+    function preUseAbility(teamIndex)
     {
 
     }
@@ -60,6 +74,6 @@ Item
     function useAbility(teamIndex, curRound, isFirst, isAvoiding,
                         isHitting, isCritting, isProcing)
     {
-       return 0;
+        return 0;
     }
 }

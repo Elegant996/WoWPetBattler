@@ -1,4 +1,4 @@
-// Critter - Racial
+// Dodge - Aura
 import QtQuick 2.0
 
 import PetAction 1.0
@@ -35,7 +35,8 @@ Item
     //Apply the aura's effect at the start of the turn.
     function applyAuraStart(teamIndex, petIndex, auraIndex, duration)
     {
-
+        //Grants 100% avoidance.
+        petStage.GetTeam(teamIndex).GetPet(petIndex).AvoidanceRating += 1;
     }
 
     //Applies the aura effect to the active pet.
@@ -51,7 +52,7 @@ Item
     }
 
     //Grants the pet any special statuses the ability has.
-    function preuseAbility(teamIndex)
+    function preUseAbility(teamIndex)
     {
 
     }
@@ -60,6 +61,6 @@ Item
     function useAbility(teamIndex, curRound, isFirst, isAvoiding,
                         isHitting, isCritting, isProcing)
     {
-       return 0;
+        return 0;
     }
 }

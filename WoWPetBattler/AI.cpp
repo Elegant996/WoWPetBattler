@@ -618,8 +618,10 @@ float AI::UseAction(PetStage* stageNode, quint8 depth, quint8 currentTeam, bool 
 	objectContext->setContextProperty("petStage", outcome);
 	object = component->create(objectContext);
 	//Parameters are currentTeam, priority, isAvoiding, isHitting, isCritting and isPrcoing.
-	QMetaObject::invokeMethod(object, "useAbility", Q_RETURN_ARG(QVariant, variantNumHits), Q_ARG(QVariant, currentTeam), Q_ARG(QVariant, ((firstCall)?1:2)),
-								Q_ARG(QVariant, isAvoiding), Q_ARG(QVariant, isHitting), Q_ARG(QVariant, isCritting), Q_ARG(QVariant, isProcing));
+	QMetaObject::invokeMethod(object, "useAbility", Q_RETURN_ARG(QVariant, variantNumHits), Q_ARG(QVariant, currentTeam), Q_ARG(QVariant, (-1)
+								* (outcome->GetTeam(currentTeam)->GetActivePet()->GetCurrentAction()->GetRoundsRemaining() - outcome->GetTeam(currentTeam)
+								->GetActivePet()->GetAbility(outcome->GetTeam(currentTeam)->GetActivePet()->GetCurrentAction()->GetAction())->GetRounds()) + 1),
+								Q_ARG(QVariant, firstCall), Q_ARG(QVariant, isAvoiding), Q_ARG(QVariant, isHitting), Q_ARG(QVariant, isCritting), Q_ARG(QVariant, isProcing));
 	//Catch any exceptions and report them.
 	if (component->status() == 3)
 			while (!component->errors().isEmpty())

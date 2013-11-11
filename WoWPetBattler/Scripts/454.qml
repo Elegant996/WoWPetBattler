@@ -68,7 +68,7 @@ Item
     }
 
     //Applies the ability and returns the number of hits made.
-    function useAbility(teamIndex, priority, isAvoiding,
+    function useAbility(teamIndex, curRound, isFirst, isAvoiding,
                         isHitting, isCritting, isProcing)
     {
        return 0;

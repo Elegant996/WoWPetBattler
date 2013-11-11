@@ -1,4 +1,4 @@
-// Critter - Racial
+// Nature's Touch - Ability
 import QtQuick 2.0
 
 import PetAction 1.0
@@ -17,7 +17,7 @@ Item
     //Returns the accuracy of the pet given the move.
     function getAccuracyRating(teamIndex)
     {
-        return 1;
+        return 0;
     }
 
     //Returns the critical strike rating of the pet given the move.
@@ -51,7 +51,7 @@ Item
     }
 
     //Grants the pet any special statuses the ability has.
-    function preuseAbility(teamIndex)
+    function preUseAbility(teamIndex)
     {
 
     }
@@ -60,6 +60,14 @@ Item
     function useAbility(teamIndex, curRound, isFirst, isAvoiding,
                         isHitting, isCritting, isProcing)
     {
-       return 0;
+        var numHits = 0;
+        var scaleFactor = 1.50;
+        var baseHealing = 30;
+        var attackType = PetType.Critter;
+        var normalHealing = Math.round(baseHealing + petStage.GetTeam(teamIndex).ActivePet.Power * scaleFactor);
+
+        petHelper.CheckHealing(petStage, teamIndex, petStage.GetTeam(teamIndex).ActivePetIndex, healing, true);
+
+        return numHits;
     }
 }

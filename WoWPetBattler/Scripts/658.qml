@@ -1,4 +1,4 @@
-// Critter - Racial
+// Plagued Blood - Aura
 import QtQuick 2.0
 
 import PetAction 1.0
@@ -17,7 +17,7 @@ Item
     //Returns the accuracy of the pet given the move.
     function getAccuracyRating(teamIndex)
     {
-        return 1;
+        return 0;
     }
 
     //Returns the critical strike rating of the pet given the move.
@@ -41,7 +41,7 @@ Item
     //Applies the aura effect to the active pet.
     function applyAura(teamIndex)
     {
-
+        petHelper.CheckHealing(petStage, (teamIndex%2)+1, petStage.GetTeam((teamIndex%2)+1).ActivePetIndex, Math.round(petStage.GetTeam((teamIndex%2)+1).ActivePet.MaxHealth * 0.01), false);
     }
 
     //Apply the aura's effect at the end of the turn.
@@ -51,7 +51,7 @@ Item
     }
 
     //Grants the pet any special statuses the ability has.
-    function preuseAbility(teamIndex)
+    function preUseAbility(teamIndex)
     {
 
     }
@@ -60,6 +60,6 @@ Item
     function useAbility(teamIndex, curRound, isFirst, isAvoiding,
                         isHitting, isCritting, isProcing)
     {
-       return 0;
+        return 0;
     }
 }

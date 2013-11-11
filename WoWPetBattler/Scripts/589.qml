@@ -57,7 +57,7 @@ Item
     }
 
     //Applies the ability and returns the number of hits made.
-    function useAbility(teamIndex, priority, isAvoiding,
+    function useAbility(teamIndex, curRound, isFirst, isAvoiding,
                         isHitting, isCritting, isProcing)
     {
         var numHits = 0;
@@ -71,31 +71,31 @@ Item
             for (var i=1; i < petStage.GetTeam((teamIndex%2)+1).NumPets+1; i++)
             {
                 var damage = Math.round((normalDamage - petStage.GetTeam((teamIndex%2)+1).GetPet(i).DamageOffset)
-                                * petType.GetEffectiveness(attackType, petStage.GetTeam((teamIndex%2)+1).Type)
+                                * petType.GetEffectiveness(attackType, petStage.GetTeam((teamIndex%2)+1).ActivePet.Type)
                                 * petStage.GetTeam((teamIndex%2)+1).GetPet(i).DefenseModifier
                                 * (petStage.GetTeam(teamIndex).ActivePet.DamageModifier
                                    + petHelper.CheckWeatherBonus(petStage, attackType)));
 
                 numHits += 1;
                 if (isCritting && i == randomPetIndex)
-                    petHelper.CheckDamage(petStage, (teamIndex%2)+1, i, 2*damage, false);
+                    petHelper.CheckDamage(petStage, (teamIndex%2)+1, i, 2*damage, true, false);
                 else
-                    petHelper.CheckDamage(petStage, (teamIndex%2)+1, i, damage, false);
+                    petHelper.CheckDamage(petStage, (teamIndex%2)+1, i, damage, true, false);
             }
         else if (isAvoiding)
             for (var i=2; i < petStage.GetTeam((teamIndex%2)+1).NumPets+1; i++)
             {
                 var damage = Math.round((normalDamage - petStage.GetTeam((teamIndex%2)+1).GetPet(i).DamageOffset)
-                                * petType.GetEffectiveness(attackType, petStage.GetTeam((teamIndex%2)+1).Type)
+                                * petType.GetEffectiveness(attackType, petStage.GetTeam((teamIndex%2)+1).ActivePet.Type)
                                 * petStage.GetTeam((teamIndex%2)+1).GetPet(i).DefenseModifier
                                 * (petStage.GetTeam(teamIndex).ActivePet.DamageModifier
                                    + petHelper.CheckWeatherBonus(petStage, attackType)));
 
                 numHits += 1;
                 if (isCritting && i == randomPetIndex)
-                    petHelper.CheckDamage(petStage, (teamIndex%2)+1, i, 2*damage, false);
+                    petHelper.CheckDamage(petStage, (teamIndex%2)+1, i, 2*damage, true, false);
                 else
-                    petHelper.CheckDamage(petStage, (teamIndex%2)+1, i, damage, false);
+                    petHelper.CheckDamage(petStage, (teamIndex%2)+1, i, damage, true, false);
             }
 
         //Remove any other weather effects.

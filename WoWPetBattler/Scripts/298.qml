@@ -1,4 +1,4 @@
-// Critter - Racial
+// Inspiring Song - Ability
 import QtQuick 2.0
 
 import PetAction 1.0
@@ -17,7 +17,7 @@ Item
     //Returns the accuracy of the pet given the move.
     function getAccuracyRating(teamIndex)
     {
-        return 1;
+        return 0;
     }
 
     //Returns the critical strike rating of the pet given the move.
@@ -51,7 +51,7 @@ Item
     }
 
     //Grants the pet any special statuses the ability has.
-    function preuseAbility(teamIndex)
+    function preUseAbility(teamIndex)
     {
 
     }
@@ -60,6 +60,27 @@ Item
     function useAbility(teamIndex, curRound, isFirst, isAvoiding,
                         isHitting, isCritting, isProcing)
     {
-       return 0;
+        var numHits = 0;
+        var scaleFactor = 0.60;
+        var baseHealing = 12;
+        var attackType = PetType.Elemental;
+        var normalHealing = Math.round(baseHealing + petStage.GetTeam(teamIndex).ActivePet.Power * scaleFactor);
+
+        //Used below.
+        var randomPetIndex = Math.floor((Math.random()*petStage.GetTeam(teamIndex).NumPets)+1);
+
+        //Apply healing to all pets.
+        for (var i=1; i < petStage.GetTeam(teamIndex).NumPets+1; i++)
+        {
+            var healing = Math.round((normalHealing + petStage.GetTeam(teamIndex).GetPet(i).BonusHealing)
+                            * petStage.GetTeam(teamIndex).GetPet(i).HealingModifier);
+
+            if (isCritting && i == randomPetIndex)
+                petHelper.CheckHealing(petStage, teamIndex, i, 2*healing, true);
+            else
+                petHelper.CheckHealing(petStage, teamIndex, i, healing, true);
+        }
+
+        return numHits;
     }
 }

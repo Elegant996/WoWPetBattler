@@ -1,7 +1,7 @@
 #include "PetHelper.h"
 
 //Checks the damage dealt.
-void PetHelper::CheckDamage(PetStage *petStage, quint8 teamIndex, quint8 petIndex, quint16 damage, bool useLightning)
+void PetHelper::CheckDamage(PetStage *petStage, quint8 teamIndex, quint8 petIndex, quint16 damage, bool mainAttack, bool useLightning)
 {
 	Pet *curPet = petStage->GetTeam(teamIndex)->GetPet(petIndex);
 	quint16 totalDamage = damage;
@@ -19,9 +19,10 @@ void PetHelper::CheckDamage(PetStage *petStage, quint8 teamIndex, quint8 petInde
 		else
 		{	//Set health to 0 and check racial procs for attacking team.
 			curPet->SetHealth(0);
-			CheckRacialsProc(petStage, (teamIndex%2)+1);
+			CheckRacials(curPet);
 		}
 	else
+	{
 		//Check if the pet can sustain the hit.
 		if (curPet->GetHealth() - totalDamage > 0)
 			curPet->SetHealth(curPet->GetHealth() - totalDamage);
@@ -30,13 +31,18 @@ void PetHelper::CheckDamage(PetStage *petStage, quint8 teamIndex, quint8 petInde
 			curPet->SetHealth(0);
 			CheckRacials(curPet);
 		}
+	}
 
-	//Set flag for other team's active pet having attacked.
-	petStage->GetTeam((teamIndex%2)+1)->GetActivePet()->AttackedThisRound(true);
+	//Check if this is the main attack.
+	if (mainAttack)
+	{	//Check to see if racials have proc'd and set attack to true.
+		CheckRacialsProc(petStage, (teamIndex%2)+1);
+		petStage->GetTeam((teamIndex%2)+1)->GetActivePet()->AttackedThisRound(true);
+	}
 }
 
 //Check the healing done.
-void PetHelper::CheckHealing(PetStage *petStage, quint8 teamIndex, quint8 petIndex, quint16 healing)
+void PetHelper::CheckHealing(PetStage *petStage, quint8 teamIndex, quint8 petIndex, quint16 healing, bool mainAttack)
 {
 	Pet *curPet = petStage->GetTeam(teamIndex)->GetPet(petIndex);
 
@@ -56,7 +62,7 @@ void PetHelper::CheckRacialsProc(PetStage *petStage, quint8 teamIndex)
                 && petStage->GetTeam((teamIndex%2)+1)->GetActivePet()->GetHealthPercentage() < 0.50
                 && !curPet->RacialUsed())
 	{
-		curPet->RacialUsed(true);				//Racial now used.
+		curPet->RacialUsed(true);			//Racial now used.
 		curPet->AddAura(245, 1, true);		//Will replace persisting racial.
     }
 }

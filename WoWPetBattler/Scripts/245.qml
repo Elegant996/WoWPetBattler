@@ -35,7 +35,8 @@ Item
     //Apply the aura's effect at the start of the turn.
     function applyAuraStart(teamIndex, petIndex, auraIndex, duration)
     {
-        petStage.GetTeam(curTeam).GetPet(petIndex).DamageModifier += 0.50;
+        if (duration == 1)
+            petStage.GetTeam(curTeam).GetPet(petIndex).DamageModifier += 0.50;
     }
 
     //Applies the aura effect to the active pet.
@@ -47,7 +48,8 @@ Item
     //Apply the aura's effect at the end of the turn.
     function applyAuraEnd(teamIndex, petIndex, auraIndex, duration)
     {
-
+        if (duration == 1 && !petStage.GetTeam(teamIndex).GetPet(petIndex).GetAura(auraIndex).IsFresh)
+            petStage.GetTeam(teamIndex).GetPet(petIndex).GetAura(auraIndex).UpdateAura(-1, false);
     }
 
     //Grants the pet any special statuses the ability has.
@@ -57,7 +59,7 @@ Item
     }
 
     //Applies the ability and returns the number of hits made.
-    function useAbility(teamIndex, priority, isAvoiding,
+    function useAbility(teamIndex, curRound, isFirst, isAvoiding,
                         isHitting, isCritting, isProcing)
     {
        return 0;

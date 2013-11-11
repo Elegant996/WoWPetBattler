@@ -9,8 +9,8 @@ class PetHelper : public QObject
 {
 	Q_OBJECT
 public:
-	Q_INVOKABLE static void CheckDamage(PetStage*, quint8, quint8, quint16, bool);
-	Q_INVOKABLE static void CheckHealing(PetStage*, quint8, quint8, quint16);
+	Q_INVOKABLE static void CheckDamage(PetStage*, quint8, quint8, quint16, bool, bool);
+	Q_INVOKABLE static void CheckHealing(PetStage*, quint8, quint8, quint16, bool);
 	static void CheckRacialsProc(PetStage*, quint8);
 	static void CheckRacials(Pet*);
 	Q_INVOKABLE static void CheckAuraPower(PetStage*, PetAura*, quint8, quint8);

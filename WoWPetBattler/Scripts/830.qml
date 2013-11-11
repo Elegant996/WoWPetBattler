@@ -1,4 +1,4 @@
-// Critter - Racial
+// Underwater - Aura
 import QtQuick 2.0
 
 import PetAction 1.0
@@ -17,7 +17,7 @@ Item
     //Returns the accuracy of the pet given the move.
     function getAccuracyRating(teamIndex)
     {
-        return 1;
+        return 0;
     }
 
     //Returns the critical strike rating of the pet given the move.
@@ -35,7 +35,8 @@ Item
     //Apply the aura's effect at the start of the turn.
     function applyAuraStart(teamIndex, petIndex, auraIndex, duration)
     {
-
+        //Overkill avoidance.
+        petStage.GetTeam(teamIndex).GetPet(petIndex).AvoidanceRating += 5;
     }
 
     //Applies the aura effect to the active pet.
@@ -51,7 +52,7 @@ Item
     }
 
     //Grants the pet any special statuses the ability has.
-    function preuseAbility(teamIndex)
+    function preUseAbility(teamIndex)
     {
 
     }

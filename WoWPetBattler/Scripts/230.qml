@@ -57,7 +57,7 @@ Item
     }
 
     //Applies the ability and returns the number of hits made.
-    function useAbility(teamIndex, priority, isAvoiding,
+    function useAbility(teamIndex, curRound, isFirst, isAvoiding,
                         isHitting, isCritting, isProcing)
     {
         var numHits = 0;
@@ -76,9 +76,9 @@ Item
                             * petStage.GetTeam(teamIndex).GetPet(i).HealingModifier);
 
             if (isCritting && i == randomPetIndex)
-                petHelper.CheckHealing(petStage, teamIndex, i, 2*healing);
+                petHelper.CheckHealing(petStage, teamIndex, i, 2*healing, true);
             else
-                petHelper.CheckHealing(petStage, teamIndex, i, healing);
+                petHelper.CheckHealing(petStage, teamIndex, i, healing, true);
         }
 
         //Remove any other weather effects.

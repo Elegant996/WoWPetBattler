@@ -1,4 +1,4 @@
-// Template
+// Dive - Ability
 import QtQuick 2.0
 
 import PetAction 1.0
@@ -17,7 +17,7 @@ Item
     //Returns the accuracy of the pet given the move.
     function getAccuracyRating(teamIndex)
     {
-        return 1;
+        return 0.80;
     }
 
     //Returns the critical strike rating of the pet given the move.
@@ -35,8 +35,7 @@ Item
     //Apply the aura's effect at the start of the turn.
     function applyAuraStart(teamIndex, petIndex, auraIndex, duration)
     {
-        if (petStage.GetTeam(teamIndex).GetPet(petIndex).GetAura(auraIndex).GetPower() == 0)
-            petHelper.CheckAuraPower(petStage, petStage.GetTeam(teamIndex).GetPet(petIndex).GetAura(auraIndex), team, abilityId);
+
     }
 
     //Applies the aura effect to the active pet.
@@ -58,13 +57,20 @@ Item
     }
 
     //Applies the ability and returns the number of hits made.
-    function useAbility(teamIndex, priority, isAvoiding,
+    function useAbility(teamIndex, curRound, isFirst, isAvoiding,
                         isHitting, isCritting, isProcing)
     {
+        //This ability does not hit on the first round but adds an aura.
+        if (curRound == 1)
+        {
+            petStage.GetTeam(teamIndex).ActivePet.AddAura(830, -1, false);
+            return 0;
+        }
+
         var numHits = 0;
-        var scaleFactor = 0.00;
-        var baseDamage = 0;
-        var attackType = PetType.Humanoid;
+        var scaleFactor = 1.75;
+        var baseDamage = 35;
+        var attackType = PetType.Aquatic;
         var normalDamage = Math.round(baseDamage + petStage.GetTeam(teamIndex).ActivePet.Power * scaleFactor);
         var damage = Math.round((normalDamage - petStage.GetTeam((teamIndex%2)+1).ActivePet.DamageOffset)
                         * petType.GetEffectiveness(attackType, petStage.GetTeam((teamIndex%2)+1).ActivePet.Type)
@@ -76,12 +82,20 @@ Item
         {
             numHits += 1;
             if (isCritting)
-                petHelper.CheckDamage(petStage, (teamIndex%2)+1, petStage.GetTeam((teamIndex%2)+1).ActivePetIndex, 2*damage, false);
+                petHelper.CheckDamage(petStage, (teamIndex%2)+1, petStage.GetTeam((teamIndex%2)+1).ActivePetIndex, 2*damage, true, true);
             else
-                petHelper.CheckDamage(petStage, (teamIndex%2)+1, petStage.GetTeam((teamIndex%2)+1).ActivePetIndex, damage, false);
+                petHelper.CheckDamage(petStage, (teamIndex%2)+1, petStage.GetTeam((teamIndex%2)+1).ActivePetIndex, damage, true, true);
         }
 
-
+        //Regardless of if we hit the pet must surface.
+        for (var i=petStage.GetTeam(teamIndex).ActivePet.NumAuras; i > 0; i--)
+            if (petStage.GetTeam(teamIndex).ActivePet.GetAura(i).AuraId == 830)
+            {
+                petStage.GetTeam(teamIndex).ActivePet.RemoveStatus(PetStatus.Underwater);
+                petStage.GetTeam(teamIndex).ActivePet.AvoidanceRating -= 5;
+                petStage.GetTeam(teamIndex).ActivePet.RemoveAura(i);
+                break;
+            }
 
         return numHits;
     }

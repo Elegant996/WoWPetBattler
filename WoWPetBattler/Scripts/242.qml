@@ -48,8 +48,11 @@ Item
     function applyAuraEnd(teamIndex, petIndex, auraIndex, duration)
     {
         //If the pet is currently staving off death, kill him.
-        if (duration == 1 && !isFresh)
+        if (duration == 1 && !petStage.GetTeam(teamIndex).GetPet(petIndex).GetAura(auraIndex).IsFresh)
+        {
+            petStage.GetTeam(teamIndex).GetPet(petIndex).GetAura(auraIndex).UpdateAura(-1, false);
             petStage.GetTeam(curTeam).GetPet(petIndex).Health = 0;
+        }
     }
 
     //Grants the pet any special statuses the ability has.
@@ -59,7 +62,7 @@ Item
     }
 
     //Applies the ability and returns the number of hits made.
-    function useAbility(teamIndex, priority, isAvoiding,
+    function useAbility(teamIndex, curRound, isFirst, isAvoiding,
                         isHitting, isCritting, isProcing)
     {
        return 0;

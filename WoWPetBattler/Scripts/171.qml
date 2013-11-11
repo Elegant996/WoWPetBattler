@@ -17,7 +17,7 @@ Item
     //Returns the accuracy of the pet given the move.
     function getAccuracyRating(teamIndex)
     {
-        return 1;
+        return 0;
     }
 
     //Returns the critical strike rating of the pet given the move.
@@ -54,11 +54,11 @@ Item
 
     //Apply the aura's effect at the end of the turn.
     function applyAuraEnd(teamIndex, petIndex, auraIndex, duration)
-    {
+    {        
         var scaleFactor = 0.2;
         var baseDamage = 4;
         var attackType = PetType.Elemental;
-        var normalDamage = Math.round(baseDamage + petStage.GetTeam(teamIndex).ActivePet.Power * scaleFactor);
+        var normalDamage = Math.round(baseDamage + petStage.GetTeam(teamIndex).GetPet(petIndex).GetAura(auraIndex).Power * scaleFactor);
 
         //Apply the weather effect to each team.
         for (var i=1; i < 3; i++)
@@ -68,7 +68,7 @@ Item
                                     * petStage.GetTeam(i).ActivePet.DefenseModifier);
 
             if (petStage.GetTeam(i).ActivePet.Type != PetType.Elemetal)
-                petHelper.CheckDamage(petStage, i, petStage.GetTeam(i).ActivePetIndex, damage, false);
+                petHelper.CheckDamage(petStage, i, petStage.GetTeam(i).ActivePetIndex, damage, false, false);
         }
     }
 
@@ -79,7 +79,7 @@ Item
     }
 
     //Applies the ability and returns the number of hits made.
-    function useAbility(teamIndex, priority, isAvoiding,
+    function useAbility(teamIndex, curRound, isFirst, isAvoiding,
                         isHitting, isCritting, isProcing)
     {
        return 0;
