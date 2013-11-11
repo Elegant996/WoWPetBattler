@@ -98,7 +98,20 @@ void Interpreter::run()
 
 		//Setup pet teams if we are now initialized.
 		if ((!petStage->Initialized() && (pixels[0].G & 64) != 0))
+		{
 			SetupPetTeams();
+
+			//Create QString for the opponent's teams' pets.
+			QString teamComp = "Opponent's Team: " + petStage->GetTeam(2)->GetPet(1)->GetName();
+			if (petStage->GetTeam(2)->GetNumPets() > 1)
+				teamComp += ", " + petStage->GetTeam(2)->GetPet(2)->GetName();
+			if (petStage->GetTeam(2)->GetNumPets() > 2)
+				teamComp += ", " + petStage->GetTeam(2)->GetPet(3)->GetName();
+			teamComp += ".";
+
+			//Emit the QString to the GUI.
+			emit OutputToGUI(teamComp);
+		}
 
 		//Update the stage info if we need to make a move.
 		if ((!petStage->SelectAbility() && (pixels[0].G & 16) != 0) || (!petStage->SelectPet() && (pixels[0].G & 32) != 0))

@@ -110,7 +110,8 @@ void WoWPetBattler::on_playButton_clicked()
 	QObject *object = component.create(objectContext);
 
 	if (component.status() == 3)
-		qDebug() << component.errors();
+		while (!component.errors().isEmpty())
+			qDebug() << component.errors().takeAt(0).toString();
 
 	qDebug() << petStage->GetTeam(2)->GetActivePet()->GetHealth();
 

@@ -391,6 +391,12 @@ void Pet::AttackedThisRound(bool attackedThisRound)
 	this->attackedThisRound = attackedThisRound;
 }
 
+//Return pet's name.
+QString Pet::GetName()
+{
+	return this->name;
+}
+
 //Return pet's species Id.
 quint16 Pet::GetSpeciesId()
 {

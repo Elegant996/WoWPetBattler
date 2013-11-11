@@ -99,6 +99,7 @@ public:
 	void RacialUsed(bool);
 	void AttackedThisRound(bool);
 
+	QString GetName();
 	quint16 GetSpeciesId();
 	quint8 GetLevel();
 	PetType::Type GetType();

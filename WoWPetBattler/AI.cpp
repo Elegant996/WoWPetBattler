@@ -95,7 +95,8 @@ Move AI::Expectiminimax(PetStage* stageNode, quint8 depth, quint8 turnIndex)
 										Q_ARG(QVariant, stageNode->GetTeam(0)->GetPet(0)->GetAura(i)->GetDuration()));
 			//Catch any exceptions and report them.
 			if (component->status() == 3)
-				qDebug() << component->errors();
+				while (!component->errors().isEmpty())
+					emit OutputToGUI(component->errors().takeAt(0).toString());
 		}
 
 		//Begin move selection process.
@@ -147,7 +148,8 @@ Move AI::SelectAction(PetStage *stageNode, quint8 depth, quint8 turnIndex)
 										Q_ARG(QVariant, stageNode->GetTeam(turnIndex)->GetPet(i)->GetAura(j)->GetDuration()));
 			//Catch any exceptions and report them.
 			if (component->status() == 3)
-				qDebug() << component->errors();
+				while (!component->errors().isEmpty())
+					emit OutputToGUI(component->errors().takeAt(0).toString());
 		}
 
 	//Add all available actions to the list.
@@ -379,7 +381,8 @@ float AI::ActionOutcomes(PetStage *stageNode, quint8 depth, quint8 currentTeam, 
 
 		//Catch any exceptions and report them.
 		if (component->status() == 3)
-			qDebug() << component->errors();
+			while (!component->errors().isEmpty())
+				emit OutputToGUI(component->errors().takeAt(0).toString());
 
 		//Set ratings based on pet info and QVariants.
 		avoidanceRating = stageNode->GetTeam((currentTeam%2)+1)->GetActivePet()->GetAvoidanceRating();
@@ -619,7 +622,8 @@ float AI::UseAction(PetStage* stageNode, quint8 depth, quint8 currentTeam, bool 
 								Q_ARG(QVariant, isAvoiding), Q_ARG(QVariant, isHitting), Q_ARG(QVariant, isCritting), Q_ARG(QVariant, isProcing));
 	//Catch any exceptions and report them.
 	if (component->status() == 3)
-		qDebug() << component->errors();
+			while (!component->errors().isEmpty())
+				emit OutputToGUI(component->errors().takeAt(0).toString());
 
 	//Convert QVariant for number of hits.
 	numHits = variantNumHits.toFloat();
@@ -651,7 +655,8 @@ float AI::UseAction(PetStage* stageNode, quint8 depth, quint8 currentTeam, bool 
 							QMetaObject::invokeMethod(object, "applyAura", Q_ARG(QVariant, (currentTeam%2)+1));		//Use the aura; parameters are teamIndex.
 							//Catch any exceptions and report them.
 							if (component->status() == 3)
-								qDebug() << component->errors();
+								while (!component->errors().isEmpty())
+									emit OutputToGUI(component->errors().takeAt(0).toString());
 							substituteStage->GetTeam((currentTeam%2)+1)->GetPet(0)->RemoveAura(j);					//Remove the aura.
 							break;																					//There should not be more than 1.
 						}
@@ -711,7 +716,8 @@ float AI::EndTurn(PetStage* stageNode, quint8 depth)
 					Q_ARG(QVariant, stageNode->GetTeam(i)->GetPet(j)->GetAura(k)->GetDuration()));
 				//Catch any exceptions and report them.
 				if (component->status() == 3)
-					qDebug() << component->errors();
+				while (!component->errors().isEmpty())
+					emit OutputToGUI(component->errors().takeAt(0).toString());
 			}
 
 
@@ -752,7 +758,8 @@ float AI::EndTurn(PetStage* stageNode, quint8 depth)
 										QMetaObject::invokeMethod(object, "applyAura", Q_ARG(QVariant, i));		//Use the aura; parameters are teamIndex.
 										//Catch any exceptions and report them.
 										if (component->status() == 3)
-											qDebug() << component->errors();
+										while (!component->errors().isEmpty())
+											emit OutputToGUI(component->errors().takeAt(0).toString());
 										substituteStage->GetTeam(i)->GetPet(0)->RemoveAura(l);					//Remove the aura.
 										break;																	//There should not be more than 1.
 									}
@@ -771,7 +778,8 @@ float AI::EndTurn(PetStage* stageNode, quint8 depth)
 									QMetaObject::invokeMethod(object, "applyAura", Q_ARG(QVariant, i));		//Use the aura; parameters are teamIndex.
 									//Catch any exceptions and report them.
 									if (component->status() == 3)
-										qDebug() << component->errors();
+										while (!component->errors().isEmpty())
+											emit OutputToGUI(component->errors().takeAt(0).toString());
 									substituteStage->GetTeam(i)->GetPet(0)->RemoveAura(k);					//Remove the aura.
 									break;																	//There should not be more than 1.
 								}
