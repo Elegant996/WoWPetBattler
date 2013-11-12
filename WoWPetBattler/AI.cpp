@@ -66,7 +66,7 @@ Move AI::Expectiminimax(PetStage* stageNode, quint8 depth, quint8 turnIndex)
 
 	if (depth == 0 || stageNode->IsMatchOver())
 	{
-		float score = 0;	//Default score.
+		float score = 0.00;	//Default score.
 
 		/*Use health values to calculate score of the node.
 		Note: 52 = 5 * 1.3 * 8 (where 8 is assumed to be the average health base of pets)
@@ -261,7 +261,7 @@ Move AI::SelectAction(PetStage *stageNode, quint8 depth, quint8 turnIndex)
 	QList<Move>::iterator iter = nextMoves.begin();
 	while (!stageMoves.isEmpty())
 	{
-		PetStage *nextStage = stageMoves.takeFirst();								//Remove the stageMove from the list.
+		PetStage *nextStage = stageMoves.takeFirst();							//Remove the stageMove from the list.
 		Move currentMove = Expectiminimax(nextStage, depth, (turnIndex+1)%3);	//Set currentMove to call our Expectiminimax again.
 		(*iter).SetHeuristic(currentMove.GetHeuristic());						//Set the heuristic of the move in the nextMoves list.
 		delete (nextStage);														//Delete the stageMove we removed from the list earlier.

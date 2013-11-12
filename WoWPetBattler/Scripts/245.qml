@@ -53,7 +53,7 @@ Item
     }
 
     //Grants the pet any special statuses the ability has.
-    function preuseAbility(teamIndex)
+    function preUseAbility(teamIndex)
     {
 
     }

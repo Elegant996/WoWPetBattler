@@ -53,7 +53,7 @@ WoWPetBattler::WoWPetBattler(QWidget *parent)
 	petStage->GetTeam(2)->GetPet(3)->AddAbility(true, 1, 0);
 
 	petStage->GetTeam(1)->SetActivePet(1);
-	petStage->GetTeam(2)->SetActivePet(1);
+	petStage->GetTeam(2)->SetActivePet(2);
 }
 
 //Destructor
@@ -104,24 +104,25 @@ void WoWPetBattler::on_playButton_clicked()
 
 	Move testMove;
 	testMove = ai->Expectiminimax(petStage, 1, 1);
-	qDebug() << "Done.";
+	qDebug() << "Move: " + QString::number(testMove.GetAction());
+	qDebug() << "Heuristic: " + QString::number(testMove.GetHeuristic());
 
 	/*QQmlContext *objectContext = new QQmlContext(engine.rootContext());
 	objectContext->setContextProperty("petStage", petStage);	
 
-	QQmlComponent component(&engine, QUrl::fromLocalFile("Scripts/564.qml"));
+	QQmlComponent component(&engine, QUrl::fromLocalFile("Scripts/466.qml"));
 	QObject *object = component.create(objectContext);
 
 	if (component.status() == 3)
 		while (!component.errors().isEmpty())
 			qDebug() << component.errors().takeFirst().toString();
 
-	qDebug() << petStage->GetTeam(2)->GetActivePet()->GetHealth();
+	qDebug() << petStage->GetTeam(2)->GetPet(1)->GetHealth();
 
-	QMetaObject::invokeMethod(object, "useAbility", Q_ARG(QVariant, 1), Q_ARG(QVariant, 2), Q_ARG(QVariant, true), Q_ARG(QVariant, false),
+	QMetaObject::invokeMethod(object, "useAbility", Q_ARG(QVariant, 1), Q_ARG(QVariant, 1), Q_ARG(QVariant, true), Q_ARG(QVariant, false),
 								Q_ARG(QVariant, true), Q_ARG(QVariant, false), Q_ARG(QVariant, false));
 
-	qDebug() << petStage->GetTeam(2)->GetActivePet()->GetHealth();
+	qDebug() << petStage->GetTeam(2)->GetPet(1)->GetHealth();
 
 	delete object;
 
