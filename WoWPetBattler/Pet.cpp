@@ -13,6 +13,10 @@ Pet::Pet()
 	this->baseHealth = 0;
 	this->basePower = 0;
 	this->baseSpeed = 0;
+	this->normalMaxHealth = 0;
+	this->normalPower = 0;
+	this->normalSpeed = 0;
+	this->lastKnownHealth = 0;
 	this->currentHealth = 0;
 	this->currentMaxHealth = 0;
 	this->currentPower = 0;
