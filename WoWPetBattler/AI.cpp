@@ -230,7 +230,7 @@ Move AI::SelectAction(PetStage *stageNode, quint8 depth, quint8 turnIndex)
 			//Swap to each pet that is still able to battle.
 			for (quint8 i=1; i < stageNode->GetTeam(turnIndex)->GetNumPets()+1; i+=1)
 				//Ignore same index an dead pets.
-				if (stageNode->GetTeam(turnIndex)->GetActivePetIndex() != i || !stageNode->GetTeam(turnIndex)->GetPet(i)->IsDead())
+				if (stageNode->GetTeam(turnIndex)->GetActivePetIndex() != i && !stageNode->GetTeam(turnIndex)->GetPet(i)->IsDead())
 				{
 					//Copy the node and add it to the list.
 					PetStage *actionNode = new PetStage(*stageNode);
