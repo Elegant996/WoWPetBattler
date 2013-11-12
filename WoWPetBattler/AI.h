@@ -39,6 +39,8 @@ private:
 	float ActionOutcomes(PetStage*, quint8, quint8, bool);
 	float UseAction(PetStage*, quint8, quint8, bool, float, float, float, float, bool, bool, bool, bool);
 	float EndTurn(PetStage*, quint8);
+
+	bool CanAttack(Pet*);
 	QList<PetStage*> IsPetDead(PetStage*, quint8);
 
 	PetStage *petStage;

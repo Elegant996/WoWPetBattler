@@ -3,7 +3,7 @@
 //Checks the damage dealt.
 void PetHelper::CheckDamage(PetStage *petStage, quint8 teamIndex, quint8 petIndex, quint16 damage, bool mainAttack, bool useLightning)
 {
-	Pet *curPet = petStage->GetTeam(teamIndex)->GetPet(petIndex);
+	Pet *currentPet = petStage->GetTeam(teamIndex)->GetPet(petIndex);
 	quint16 totalDamage = damage;
 
 	//Special exception is the use of Lightning Storm weather effect.
@@ -12,30 +12,30 @@ void PetHelper::CheckDamage(PetStage *petStage, quint8 teamIndex, quint8 petInde
 		totalDamage += 2 + petStage->GetTeam(0)->GetPet(0)->GetAura(1)->GetPower() * 0.10;
 
 	//Use Magic racial if applicable.
-	if (curPet->GetType() == PetType::Magic && totalDamage > (int)(curPet->GetMaxHealth() * 0.35))
+	if (currentPet->GetType() == PetType::Magic && totalDamage > (int)(currentPet->GetMaxHealth() * 0.35))
 		//Check if health is greater than 35%.
-		if (curPet->GetHealthPercentage() > 0.35)
-			curPet->SetHealth(curPet->GetHealth() - curPet->GetMaxHealth() * 0.35);
+		if (currentPet->GetHealthPercentage() > 0.35)
+			currentPet->SetHealth(currentPet->GetHealth() - currentPet->GetMaxHealth() * 0.35);
 		else
 		{	//Set health to 0 and check racial procs for attacking team.
-			curPet->SetHealth(0);
-			CheckRacials(curPet);
+			currentPet->SetHealth(0);
+			CheckRacials(currentPet);
 		}
 	else
 	{
 		//Check if the pet can sustain the hit.
-		if (curPet->GetHealth() - totalDamage > 0)
-			curPet->SetHealth(curPet->GetHealth() - totalDamage);
+		if (currentPet->GetHealth() - totalDamage > 0)
+			currentPet->SetHealth(currentPet->GetHealth() - totalDamage);
 		else
 		{	//Pet can't sustain the hit, set health to 0 and check racials.
-			curPet->SetHealth(0);
-			CheckRacials(curPet);
+			currentPet->SetHealth(0);
+			CheckRacials(currentPet);
 		}
 	}
 
 	//Special exception; pet is unkillable but health hits 0.
-	if (curPet->HasStatus(Pet::Unkillable) && curPet->IsDead())
-		curPet->SetHealth(1);
+	if (currentPet->HasStatus(Pet::Unkillable) && currentPet->IsDead())
+		currentPet->SetHealth(1);
 
 	//Check if this is the main attack.
 	if (mainAttack)
@@ -48,76 +48,76 @@ void PetHelper::CheckDamage(PetStage *petStage, quint8 teamIndex, quint8 petInde
 //Check the healing done.
 void PetHelper::CheckHealing(PetStage *petStage, quint8 teamIndex, quint8 petIndex, quint16 healing, bool mainAttack)
 {
-	Pet *curPet = petStage->GetTeam(teamIndex)->GetPet(petIndex);
+	Pet *currentPet = petStage->GetTeam(teamIndex)->GetPet(petIndex);
 
-	if (curPet->GetHealth() + healing > curPet->GetMaxHealth())
-		curPet->SetHealth(curPet->GetMaxHealth());
+	if (currentPet->GetHealth() + healing > currentPet->GetMaxHealth())
+		currentPet->SetHealth(currentPet->GetMaxHealth());
 	else
-		curPet->SetHealth(curPet->GetHealth() + healing);
+		currentPet->SetHealth(currentPet->GetHealth() + healing);
 }
 
 //Checks whether the Dragonkin racial should proc.
 void PetHelper::CheckRacialsProc(PetStage *petStage, quint8 teamIndex)
 {
-	Pet *curPet = petStage->GetTeam(teamIndex)->GetActivePet();
+	Pet *currentPet = petStage->GetTeam(teamIndex)->GetActivePet();
 
 	//Check if active pet is Dragonkin type and has brought the other team's pet below 50%.
-	if (curPet->GetType() == PetType::Dragonkin
+	if (currentPet->GetType() == PetType::Dragonkin
                 && petStage->GetTeam((teamIndex%2)+1)->GetActivePet()->GetHealthPercentage() < 0.50
-                && !curPet->RacialUsed())
+                && !currentPet->RacialUsed())
 	{
-		curPet->RacialUsed(true);			//Racial now used.
-		curPet->AddAura(245, 1, true);		//Will replace persisting racial.
+		currentPet->RacialUsed(true);			//Racial now used.
+		currentPet->AddAura(245, 1, true);		//Will replace persisting racial.
     }
 }
 
 //Called by everything else to handle racial effects.
-void PetHelper::CheckRacials(Pet *curPet)
+void PetHelper::CheckRacials(Pet *currentPet)
 {
 	//Check if active pet is Flying type is now below 50% and racial is active.
-	if (curPet->GetType() == PetType::Flying)
+	if (currentPet->GetType() == PetType::Flying)
 	{
-		if (curPet->GetHealthPercentage() > 0.50 && !curPet->RacialUsed())
+		if (currentPet->GetHealthPercentage() > 0.50 && !currentPet->RacialUsed())
 		{
-			curPet->SetSpeed(curPet->GetSpeed() * 1.5);
-			curPet->RacialUsed(true);
+			currentPet->SetSpeed(currentPet->GetSpeed() * 1.5);
+			currentPet->RacialUsed(true);
 		}
-		else if (curPet->GetHealthPercentage() <= 0.50 && curPet->RacialUsed())
+		else if (currentPet->GetHealthPercentage() <= 0.50 && currentPet->RacialUsed())
 		{
-			curPet->SetSpeed(curPet->GetSpeed() / 1.5);
-			curPet->RacialUsed(false);
+			currentPet->SetSpeed(currentPet->GetSpeed() / 1.5);
+			currentPet->RacialUsed(false);
 		}
 	}
 	//Check if active pet is Beast type and is now above/below 25% health and racial is active/inactive.
-	else if (curPet->GetType() == PetType::Beast)
+	else if (currentPet->GetType() == PetType::Beast)
 	{
 		//Disable the racial.
-		if (curPet->GetHealthPercentage() >= 0.50 && curPet->RacialUsed())
+		if (currentPet->GetHealthPercentage() >= 0.50 && currentPet->RacialUsed())
 		{
-			curPet->SetDamageModifier(curPet->GetDamageModifier() / 1.25);
-			curPet->RacialUsed(false);
+			currentPet->SetDamageModifier(currentPet->GetDamageModifier() / 1.25);
+			currentPet->RacialUsed(false);
 		}
-		else if (curPet->GetHealthPercentage() < 0.50	&& !curPet->RacialUsed())
+		else if (currentPet->GetHealthPercentage() < 0.50	&& !currentPet->RacialUsed())
 		{
-			curPet->SetDamageModifier(curPet->GetDamageModifier() * 1.25);
-			curPet->RacialUsed(true);
+			currentPet->SetDamageModifier(currentPet->GetDamageModifier() * 1.25);
+			currentPet->RacialUsed(true);
 		}
 	}
 	//Check if active pet is Undead type and has just died.
-	else if (curPet->IsDead())
+	else if (currentPet->IsDead())
 	{
-		if (curPet->GetType() == PetType::Undead && !curPet->RacialUsed())
+		if (currentPet->GetType() == PetType::Undead && !currentPet->RacialUsed())
 		{
-			curPet->SetHealth(1);						//Ensures pet is alive.
-			curPet->RacialUsed(true);					//Racial now used.
-			curPet->AddStatus(Pet::Unkillable);			//Pet can't die.
-			curPet->AddAura(242, 1, true);				//Will replace persisting racial.
+			currentPet->SetHealth(1);						//Ensures pet is alive.
+			currentPet->RacialUsed(true);					//Racial now used.
+			currentPet->AddStatus(Pet::Unkillable);			//Pet can't die.
+			currentPet->AddAura(242, 1, true);				//Will replace persisting racial.
 		}
-		else if (curPet->GetType() == PetType::Mechanical)
+		else if (currentPet->GetType() == PetType::Mechanical)
 		{
-			curPet->SetHealth(curPet->GetMaxHealth() * 0.20);	//Set pet's new health value.
-			curPet->RacialUsed(true);							//Racial now used.
-			curPet->AddAura(244, 1, true);						//Will replace persisting racial.
+			currentPet->SetHealth(currentPet->GetMaxHealth() * 0.20);	//Set pet's new health value.
+			currentPet->RacialUsed(true);							//Racial now used.
+			currentPet->AddAura(244, 1, true);						//Will replace persisting racial.
 		}
 	}
 }
@@ -163,21 +163,4 @@ float PetHelper::CheckWeatherBonus(PetStage *petStage, PetType::Type petType)
 		return 0.25;
 	else
 		return 0;
-}
-
-//Returns whether or not the pet can attack.
-bool PetHelper::CanAttack(Pet* curPet)
-{
-	//Pet is asleep, can't attack.
-	if (curPet->HasStatus(Pet::Asleep))
-		return false;
-	//Pet is Polymorphed, can't attack.
-	else if (curPet->HasStatus(Pet::Polymorphed))
-		return false;
-	//Pet is Stunned can't attack.
-	else if (curPet->HasStatus(Pet::Stunned))
-		return false;
-	//Pet can attack.
-	else
-		return true;
 }
