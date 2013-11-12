@@ -253,7 +253,7 @@ Move AI::SelectAction(PetStage *stageNode, quint8 depth, quint8 turnIndex)
 
 		//Set the action and add the move to the list.
 		Move nextMove;
-		nextMove.SetAction(PetAction::Action::Pass);
+		nextMove.SetAction(PetAction::Pass);
 		nextMoves.append(nextMove);
 	}
 

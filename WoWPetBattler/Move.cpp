@@ -15,7 +15,7 @@ Move::~Move(void)
 //Copy Constructor
 Move::Move(const Move& other)
 {
-	this->action = PetAction::None;
+	this->action = other.action;
 	this->heuristic = other.heuristic;
 }
 

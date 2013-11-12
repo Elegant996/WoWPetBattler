@@ -53,7 +53,7 @@ WoWPetBattler::WoWPetBattler(QWidget *parent)
 	petStage->GetTeam(2)->GetPet(3)->AddAbility(true, 1, 0);
 
 	petStage->GetTeam(1)->SetActivePet(1);
-	petStage->GetTeam(2)->SetActivePet(2);
+	petStage->GetTeam(2)->SetActivePet(1);
 }
 
 //Destructor
