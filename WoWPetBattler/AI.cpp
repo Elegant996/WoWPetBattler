@@ -194,9 +194,7 @@ Move AI::SelectAction(PetStage *stageNode, quint8 depth, quint8 turnIndex)
 	else	//There is no active ability, use selection process.
 	{
 		//Check to see if we can select an ability for the current round.
-		if (!stageNode->GetTeam(turnIndex)->GetActivePet()->HasStatus(Pet::Asleep)
-				&& !stageNode->GetTeam(turnIndex)->GetActivePet()->HasStatus(Pet::Polymorphed)
-				&& !stageNode->GetTeam(turnIndex)->GetActivePet()->HasStatus(Pet::Stunned))
+		if (PetHelper::CanAttack(stageNode->GetTeam(turnIndex)->GetActivePet()))
 			for (quint8 i=1; i < stageNode->GetTeam(turnIndex)->GetActivePet()->GetNumAbilities()+1; i+=1)
 				//Use the ability if it is off cooldown.
 				if (stageNode->GetTeam(turnIndex)->GetActivePet()->GetAbility(i)->GetCooldown() == 0)
@@ -361,8 +359,23 @@ float AI::ActionOutcomes(PetStage *stageNode, quint8 depth, quint8 currentTeam, 
 			&& stageNode->GetTeam(currentTeam)->GetActivePet()->GetCurrentAction()->GetAction() < 7)		
 	{
 		PetStage *currentStage = new PetStage(*stageNode);
-		currentStage->GetTeam(currentTeam)->SetActivePet(currentStage->GetTeam(currentTeam)->GetActivePet()->GetCurrentAction()->GetAction());
-		//TODO: Call other teams move.
+		quint8 tempAction = currentStage->GetTeam(currentTeam)->GetActivePet()->GetCurrentAction()->GetAction() - 3;
+
+		//Empty the pet's current action.
+		currentStage->GetTeam(currentTeam)->GetActivePet()->GetCurrentAction()->SetAction(PetAction::None);
+		currentStage->GetTeam(currentTeam)->GetActivePet()->GetCurrentAction()->SetRoundsRemaining(0);
+
+		//Change to the designated pet.
+		currentStage->GetTeam(currentTeam)->SetActivePet(tempAction);
+
+		//Call other teams move or end turn.
+		if (firstCall)
+			heuristic += ActionOutcomes(currentStage, depth, (currentTeam%2)+1, !firstCall);
+		else
+			heuristic += EndTurn(currentStage, depth);
+
+		//Clean up.
+		delete currentStage;
 	}
 	//Normal ability usage.
 	else if (stageNode->GetTeam(currentTeam)->GetActivePet()->GetCurrentAction()->GetAction() > 0
@@ -380,7 +393,7 @@ float AI::ActionOutcomes(PetStage *stageNode, quint8 depth, quint8 currentTeam, 
 		//Set variables to be used.
 		quint16 abilityId = stageNode->GetTeam(currentTeam)->GetActivePet()->GetAbility(stageNode->GetTeam(currentTeam)->GetActivePet()->GetCurrentAction()->GetAction())->GetAbilityId();
 		float avoidanceRating, accuracyRating, criticalRating, chanceOnHitRating;
-		QVariant variantAvoidanceRating, variantAccuracyRating, variantCriticalRating, variantChanceOnHitRating;
+		QVariant variantAccuracyRating, variantCriticalRating, variantChanceOnHitRating;
 
 		//Set script.
 		objectContext->setContextProperty("petStage", stageNode);

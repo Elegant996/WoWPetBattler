@@ -33,6 +33,10 @@ void PetHelper::CheckDamage(PetStage *petStage, quint8 teamIndex, quint8 petInde
 		}
 	}
 
+	//Special exception; pet is unkillable but health hits 0.
+	if (curPet->HasStatus(Pet::Unkillable) && curPet->IsDead())
+		curPet->SetHealth(1);
+
 	//Check if this is the main attack.
 	if (mainAttack)
 	{	//Check to see if racials have proc'd and set attack to true.
@@ -159,4 +163,21 @@ float PetHelper::CheckWeatherBonus(PetStage *petStage, PetType::Type petType)
 		return 0.25;
 	else
 		return 0;
+}
+
+//Returns whether or not the pet can attack.
+bool PetHelper::CanAttack(Pet* curPet)
+{
+	//Pet is asleep, can't attack.
+	if (curPet->HasStatus(Pet::Asleep))
+		return false;
+	//Pet is Polymorphed, can't attack.
+	else if (curPet->HasStatus(Pet::Polymorphed))
+		return false;
+	//Pet is Stunned can't attack.
+	else if (curPet->HasStatus(Pet::Stunned))
+		return false;
+	//Pet can attack.
+	else
+		return true;
 }
