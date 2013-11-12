@@ -16,7 +16,7 @@ WoWPetBattler::WoWPetBattler(QWidget *parent)
 	connect(interpreter, SIGNAL(OutputToGUI(QString)), this, SLOT(Output("", QString)));
 	connect(interpreter, SIGNAL(Stop(QString)), this, SLOT(Stop(QString)));
 
-	this->ai = new AI(petStage);
+	this->ai = new AI(petStage, &WoWWindow);
 	this->ai->moveToThread(interpreter);
 	connect(ai, SIGNAL(OutputToGUI(QString, QString)), this, SLOT(Output(QString, QString)));
 	connect(ai, SIGNAL(OutputToGUI(QString)), this, SLOT(Output("", QString)));

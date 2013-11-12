@@ -1,6 +1,10 @@
 #ifndef AI_H
 #define AI_H
 
+#define NOMINMAX
+#define WIN32_LEAN_AND_MEAN
+#include <Windows.h>
+
 #include <QtQml>
 #include <QObject>
 #include <QDebug>
@@ -17,7 +21,7 @@ class AI :
     Q_OBJECT
 
 public:
-	AI(PetStage*);
+	AI(PetStage*, Robot::Window*);
 	~AI(void);
 
 	void QueueUp();
@@ -44,6 +48,7 @@ private:
 	QList<PetStage*> IsPetDead(PetStage*, quint8);
 
 	PetStage *petStage;
+	Robot::Window *window;
 	Robot::Keyboard keyboard;
 
 	QQmlEngine *engine;
@@ -52,6 +57,8 @@ private:
 	QObject *object;
 
 	bool tieBreaker;
+
+	int totalCalls;
 };
 
 #endif

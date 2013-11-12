@@ -1,10 +1,10 @@
 #include "AI.h"
 
 //Constructor
-AI::AI(PetStage *petStage)
+AI::AI(PetStage *petStage, Robot::Window *window)
 {
-	//Set stage.
-	this->petStage = petStage;
+	this->petStage = petStage;	//Set stage.
+	this->window = window;		//Set the window.
 
 	qmlRegisterType<PetStage>();
 	qmlRegisterType<PetTeam>();
@@ -21,6 +21,8 @@ AI::AI(PetStage *petStage)
 	this->component = new QQmlComponent(engine);
 
 	this->tieBreaker = false;		//Used to decide if more nodes should be created.
+
+	this-> totalCalls = 0;
 }
 
 //Destructor
@@ -48,14 +50,16 @@ void AI::AcceptQueue()
 //Begin AI simulation and respond with best move.
 void AI::Run()
 {
-	//PostMessage((HWND)window->GetHandle(), 
+	//Keyboard::Compile (Keyboard::CmdClick, "+hello+world", myList)
+	PostMessage((HWND)(*window).GetHandle(), WM_KEYDOWN, Robot::KeyA, NULL);
+	PostMessage((HWND)(*window).GetHandle(), WM_KEYUP, Robot::KeyA, NULL);
 	//keyboard.AutoDelay = (5, 10);
-	if (petStage->SelectAbility())
+	/*if (petStage->SelectAbility())
 		qDebug() << "Select Ability";
 	else if (petStage->SelectPet() && petStage->Initialized())
 		qDebug() << "Select Pet";
 	else if (petStage->SelectPet() && !petStage->Initialized())
-		qDebug() << "F1";
+		qDebug() << "F1";*/
 		//keyboard.Click("F1");	//Select First Pet
 }
 
@@ -68,6 +72,9 @@ Move AI::Expectiminimax(PetStage* petStage, quint8 depth, quint8 turnIndex)
 	if (depth == 0 || stageNode->IsMatchOver())
 	{
 		float score = 0.00;	//Default score.
+
+		totalCalls++;
+		qDebug() << totalCalls;
 
 		/*Use health values to calculate score of the node.
 		Note: 52 = 5 * 1.3 * 8 (where 8 is assumed to be the average health base of pets)
@@ -341,27 +348,8 @@ float AI::ActionOutcomes(PetStage *stageNode, quint8 depth, quint8 currentTeam, 
 	float heuristic = 0.00;									//Used for holding heuristic.
 	PetStage *currentStage = new PetStage(*stageNode);		//Clone the stage.
 
-	//Pet swap occuring.
-	if (currentStage->GetTeam(currentTeam)->GetActivePet()->GetCurrentAction()->GetAction() > 3
-			&& currentStage->GetTeam(currentTeam)->GetActivePet()->GetCurrentAction()->GetAction() < 7)		
-	{
-		quint8 tempAction = currentStage->GetTeam(currentTeam)->GetActivePet()->GetCurrentAction()->GetAction() - 3;
-
-		//Empty the pet's current action.
-		currentStage->GetTeam(currentTeam)->GetActivePet()->GetCurrentAction()->SetAction(PetAction::None);
-		currentStage->GetTeam(currentTeam)->GetActivePet()->GetCurrentAction()->SetRoundsRemaining(0);
-
-		//Change to the designated pet.
-		currentStage->GetTeam(currentTeam)->SetActivePet(tempAction);
-
-		//Call other teams move or end turn.
-		if (firstCall)
-			heuristic += ActionOutcomes(currentStage, depth, (currentTeam%2)+1, !firstCall);
-		else
-			heuristic += EndTurn(currentStage, depth);
-	}
 	//Normal ability usage.
-	else if (currentStage->GetTeam(currentTeam)->GetActivePet()->GetCurrentAction()->GetAction() > 0
+	if (currentStage->GetTeam(currentTeam)->GetActivePet()->GetCurrentAction()->GetAction() > 0
 			&& currentStage->GetTeam(currentTeam)->GetActivePet()->GetCurrentAction()->GetAction() < 4)
 	{
 		//Put the ability on cooldown.
@@ -611,6 +599,25 @@ float AI::ActionOutcomes(PetStage *stageNode, quint8 depth, quint8 currentTeam, 
 			}
 		}
 	}
+	//Pet swap occuring.
+	else if (currentStage->GetTeam(currentTeam)->GetActivePet()->GetCurrentAction()->GetAction() > 3
+			&& currentStage->GetTeam(currentTeam)->GetActivePet()->GetCurrentAction()->GetAction() < 7)		
+	{
+		quint8 tempAction = currentStage->GetTeam(currentTeam)->GetActivePet()->GetCurrentAction()->GetAction() - 3;
+
+		//Empty the pet's current action.
+		currentStage->GetTeam(currentTeam)->GetActivePet()->GetCurrentAction()->SetAction(PetAction::None);
+		currentStage->GetTeam(currentTeam)->GetActivePet()->GetCurrentAction()->SetRoundsRemaining(0);
+
+		//Change to the designated pet.
+		currentStage->GetTeam(currentTeam)->SetActivePet(tempAction);
+
+		//Call other teams move or end turn.
+		if (firstCall)
+			heuristic += ActionOutcomes(currentStage, depth, (currentTeam%2)+1, !firstCall);
+		else
+			heuristic += EndTurn(currentStage, depth);
+	}
 	//We are either passing or do not have a move.
 	else
 	{
@@ -651,16 +658,36 @@ float AI::UseAction(PetStage* stageNode, quint8 depth, quint8 currentTeam, bool 
 	//Convert QVariant for number of hits.
 	numHits = variantNumHits.toFloat();
 
-	QList<PetStage*> possibleStages = IsPetDead(outcome, (currentTeam%2)+1);	//Get the possible outcomes if a pet has died.
-	float possibleStagesSize = possibleStages.size();							//Get the initial side of the list for heuristic purposes.
+	//Check to see if an active pet is dead.
+	QList<PetStage*> possibleStages, tempStages;
+	tempStages = IsPetDead(outcome, 1);						//Get the possible outcomes if a pet has died.
+	float possibleStagesSize;
 	
-	//Process each possible outcome..
+	//Process each possible outcome of if our team's active pet died and check if the opponent's team has a dead active pet as well.
+	while (!tempStages.isEmpty())
+	{
+		//Take the first stage in the list.
+		PetStage *curTempStage = tempStages.takeFirst();
+
+		//Check to see if both pets have died and both teams possible outcomes.
+		possibleStages.append(IsPetDead(curTempStage, 2));
+
+		//Delete the stage after it's been used.
+		delete curTempStage;
+	}
+
+	tempStages.clear();		//Clear the list.
+
+	//Process each possible stage.
+	possibleStagesSize = possibleStages.size();
 	while (!possibleStages.isEmpty())
 	{
+		//Take the first stage in the list.
 		PetStage *curPossibleStage = possibleStages.takeFirst();
+
 		//If it is the first time this function was called we must still process the other team's action.
 		if (firstCall)
-			//If there is more than one option divide by the size (max 2 pets to choose from).
+			//If there is more than one option divide by the size.
 			heuristic += avoidanceRating * hitRating * critRating * ActionOutcomes(curPossibleStage, depth, (currentTeam%2)+1, false) / possibleStagesSize;
 		else
 			heuristic += avoidanceRating * hitRating * critRating * EndTurn(curPossibleStage, depth) / possibleStagesSize;
@@ -740,6 +767,8 @@ float AI::EndTurn(PetStage* stageNode, quint8 depth)
 		//Delete the stage after it's been used.
 		delete curPossibleStage;
 	}
+
+	possibleStages.clear();		//Clear the list.
 
 	//Return heuristic.
 	return heuristic;
