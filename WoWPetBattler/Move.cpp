@@ -4,7 +4,7 @@
 Move::Move()
 {
 	this->action = PetAction::None;
-	this->heuristic = heuristic;
+	this->heuristic = 0;
 }
 
 //Destructor

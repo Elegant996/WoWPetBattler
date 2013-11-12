@@ -104,6 +104,7 @@ void WoWPetBattler::on_playButton_clicked()
 
 	Move testMove;
 	testMove = ai->Expectiminimax(petStage, 1, 1);
+	qDebug() << "Done.";
 
 	/*QQmlContext *objectContext = new QQmlContext(engine.rootContext());
 	objectContext->setContextProperty("petStage", petStage);	
@@ -113,7 +114,7 @@ void WoWPetBattler::on_playButton_clicked()
 
 	if (component.status() == 3)
 		while (!component.errors().isEmpty())
-			qDebug() << component.errors().takeAt(0).toString();
+			qDebug() << component.errors().takeFirst().toString();
 
 	qDebug() << petStage->GetTeam(2)->GetActivePet()->GetHealth();
 

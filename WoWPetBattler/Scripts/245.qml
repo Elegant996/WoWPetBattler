@@ -36,7 +36,7 @@ Item
     function applyAuraStart(teamIndex, petIndex, auraIndex, duration)
     {
         if (duration == 1)
-            petStage.GetTeam(curTeam).GetPet(petIndex).DamageModifier += 0.50;
+            petStage.GetTeam(teamIndex).GetPet(petIndex).DamageModifier += 0.50;
     }
 
     //Applies the aura effect to the active pet.

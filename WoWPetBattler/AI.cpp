@@ -259,9 +259,9 @@ Move AI::SelectAction(PetStage *stageNode, quint8 depth, quint8 turnIndex)
 
 	//Set the action for each move.
 	QList<Move>::iterator iter = nextMoves.begin();
-	while (stageMoves.isEmpty())
+	while (!stageMoves.isEmpty())
 	{
-		PetStage *nextStage = stageMoves.takeAt(0);								//Remove the stageMove from the list.
+		PetStage *nextStage = stageMoves.takeFirst();								//Remove the stageMove from the list.
 		Move currentMove = Expectiminimax(nextStage, depth, (turnIndex+1)%3);	//Set currentMove to call our Expectiminimax again.
 		(*iter).SetHeuristic(currentMove.GetHeuristic());						//Set the heuristic of the move in the nextMoves list.
 		delete (nextStage);														//Delete the stageMove we removed from the list earlier.
@@ -271,20 +271,26 @@ Move AI::SelectAction(PetStage *stageNode, quint8 depth, quint8 turnIndex)
 	//Empty stageMoves QList.
 	stageMoves.clear();
 
-	//Re-use iterator.
-	iter = nextMoves.begin();
-	Move desiredMove = (*iter);
+	//Take first move as desired move initially.
+	Move desiredMove, tempMove;
+	desiredMove = nextMoves.takeFirst();
 
 	//Maximize.
 	if (turnIndex == 1)
-		for (iter; iter != nextMoves.end(); ++iter)
-			if ((*iter).GetHeuristic() > desiredMove.GetHeuristic())
-				desiredMove = (*iter);
+		while (!nextMoves.isEmpty())
+		{
+			tempMove = nextMoves.takeFirst();
+			if (tempMove.GetHeuristic() > desiredMove.GetHeuristic())
+				desiredMove = tempMove;
+		}
 	//Minimize.
 	else	//turnIndex == 2;
-		for (iter; iter != nextMoves.end(); ++iter)
-			if ((*iter).GetHeuristic() < desiredMove.GetHeuristic())
-				desiredMove = (*iter);
+		while (!nextMoves.isEmpty())
+		{
+			tempMove = nextMoves.takeFirst();
+			if (tempMove.GetHeuristic() < desiredMove.GetHeuristic())
+				desiredMove = tempMove;
+		}
 
 	//Empty the nextMoves QList.
 	nextMoves.clear();
@@ -681,7 +687,7 @@ float AI::UseAction(PetStage* stageNode, quint8 depth, quint8 currentTeam, bool 
 					heuristic += avoidanceRating * hitRating * critRating * ActionOutcomes(substituteStages.at(i), depth, (currentTeam%2)+1, false) / tempSize;
 				else
 					heuristic += avoidanceRating * hitRating * critRating * EndTurn(outcome, depth);
-				delete (substituteStages.takeAt(0));
+				delete (substituteStages.takeFirst());
 			}
 			substituteStages.clear();
 		}
@@ -812,7 +818,7 @@ float AI::EndTurn(PetStage* stageNode, quint8 depth)
 			//Add the heuristic to our return value.
 			heuristic += nextTurn.GetHeuristic() / tempSize;
 
-			delete (substituteStages.takeAt(0));
+			delete (substituteStages.takeFirst());
 		}
 		substituteStages.clear();
 	}

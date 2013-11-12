@@ -65,6 +65,8 @@ Item
         var baseHealing = 30;
         var attackType = PetType.Critter;
         var normalHealing = Math.round(baseHealing + petStage.GetTeam(teamIndex).ActivePet.Power * scaleFactor);
+        var healing = Math.round((normalHealing + petStage.GetTeam(teamIndex).ActivePet.BonusHealing)
+                        * petStage.GetTeam(teamIndex).ActivePet.HealingModifier);
 
         petHelper.CheckHealing(petStage, teamIndex, petStage.GetTeam(teamIndex).ActivePetIndex, healing, true);
 

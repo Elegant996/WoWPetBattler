@@ -79,11 +79,11 @@ Pet::~Pet(void)
 	this->petStatuses.clear();
 
 	while (!this->petAbilities.isEmpty())
-		delete (this->petAbilities.takeAt(0));
+		delete (this->petAbilities.takeFirst());
 	this->petAbilities.clear();
 
 	while (!this->petAuras.isEmpty())
-		delete (this->petAuras.takeAt(0));
+		delete (this->petAuras.takeFirst());
 	this->petAuras.clear();
 }
 

@@ -35,10 +35,10 @@ Item
     //Apply the aura's effect at the start of the turn.
     function applyAuraStart(teamIndex, petIndex, auraIndex, duration)
     {
-        if (petStage.GetTeam(curTeam).GetPet(petIndex).Health < 0.50)
+        if (petStage.GetTeam(teamIndex).GetPet(petIndex).Health < 0.50)
         {
-            petStage.GetTeam(curTeam).GetPet(petIndex).DamageModifier += 0.25;
-            petStage.GetTeam(curTeam).GetPet(petIndex).RacialUsed = true;
+            petStage.GetTeam(teamIndex).GetPet(petIndex).DamageModifier += 0.25;
+            petStage.GetTeam(teamIndex).GetPet(petIndex).RacialUsed = true;
         }
     }
 

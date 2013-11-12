@@ -51,7 +51,7 @@ Item
         if (duration == 1 && !petStage.GetTeam(teamIndex).GetPet(petIndex).GetAura(auraIndex).IsFresh)
         {
             petStage.GetTeam(teamIndex).GetPet(petIndex).GetAura(auraIndex).UpdateAura(-1, false);
-            petStage.GetTeam(curTeam).GetPet(petIndex).Health = 0;
+            petStage.GetTeam(teamIndex).GetPet(petIndex).Health = 0;
         }
     }
 

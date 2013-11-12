@@ -25,7 +25,7 @@ PetStage::PetStage(void)
 PetStage::~PetStage(void)
 {
 	while (!this->petTeams.isEmpty())
-		delete (this->petTeams.takeAt(0));
+		delete (this->petTeams.takeFirst());
 	this->petTeams.clear();
 }
 

@@ -48,9 +48,9 @@ Item
     function applyAuraEnd(teamIndex, petIndex, auraIndex, duration)
     {
         //If the pet attacked this round increase it health.
-        if (petStage.GetTeam(curTeam).GetTeam(petIndex).AttackedThisRound)
-            petStage.GetTeam(curTeam).GetTeam(petIndex).Health += petStage.GetTeam(curTeam).GetTeam(petIndex).Health
-                    * petStage.GetTeam(curTeam).GetTeam(petIndex).HealingModifier * 0.04;
+        if (petStage.GetTeam(teamIndex).GetPet(petIndex).AttackedThisRound)
+            petStage.GetTeam(teamIndex).GetPet(petIndex).Health += petStage.GetTeam(teamIndex).GetPet(petIndex).Health
+                    * petStage.GetTeam(teamIndex).GetPet(petIndex).HealingModifier * 0.04;
     }
 
     //Grants the pet any special statuses the ability has.

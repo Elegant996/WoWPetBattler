@@ -12,7 +12,7 @@ PetTeam::PetTeam(void)
 PetTeam::~PetTeam(void)
 {
 	while (!this->pets.isEmpty())
-		delete (this->pets.takeAt(0));
+		delete (this->pets.takeFirst());
 	this->pets.clear();
 }
 
