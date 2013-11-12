@@ -90,14 +90,14 @@ Move AI::Expectiminimax(PetStage* stageNode, quint8 depth, quint8 turnIndex)
 			objectContext->setContextProperty("petStage", stageNode);	
 			component->loadUrl(QUrl::fromLocalFile("Scripts/" + QString::number(stageNode->GetTeam(0)->GetPet(0)->GetAura(i)->GetAuraId()) + ".qml"));
 			//Catch any exceptions and report them.
-			if (component->status() == 3)
+			if (component->status() != QQmlComponent::Ready)
 				emit OutputToGUI(component->errorString());
 			object = component->create(objectContext);
 			//Call ApplyAuraStart; paramters are TeamNumber, PetNumber, AuraIndex and AuraDuration.
 			QMetaObject::invokeMethod(object, "applyAuraStart", Q_ARG(QVariant, 0), Q_ARG(QVariant, 0), Q_ARG(QVariant, 1),
 										Q_ARG(QVariant, stageNode->GetTeam(0)->GetPet(0)->GetAura(i)->GetDuration()));
 			//Catch any exceptions and report them.
-			if (component->status() == 3)
+			if (component->status() != QQmlComponent::Ready)
 				emit OutputToGUI(component->errorString());
 		}
 
@@ -145,14 +145,14 @@ Move AI::SelectAction(PetStage *stageNode, quint8 depth, quint8 turnIndex)
 			objectContext->setContextProperty("petStage", stageNode);	
 			component->loadUrl(QUrl::fromLocalFile("Scripts/" + QString::number(stageNode->GetTeam(turnIndex)->GetPet(i)->GetAura(j)->GetAuraId()) + ".qml"));
 			//Catch any exceptions and report them.
-			if (component->status() == 3)
+			if (component->status() != QQmlComponent::Ready)
 				emit OutputToGUI(component->errorString());
 			object = component->create(objectContext);
 			//Call ApplyAuraStart; paramters are TeamNumber, PetNumber, AuraIndex and AuraDuration.
 			QMetaObject::invokeMethod(object, "applyAuraStart", Q_ARG(QVariant, turnIndex), Q_ARG(QVariant, i), Q_ARG(QVariant, j),
 										Q_ARG(QVariant, stageNode->GetTeam(turnIndex)->GetPet(i)->GetAura(j)->GetDuration()));
 			//Catch any exceptions and report them.
-			if (component->status() == 3)
+			if (component->status() != QQmlComponent::Ready)
 				emit OutputToGUI(component->errorString());
 		}
 
@@ -203,13 +203,13 @@ Move AI::SelectAction(PetStage *stageNode, quint8 depth, quint8 turnIndex)
 					objectContext->setContextProperty("petStage", stageNode);	
 					component->loadUrl(QUrl::fromLocalFile("Scripts/" + QString::number(stageNode->GetTeam(turnIndex)->GetActivePet()->GetAbility(i)->GetAbilityId()) + ".qml"));
 					//Catch any exceptions and report them.
-					if (component->status() == 3)
+					if (component->status() != QQmlComponent::Ready)
 						emit OutputToGUI(component->errorString());
 					object = component->create(objectContext);
 					//Call PreUseAbility; paramters are TeamNumber. This is used to make the move tell us it's priority.
 					QMetaObject::invokeMethod(object, "preUseAbility", Q_ARG(QVariant, turnIndex));
 					//Catch any exceptions and report them.
-					if (component->status() == 3)
+					if (component->status() != QQmlComponent::Ready)
 						qDebug() << component->errors();
 
 					//Copy the node and add it to the list.
@@ -399,7 +399,7 @@ float AI::ActionOutcomes(PetStage *stageNode, quint8 depth, quint8 currentTeam, 
 		objectContext->setContextProperty("petStage", stageNode);
 		component->loadUrl(QUrl::fromLocalFile("Scripts/" + QString::number(abilityId) + ".qml"));
 		//Catch any exceptions and report them.
-		if (component->status() == 3)
+		if (component->status() != QQmlComponent::Ready)
 			emit OutputToGUI(component->errorString());
 		object = component->create(objectContext);
 
@@ -409,7 +409,7 @@ float AI::ActionOutcomes(PetStage *stageNode, quint8 depth, quint8 currentTeam, 
 		QMetaObject::invokeMethod(object, "getChanceOnHitRating", Q_RETURN_ARG(QVariant, variantChanceOnHitRating), Q_ARG(QVariant, currentTeam));
 
 		//Catch any exceptions and report them.
-		if (component->status() == 3)
+		if (component->status() != QQmlComponent::Ready)
 			emit OutputToGUI(component->errorString());
 
 		//Set ratings based on pet info and QVariants.
@@ -651,78 +651,44 @@ float AI::UseAction(PetStage* stageNode, quint8 depth, quint8 currentTeam, bool 
 								->GetActivePet()->GetAbility(outcome->GetTeam(currentTeam)->GetActivePet()->GetCurrentAction()->GetAction())->GetRounds()) + 1),
 								Q_ARG(QVariant, firstCall), Q_ARG(QVariant, isAvoiding), Q_ARG(QVariant, isHitting), Q_ARG(QVariant, isCritting), Q_ARG(QVariant, isProcing));
 	//Catch any exceptions and report them.
-	if (component->status() == 3)
+	if (component->status() != QQmlComponent::Ready)
 		emit OutputToGUI(component->errorString());
 
 	//Convert QVariant for number of hits.
 	numHits = variantNumHits.toFloat();
 
-	//If the pet died as a result of the battle.
-	if (outcome->GetTeam((currentTeam%2)+1)->GetActivePet()->IsDead())
+	QList<PetStage*> possibleStages = IsPetDead(outcome, (currentTeam%2)+1);	//Get the possible outcomes if a pet has died.
+	quint8 possibleStagesSize = possibleStages.size();							//Get the initial side of the list for heuristic purposes.
+	
+	//If there are possible outcomes, use them.
+	if (!possibleStages.isEmpty())
 	{
-		//Pet is dead, remove its current action.
-		outcome->GetTeam((currentTeam%2)+1)->GetActivePet()->RemoveAuras();
-		outcome->GetTeam((currentTeam%2)+1)->GetActivePet()->GetCurrentAction()->SetAction(PetAction::None);
-		outcome->GetTeam((currentTeam%2)+1)->GetActivePet()->GetCurrentAction()->SetRoundsRemaining(0);
-
-		//Attempt to find a new pet to substitute if the team is not dead.
-		if (!outcome->GetTeam((currentTeam%2)+1)->IsTeamDead())
+		while (!possibleStages.isEmpty())
 		{
-			QList<PetStage*> substituteStages;
-			//Find a pet that is alive.
-			for (quint8 i=1; i < outcome->GetTeam((currentTeam%2)+1)->GetNumPets()+1; i+=1)
-				if (!outcome->GetTeam((currentTeam%2)+1)->GetPet(i)->IsDead())
-				{
-					PetStage *substituteStage = new PetStage(*outcome);
-					substituteStage->GetTeam((currentTeam%2)+1)->SetActivePet(i);
-					substituteStage->GetTeam((currentTeam%2)+1)->GetActivePet()->GetCurrentAction()->SetAction(PetAction::None);
-					substituteStage->GetTeam((currentTeam%2)+1)->GetActivePet()->GetCurrentAction()->SetRoundsRemaining(0);
-					//Pet swap has occured; Use Minefield, etc..
-					for (quint8 j=1; j < substituteStage->GetTeam((currentTeam%2)+1)->GetPet(0)->GetNumAuras()+1; j+=1)
-						if (substituteStage->GetTeam((currentTeam%2)+1)->GetPet(0)->GetAura(j)->OnSwapIn())
-						{
-							QMetaObject::invokeMethod(object, "applyAura", Q_ARG(QVariant, (currentTeam%2)+1));		//Use the aura; parameters are teamIndex.
-							//Catch any exceptions and report them.
-							if (component->status() == 3)
-								emit OutputToGUI(component->errorString());
-							substituteStage->GetTeam((currentTeam%2)+1)->GetPet(0)->RemoveAura(j);					//Remove the aura.
-							break;																					//There should not be more than 1.
-						}
-					substituteStages.append(substituteStage);														//Append the substitute stage to the QList.
-				}
-							
-			quint8 tempSize = substituteStages.size();		//Temporary size variable for dividing.
-			for (quint8 i=0; i < substituteStages.size(); i+=1)
-			{
-				//If it is the first time this function was called we must still process the other team's action.
-				if (firstCall)
-					//If there is more than one option divide by the size (max 2 pets to choose from).
-					heuristic += avoidanceRating * hitRating * critRating * ActionOutcomes(substituteStages.at(i), depth, (currentTeam%2)+1, false) / tempSize;
-				else
-					heuristic += avoidanceRating * hitRating * critRating * EndTurn(outcome, depth);
-				delete (substituteStages.takeFirst());
-			}
-			substituteStages.clear();
-		}
-		else	//No living pet found, let's just move on.
+			PetStage *curPossibleStage = possibleStages.first();
 			//If it is the first time this function was called we must still process the other team's action.
 			if (firstCall)
-				heuristic += avoidanceRating * hitRating * critRating * ActionOutcomes(outcome, depth, (currentTeam%2)+1, false);
+				//If there is more than one option divide by the size (max 2 pets to choose from).
+				heuristic += avoidanceRating * hitRating * critRating * ActionOutcomes(curPossibleStage, depth, (currentTeam%2)+1, false) / possibleStagesSize;
 			else
-				heuristic += avoidanceRating * hitRating * critRating * EndTurn(outcome, depth);
+				heuristic += avoidanceRating * hitRating * critRating * EndTurn(curPossibleStage, depth);
+
+			//Delete the stage after it's been used.
+			delete curPossibleStage;
+		}
+
+		possibleStages.clear();		//Clear the list.
 	}
 	else
-	{
 		//If it is the first time this function was called we must still process the other team's action.
 		if (firstCall)
 			heuristic += avoidanceRating * hitRating * critRating * ActionOutcomes(outcome, depth, (currentTeam%2)+1, false);
 		else
 			heuristic += avoidanceRating * hitRating * critRating * EndTurn(outcome, depth);
-	}
 					
-	delete outcome;
+	delete outcome;		//Delete the base stage.
 
-	return heuristic;
+	return heuristic;	//Return the value.
 }
 
 //Apply auras at the end of the turn.
@@ -739,17 +705,40 @@ float AI::EndTurn(PetStage* stageNode, quint8 depth)
 				objectContext->setContextProperty("petStage", stageNode);	
 				component->loadUrl(QUrl::fromLocalFile("Scripts/" + QString::number(stageNode->GetTeam(i)->GetPet(j)->GetAura(k)->GetAuraId()) + ".qml"));
 				//Catch any exceptions and report them.
-				if (component->status() == 3)
+				if (component->status() != QQmlComponent::Ready)
 					emit OutputToGUI(component->errorString());
 				object = component->create(objectContext);
 				//Call ApplyAuraEnd; paramters are TeamNumber, PetNumber and AuraDuration.
 				QMetaObject::invokeMethod(object, "applyAuraEnd", Q_ARG(QVariant, i), Q_ARG(QVariant, j), Q_ARG(QVariant, k),
 					Q_ARG(QVariant, stageNode->GetTeam(i)->GetPet(j)->GetAura(k)->GetDuration()));
 				//Catch any exceptions and report them.
-				if (component->status() == 3)
+				if (component->status() != QQmlComponent::Ready)
 					emit OutputToGUI(component->errorString());
 			}
 
+	//TODO: Check to see if an active pet is dead.
+	/*QList<PetStage*> possibleStages = IsPetDead(outcome, 1);	//Get the possible outcomes if a pet has died.
+	quint8 possibleStagesSize = possibleStages.size();			//Get the initial side of the list for heuristic purposes.
+	
+	//If there are possible outcomes, use them.
+	if (!possibleStages.isEmpty())
+	{
+		while (!possibleStages.isEmpty())
+		{
+			PetStage *curPossibleStage = possibleStages.first();
+			//If it is the first time this function was called we must still process the other team's action.
+			if (firstCall)
+				//If there is more than one option divide by the size (max 2 pets to choose from).
+				heuristic += avoidanceRating * hitRating * critRating * ActionOutcomes(curPossibleStage, depth, (currentTeam%2)+1, false) / possibleStagesSize;
+			else
+				heuristic += avoidanceRating * hitRating * critRating * EndTurn(curPossibleStage, depth);
+
+			//Delete the stage after it's been used.
+			delete curPossibleStage;
+		}
+
+		possibleStages.clear();		//Clear the list.
+	}*/
 
 	//Check to see if a pet is dead.
 	quint8 tempSize = 0;
@@ -787,7 +776,7 @@ float AI::EndTurn(PetStage* stageNode, quint8 depth)
 									{
 										QMetaObject::invokeMethod(object, "applyAura", Q_ARG(QVariant, i));		//Use the aura; parameters are teamIndex.
 										//Catch any exceptions and report them.
-										if (component->status() == 3)
+										if (component->status() != QQmlComponent::Ready)
 											emit OutputToGUI(component->errorString());
 										substituteStage->GetTeam(i)->GetPet(0)->RemoveAura(l);					//Remove the aura.
 										break;																	//There should not be more than 1.
@@ -806,7 +795,7 @@ float AI::EndTurn(PetStage* stageNode, quint8 depth)
 								{
 									QMetaObject::invokeMethod(object, "applyAura", Q_ARG(QVariant, i));		//Use the aura; parameters are teamIndex.
 									//Catch any exceptions and report them.
-									if (component->status() == 3)
+									if (component->status() != QQmlComponent::Ready)
 										emit OutputToGUI(component->errorString());
 									substituteStage->GetTeam(i)->GetPet(0)->RemoveAura(k);					//Remove the aura.
 									break;																	//There should not be more than 1.
@@ -845,4 +834,49 @@ float AI::EndTurn(PetStage* stageNode, quint8 depth)
 
 	//Return heuristic.
 	return nextTurn.GetHeuristic();
+}
+
+//Determine if a pet is dead and the possible options that go with that result.
+QList<PetStage*> AI::IsPetDead(PetStage *petStage, quint8 teamIndex)
+{
+	QList<PetStage*> possibleStages;
+
+	//If the pet died find possible outcomes.
+	if (petStage->GetTeam(teamIndex)->GetActivePet()->IsDead())
+	{
+		//Pet is dead, remove its current action.
+		petStage->GetTeam(teamIndex)->GetActivePet()->RemoveAuras();
+		petStage->GetTeam(teamIndex)->GetActivePet()->GetCurrentAction()->SetAction(PetAction::None);
+		petStage->GetTeam(teamIndex)->GetActivePet()->GetCurrentAction()->SetRoundsRemaining(0);
+
+		//Attempt to find a new pet to substitute if the team is not dead.
+		if (!petStage->GetTeam(teamIndex)->IsTeamDead())
+		{
+			//Find a pet that is alive.
+			for (quint8 i=1; i < petStage->GetTeam(teamIndex)->GetNumPets()+1; i+=1)
+				if (!petStage->GetTeam(teamIndex)->GetPet(i)->IsDead())
+				{
+					PetStage *outcomeStage = new PetStage(*petStage);
+					outcomeStage->GetTeam(teamIndex)->SetActivePet(i);
+					outcomeStage->GetTeam(teamIndex)->GetActivePet()->GetCurrentAction()->SetAction(PetAction::None);
+					outcomeStage->GetTeam(teamIndex)->GetActivePet()->GetCurrentAction()->SetRoundsRemaining(0);
+
+					//Pet swap has occured; Use Minefield, etc..
+					for (quint8 j=1; j < outcomeStage->GetTeam(teamIndex)->GetPet(0)->GetNumAuras()+1; j+=1)
+						if (outcomeStage->GetTeam(teamIndex)->GetPet(0)->GetAura(j)->OnSwapIn())
+						{
+							QMetaObject::invokeMethod(object, "applyAura", Q_ARG(QVariant, teamIndex));					//Use the aura; parameters are teamIndex.
+							//Catch any exceptions and report them.
+							if (component->status() != QQmlComponent::Ready)
+								emit OutputToGUI(component->errorString());
+							outcomeStage->GetTeam(teamIndex)->GetPet(0)->RemoveAura(j);									//Remove the aura.
+							break;																						//There should not be more than 1.
+						}
+					possibleStages.append(outcomeStage);																//Append the substitute stage to the QList.
+				}
+		}
+	}
+
+	//Return the list of possible outcomes.
+	return possibleStages;
 }
