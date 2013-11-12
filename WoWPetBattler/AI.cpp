@@ -74,8 +74,8 @@ Move AI::Expectiminimax(PetStage* petStage, quint8 depth, quint8 turnIndex)
 		The full equation is similar to how pet health is actually calculated: petHealthPercent * 52 * Level + 100*/
 		for (quint8 i=1; i < 3; i+=1)
 			for (quint8 j=1; j < stageNode->GetTeam(1)->GetNumPets()+1; j+=1)
-				score += ((i==1)?-1:1) * (stageNode->GetTeam(i)->GetPet(j)->GetHealthPercentage()
-							* 52 * stageNode->GetTeam(i)->GetPet(j)->GetLevel() + 100);
+				score += ((i==1)?1:-1) * (stageNode->GetTeam(i)->GetPet(j)->GetHealthPercentage()
+							* (52 * stageNode->GetTeam(i)->GetPet(j)->GetLevel() + 100));
 
 		
 		desiredMove.SetHeuristic(score);	//Pass it the score.
@@ -328,9 +328,9 @@ quint8 AI::CalculatePriority(PetStage *stageNode)
 
 	//All priorities handled, proceed based on speed.
 	if (stageNode->GetTeam(1)->GetActivePet()->GetSpeed() > stageNode->GetTeam(2)->GetActivePet()->GetSpeed())
-		return 2;
-	else if (stageNode->GetTeam(1)->GetActivePet()->GetSpeed() < stageNode->GetTeam(2)->GetActivePet()->GetSpeed())
 		return 1;
+	else if (stageNode->GetTeam(1)->GetActivePet()->GetSpeed() < stageNode->GetTeam(2)->GetActivePet()->GetSpeed())
+		return 2;
 	else
 		return (tieBreaker) ? 3 : ((qrand() % 2) + 1);		//If no tie breaking randomize it.
 }
@@ -611,6 +611,15 @@ float AI::ActionOutcomes(PetStage *stageNode, quint8 depth, quint8 currentTeam, 
 			}
 		}
 	}
+	//We are either passing or do not have a move.
+	else
+	{
+		//Call other teams move or end turn.
+		if (firstCall)
+			heuristic += ActionOutcomes(currentStage, depth, (currentTeam%2)+1, !firstCall);
+		else
+			heuristic += EndTurn(currentStage, depth);
+	}
 
 	delete currentStage;	//Clean up.
 
@@ -695,8 +704,7 @@ float AI::EndTurn(PetStage* stageNode, quint8 depth)
 	//Check to see if an active pet is dead.
 	QList<PetStage*> possibleStages, tempStages;
 	tempStages = IsPetDead(stageNode, 1);						//Get the possible outcomes if a pet has died.
-	float possibleStagesSize, tempStagesSize;
-	tempStagesSize = possibleStages.size();						//Get the initial side of the list for heuristic purposes.
+	float possibleStagesSize;
 	
 	//Process each possible outcome of if our team's active pet died and check if the opponent's team has a dead active pet as well.
 	while (!tempStages.isEmpty())
