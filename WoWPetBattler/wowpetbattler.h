@@ -25,8 +25,8 @@ public:
 	~WoWPetBattler();
 
 public slots:
-	void LoadPreferences();
 	void Output(QString, QString);
+	void Output(QString);
 	void Stop(QString);
 
 private slots:

@@ -8,6 +8,7 @@
 #include <QtQml>
 #include <QObject>
 #include <QDebug>
+#include <QSettings>
 
 #include <Robot.h>
 
@@ -34,6 +35,7 @@ signals:
 	void OutputToGUI(QString);
 
 public slots:
+	void LoadPreferences();
 	void Run();
 
 private:
@@ -55,6 +57,9 @@ private:
 	QQmlContext *objectContext;
 	QQmlComponent *component;
 	QObject *object;
+
+	float minAvoidanceThreshold, minHitThreshold, minCritThreshold, minChanceOnHitThreshold;
+	float maxAvoidanceThreshold, maxHitThreshold, maxCritThreshold, maxChanceOnHitThreshold;
 
 	bool tieBreaker;
 

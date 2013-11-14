@@ -36,6 +36,7 @@ public:
     QSplitter *checkBoxSplitter;
     QCheckBox *aeroCheckBox;
     QCheckBox *tieCheckBox;
+    QCheckBox *passingCheckBox;
     QCheckBox *PvPCheckBox;
     QGridLayout *thresholdsGridLayout;
     QSplitter *maxChanceOnHitSplitter;
@@ -67,12 +68,12 @@ public:
     {
         if (PreferencesDialog->objectName().isEmpty())
             PreferencesDialog->setObjectName(QStringLiteral("PreferencesDialog"));
-        PreferencesDialog->resize(600, 450);
-        PreferencesDialog->setMinimumSize(QSize(430, 0));
+        PreferencesDialog->resize(600, 477);
+        PreferencesDialog->setMinimumSize(QSize(430, 440));
         PreferencesDialog->setBaseSize(QSize(430, 435));
         layoutWidget = new QWidget(PreferencesDialog);
         layoutWidget->setObjectName(QStringLiteral("layoutWidget"));
-        layoutWidget->setGeometry(QRect(10, 10, 581, 435));
+        layoutWidget->setGeometry(QRect(10, 10, 581, 460));
         gridLayout = new QGridLayout(layoutWidget);
         gridLayout->setObjectName(QStringLiteral("gridLayout"));
         gridLayout->setContentsMargins(10, 10, 10, 10);
@@ -122,6 +123,11 @@ public:
         tieCheckBox->setFont(font2);
         tieCheckBox->setChecked(true);
         checkBoxSplitter->addWidget(tieCheckBox);
+        passingCheckBox = new QCheckBox(checkBoxSplitter);
+        passingCheckBox->setObjectName(QStringLiteral("passingCheckBox"));
+        passingCheckBox->setFont(font2);
+        passingCheckBox->setChecked(false);
+        checkBoxSplitter->addWidget(passingCheckBox);
         PvPCheckBox = new QCheckBox(checkBoxSplitter);
         PvPCheckBox->setObjectName(QStringLiteral("PvPCheckBox"));
         PvPCheckBox->setFont(font2);
@@ -146,13 +152,14 @@ public:
         maxChanceOnHitSlider = new QSlider(maxChanceOnHitSplitter);
         maxChanceOnHitSlider->setObjectName(QStringLiteral("maxChanceOnHitSlider"));
         maxChanceOnHitSlider->setMinimum(0);
-        maxChanceOnHitSlider->setMaximum(100);
-        maxChanceOnHitSlider->setSingleStep(5);
+        maxChanceOnHitSlider->setMaximum(20);
+        maxChanceOnHitSlider->setSingleStep(1);
+        maxChanceOnHitSlider->setPageStep(2);
         maxChanceOnHitSlider->setValue(0);
         maxChanceOnHitSlider->setSliderPosition(0);
         maxChanceOnHitSlider->setOrientation(Qt::Horizontal);
         maxChanceOnHitSlider->setTickPosition(QSlider::TicksBelow);
-        maxChanceOnHitSlider->setTickInterval(50);
+        maxChanceOnHitSlider->setTickInterval(10);
         maxChanceOnHitSplitter->addWidget(maxChanceOnHitSlider);
 
         thresholdsGridLayout->addWidget(maxChanceOnHitSplitter, 3, 1, 1, 1);
@@ -169,13 +176,14 @@ public:
         minChanceOnHitSlider = new QSlider(minChanceOnHitSplitter);
         minChanceOnHitSlider->setObjectName(QStringLiteral("minChanceOnHitSlider"));
         minChanceOnHitSlider->setMinimum(0);
-        minChanceOnHitSlider->setMaximum(100);
-        minChanceOnHitSlider->setSingleStep(5);
+        minChanceOnHitSlider->setMaximum(20);
+        minChanceOnHitSlider->setSingleStep(1);
+        minChanceOnHitSlider->setPageStep(2);
         minChanceOnHitSlider->setValue(0);
         minChanceOnHitSlider->setSliderPosition(0);
         minChanceOnHitSlider->setOrientation(Qt::Horizontal);
         minChanceOnHitSlider->setTickPosition(QSlider::TicksBelow);
-        minChanceOnHitSlider->setTickInterval(50);
+        minChanceOnHitSlider->setTickInterval(10);
         minChanceOnHitSplitter->addWidget(minChanceOnHitSlider);
 
         thresholdsGridLayout->addWidget(minChanceOnHitSplitter, 3, 0, 1, 1);
@@ -192,12 +200,14 @@ public:
         maxCritSlider = new QSlider(maxCritSplitter);
         maxCritSlider->setObjectName(QStringLiteral("maxCritSlider"));
         maxCritSlider->setMinimum(0);
-        maxCritSlider->setMaximum(100);
-        maxCritSlider->setSingleStep(5);
-        maxCritSlider->setSliderPosition(5);
+        maxCritSlider->setMaximum(20);
+        maxCritSlider->setSingleStep(1);
+        maxCritSlider->setPageStep(2);
+        maxCritSlider->setValue(1);
+        maxCritSlider->setSliderPosition(1);
         maxCritSlider->setOrientation(Qt::Horizontal);
         maxCritSlider->setTickPosition(QSlider::TicksBelow);
-        maxCritSlider->setTickInterval(50);
+        maxCritSlider->setTickInterval(10);
         maxCritSplitter->addWidget(maxCritSlider);
 
         thresholdsGridLayout->addWidget(maxCritSplitter, 2, 1, 1, 1);
@@ -214,12 +224,14 @@ public:
         minCritSlider = new QSlider(minCritSplitter);
         minCritSlider->setObjectName(QStringLiteral("minCritSlider"));
         minCritSlider->setMinimum(0);
-        minCritSlider->setMaximum(100);
-        minCritSlider->setSingleStep(5);
-        minCritSlider->setSliderPosition(5);
+        minCritSlider->setMaximum(20);
+        minCritSlider->setSingleStep(1);
+        minCritSlider->setPageStep(2);
+        minCritSlider->setValue(1);
+        minCritSlider->setSliderPosition(1);
         minCritSlider->setOrientation(Qt::Horizontal);
         minCritSlider->setTickPosition(QSlider::TicksBelow);
-        minCritSlider->setTickInterval(50);
+        minCritSlider->setTickInterval(10);
         minCritSplitter->addWidget(minCritSlider);
 
         thresholdsGridLayout->addWidget(minCritSplitter, 2, 0, 1, 1);
@@ -236,13 +248,14 @@ public:
         maxHitSlider = new QSlider(maxHitSplitter);
         maxHitSlider->setObjectName(QStringLiteral("maxHitSlider"));
         maxHitSlider->setMinimum(0);
-        maxHitSlider->setMaximum(100);
-        maxHitSlider->setSingleStep(5);
+        maxHitSlider->setMaximum(20);
+        maxHitSlider->setSingleStep(1);
+        maxHitSlider->setPageStep(2);
         maxHitSlider->setValue(0);
         maxHitSlider->setSliderPosition(0);
         maxHitSlider->setOrientation(Qt::Horizontal);
         maxHitSlider->setTickPosition(QSlider::TicksBelow);
-        maxHitSlider->setTickInterval(50);
+        maxHitSlider->setTickInterval(10);
         maxHitSplitter->addWidget(maxHitSlider);
 
         thresholdsGridLayout->addWidget(maxHitSplitter, 1, 1, 1, 1);
@@ -259,13 +272,14 @@ public:
         maxAvoidanceSlider = new QSlider(maxAvoidanceSplitter);
         maxAvoidanceSlider->setObjectName(QStringLiteral("maxAvoidanceSlider"));
         maxAvoidanceSlider->setMinimum(0);
-        maxAvoidanceSlider->setMaximum(100);
-        maxAvoidanceSlider->setSingleStep(5);
+        maxAvoidanceSlider->setMaximum(20);
+        maxAvoidanceSlider->setSingleStep(1);
+        maxAvoidanceSlider->setPageStep(2);
         maxAvoidanceSlider->setValue(0);
         maxAvoidanceSlider->setSliderPosition(0);
         maxAvoidanceSlider->setOrientation(Qt::Horizontal);
         maxAvoidanceSlider->setTickPosition(QSlider::TicksBelow);
-        maxAvoidanceSlider->setTickInterval(50);
+        maxAvoidanceSlider->setTickInterval(10);
         maxAvoidanceSplitter->addWidget(maxAvoidanceSlider);
 
         thresholdsGridLayout->addWidget(maxAvoidanceSplitter, 0, 1, 1, 1);
@@ -282,12 +296,13 @@ public:
         minAvoidanceSlider = new QSlider(minAvoidanceSplitter);
         minAvoidanceSlider->setObjectName(QStringLiteral("minAvoidanceSlider"));
         minAvoidanceSlider->setMinimum(0);
-        minAvoidanceSlider->setMaximum(100);
-        minAvoidanceSlider->setSingleStep(5);
+        minAvoidanceSlider->setMaximum(20);
+        minAvoidanceSlider->setSingleStep(1);
+        minAvoidanceSlider->setPageStep(2);
         minAvoidanceSlider->setSliderPosition(0);
         minAvoidanceSlider->setOrientation(Qt::Horizontal);
         minAvoidanceSlider->setTickPosition(QSlider::TicksBelow);
-        minAvoidanceSlider->setTickInterval(50);
+        minAvoidanceSlider->setTickInterval(10);
         minAvoidanceSplitter->addWidget(minAvoidanceSlider);
 
         thresholdsGridLayout->addWidget(minAvoidanceSplitter, 0, 0, 1, 1);
@@ -304,13 +319,14 @@ public:
         minHitSlider = new QSlider(minHitSplitter);
         minHitSlider->setObjectName(QStringLiteral("minHitSlider"));
         minHitSlider->setMinimum(0);
-        minHitSlider->setMaximum(100);
-        minHitSlider->setSingleStep(5);
+        minHitSlider->setMaximum(20);
+        minHitSlider->setSingleStep(1);
+        minHitSlider->setPageStep(2);
         minHitSlider->setValue(0);
         minHitSlider->setSliderPosition(0);
         minHitSlider->setOrientation(Qt::Horizontal);
         minHitSlider->setTickPosition(QSlider::TicksBelow);
-        minHitSlider->setTickInterval(50);
+        minHitSlider->setTickInterval(10);
         minHitSplitter->addWidget(minHitSlider);
 
         thresholdsGridLayout->addWidget(minHitSplitter, 1, 0, 1, 1);
@@ -342,6 +358,7 @@ public:
         optionsLabel->setText(QApplication::translate("PreferencesDialog", "Options", 0));
         aeroCheckBox->setText(QApplication::translate("PreferencesDialog", "Disables Aero (Increases Performance)", 0));
         tieCheckBox->setText(QApplication::translate("PreferencesDialog", "Random When Speeds Are Equal", 0));
+        passingCheckBox->setText(QApplication::translate("PreferencesDialog", "Considering Passing As A Move", 0));
         PvPCheckBox->setText(QApplication::translate("PreferencesDialog", "Enable PvP Queuing", 0));
         maxChanceOnHitLabel->setText(QApplication::translate("PreferencesDialog", "Maximum Chance On Hit %", 0));
         minChanceOnHitLabel->setText(QApplication::translate("PreferencesDialog", "Minimum Chance On Hit %", 0));

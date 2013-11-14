@@ -7,13 +7,13 @@
     <x>0</x>
     <y>0</y>
     <width>600</width>
-    <height>450</height>
+    <height>477</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
     <width>430</width>
-    <height>0</height>
+    <height>440</height>
    </size>
   </property>
   <property name="baseSize">
@@ -31,7 +31,7 @@
      <x>10</x>
      <y>10</y>
      <width>581</width>
-     <height>435</height>
+     <height>460</height>
     </rect>
    </property>
    <layout class="QGridLayout" name="gridLayout">
@@ -123,6 +123,20 @@
         <bool>true</bool>
        </property>
       </widget>
+      <widget class="QCheckBox" name="passingCheckBox">
+       <property name="font">
+        <font>
+         <family>MS Shell Dlg 2</family>
+         <pointsize>10</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>Considering Passing As A Move</string>
+       </property>
+       <property name="checked">
+        <bool>false</bool>
+       </property>
+      </widget>
       <widget class="QCheckBox" name="PvPCheckBox">
        <property name="font">
         <font>
@@ -177,10 +191,13 @@
           <number>0</number>
          </property>
          <property name="maximum">
-          <number>100</number>
+          <number>20</number>
          </property>
          <property name="singleStep">
-          <number>5</number>
+          <number>1</number>
+         </property>
+         <property name="pageStep">
+          <number>2</number>
          </property>
          <property name="value">
           <number>0</number>
@@ -195,7 +212,7 @@
           <enum>QSlider::TicksBelow</enum>
          </property>
          <property name="tickInterval">
-          <number>50</number>
+          <number>10</number>
          </property>
         </widget>
        </widget>
@@ -227,10 +244,13 @@
           <number>0</number>
          </property>
          <property name="maximum">
-          <number>100</number>
+          <number>20</number>
          </property>
          <property name="singleStep">
-          <number>5</number>
+          <number>1</number>
+         </property>
+         <property name="pageStep">
+          <number>2</number>
          </property>
          <property name="value">
           <number>0</number>
@@ -245,7 +265,7 @@
           <enum>QSlider::TicksBelow</enum>
          </property>
          <property name="tickInterval">
-          <number>50</number>
+          <number>10</number>
          </property>
         </widget>
        </widget>
@@ -277,13 +297,19 @@
           <number>0</number>
          </property>
          <property name="maximum">
-          <number>100</number>
+          <number>20</number>
          </property>
          <property name="singleStep">
-          <number>5</number>
+          <number>1</number>
+         </property>
+         <property name="pageStep">
+          <number>2</number>
+         </property>
+         <property name="value">
+          <number>1</number>
          </property>
          <property name="sliderPosition">
-          <number>5</number>
+          <number>1</number>
          </property>
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
@@ -292,7 +318,7 @@
           <enum>QSlider::TicksBelow</enum>
          </property>
          <property name="tickInterval">
-          <number>50</number>
+          <number>10</number>
          </property>
         </widget>
        </widget>
@@ -324,13 +350,19 @@
           <number>0</number>
          </property>
          <property name="maximum">
-          <number>100</number>
+          <number>20</number>
          </property>
          <property name="singleStep">
-          <number>5</number>
+          <number>1</number>
+         </property>
+         <property name="pageStep">
+          <number>2</number>
+         </property>
+         <property name="value">
+          <number>1</number>
          </property>
          <property name="sliderPosition">
-          <number>5</number>
+          <number>1</number>
          </property>
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
@@ -339,7 +371,7 @@
           <enum>QSlider::TicksBelow</enum>
          </property>
          <property name="tickInterval">
-          <number>50</number>
+          <number>10</number>
          </property>
         </widget>
        </widget>
@@ -371,10 +403,13 @@
           <number>0</number>
          </property>
          <property name="maximum">
-          <number>100</number>
+          <number>20</number>
          </property>
          <property name="singleStep">
-          <number>5</number>
+          <number>1</number>
+         </property>
+         <property name="pageStep">
+          <number>2</number>
          </property>
          <property name="value">
           <number>0</number>
@@ -389,7 +424,7 @@
           <enum>QSlider::TicksBelow</enum>
          </property>
          <property name="tickInterval">
-          <number>50</number>
+          <number>10</number>
          </property>
         </widget>
        </widget>
@@ -421,10 +456,13 @@
           <number>0</number>
          </property>
          <property name="maximum">
-          <number>100</number>
+          <number>20</number>
          </property>
          <property name="singleStep">
-          <number>5</number>
+          <number>1</number>
+         </property>
+         <property name="pageStep">
+          <number>2</number>
          </property>
          <property name="value">
           <number>0</number>
@@ -439,7 +477,7 @@
           <enum>QSlider::TicksBelow</enum>
          </property>
          <property name="tickInterval">
-          <number>50</number>
+          <number>10</number>
          </property>
         </widget>
        </widget>
@@ -471,10 +509,13 @@
           <number>0</number>
          </property>
          <property name="maximum">
-          <number>100</number>
+          <number>20</number>
          </property>
          <property name="singleStep">
-          <number>5</number>
+          <number>1</number>
+         </property>
+         <property name="pageStep">
+          <number>2</number>
          </property>
          <property name="sliderPosition">
           <number>0</number>
@@ -486,7 +527,7 @@
           <enum>QSlider::TicksBelow</enum>
          </property>
          <property name="tickInterval">
-          <number>50</number>
+          <number>10</number>
          </property>
         </widget>
        </widget>
@@ -518,10 +559,13 @@
           <number>0</number>
          </property>
          <property name="maximum">
-          <number>100</number>
+          <number>20</number>
          </property>
          <property name="singleStep">
-          <number>5</number>
+          <number>1</number>
+         </property>
+         <property name="pageStep">
+          <number>2</number>
          </property>
          <property name="value">
           <number>0</number>
@@ -536,7 +580,7 @@
           <enum>QSlider::TicksBelow</enum>
          </property>
          <property name="tickInterval">
-          <number>50</number>
+          <number>10</number>
          </property>
         </widget>
        </widget>

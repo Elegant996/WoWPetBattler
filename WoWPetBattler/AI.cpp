@@ -20,6 +20,8 @@ AI::AI(PetStage *petStage, Robot::Window *window)
 	this->objectContext = new QQmlContext(engine->rootContext());
 	this->component = new QQmlComponent(engine);
 
+	this->LoadPreferences();		//Setup thresholds.
+
 	this->tieBreaker = false;		//Used to decide if more nodes should be created.
 
 	this-> totalCalls = 0;
@@ -45,6 +47,35 @@ void AI::AcceptQueue()
 {
 	//keyboard.Click("`");		//Queue Up.	
 	qDebug() << "`";
+}
+
+//Load preferences.
+void AI::LoadPreferences()
+{
+	qDebug() << "Here.";
+
+	//Grab QSettings and open the group.
+	QSettings setting("N/A", "WoWPetBattler");
+	setting.beginGroup("AI");
+
+	//Fetch avoidance rating.
+	this->minAvoidanceThreshold = setting.value("minAvoidanceThreshold", 0).toFloat() * 0.05;
+	this->maxAvoidanceThreshold = setting.value("maxAvoidanceThreshold", 0).toFloat() * 0.05;
+
+	//Fetch hit rating.
+	this->minHitThreshold = setting.value("minHitThreshold", 0).toFloat() * 0.05;
+	this->maxHitThreshold = setting.value("maxHitThreshold", 0).toFloat() * 0.05;
+
+	//Fetch crit rating.
+	this->minCritThreshold = setting.value("minCritThreshold", 1).toFloat() * 0.05;
+	this->maxCritThreshold = setting.value("maxCritThreshold", 1).toFloat() * 0.05;
+
+	//Fetch chance on hit rating.
+	this->minChanceOnHitThreshold = setting.value("minChanceOnHitThreshold", 0).toFloat() * 0.05;
+	this->maxChanceOnHitThreshold = setting.value("maxChanceOnHitThreshold", 0).toFloat() * 0.05;
+
+	//Close the group.
+	setting.endGroup();
 }
 
 //Begin AI simulation and respond with best move.
@@ -127,19 +158,19 @@ Move AI::Expectiminimax(PetStage* petStage, quint8 depth, quint8 turnIndex)
 	else	//turnIndex == 0;
 	{
 		//Determine who goes first.
-		quint8 currentTeam = CalculatePriority(stageNode);
+		quint8 teamIndex = CalculatePriority(stageNode);
 
 		float heuristic = 0.00;
 
 		//In the case that there is a tie for speed, split the value in half and weigh each outcome.
-		if (currentTeam == 3)
+		if (teamIndex == 3)
 		{
 			heuristic += 0.5 * ActionOutcomes(stageNode, depth, 1, true);
 			heuristic += 0.5 * ActionOutcomes(stageNode, depth, 2, true);
 		}
 		//We know who's going first already; use that team.
 		else
-			heuristic = ActionOutcomes(stageNode, depth, currentTeam, true);
+			heuristic = ActionOutcomes(stageNode, depth, teamIndex, true);
 
 		desiredMove.SetHeuristic(heuristic);
 		delete stageNode;
@@ -322,9 +353,9 @@ quint8 AI::CalculatePriority(PetStage *stageNode)
 	if (stageNode->GetTeam(1)->GetActivePet()->HasStatus(Pet::Second))
 		if (stageNode->GetTeam(2)->GetActivePet()->HasStatus(Pet::Second))
 			if (stageNode->GetTeam(1)->GetActivePet()->GetSpeed() > stageNode->GetTeam(2)->GetActivePet()->GetSpeed())
-				return 2;
-			else if (stageNode->GetTeam(1)->GetActivePet()->GetSpeed() < stageNode->GetTeam(2)->GetActivePet()->GetSpeed())
 				return 1;
+			else if (stageNode->GetTeam(1)->GetActivePet()->GetSpeed() < stageNode->GetTeam(2)->GetActivePet()->GetSpeed())
+				return 2;
 			else
 				return (tieBreaker) ? 3 : ((qrand() % 2) + 1);		//If no tie breaking randomize it.
 		else
@@ -343,26 +374,26 @@ quint8 AI::CalculatePriority(PetStage *stageNode)
 }
 
 //Uses the first action during round playback. Note: Actions as a result of death happen in scripts but real deaths happen here.
-float AI::ActionOutcomes(PetStage *stageNode, quint8 depth, quint8 currentTeam, bool firstCall)
+float AI::ActionOutcomes(PetStage *stageNode, quint8 depth, quint8 teamIndex, bool firstCall)
 {
 	float heuristic = 0.00;									//Used for holding heuristic.
 	PetStage *currentStage = new PetStage(*stageNode);		//Clone the stage.
 
 	//Normal ability usage.
-	if (currentStage->GetTeam(currentTeam)->GetActivePet()->GetCurrentAction()->GetAction() > 0
-			&& currentStage->GetTeam(currentTeam)->GetActivePet()->GetCurrentAction()->GetAction() < 4)
+	if (currentStage->GetTeam(teamIndex)->GetActivePet()->GetCurrentAction()->GetAction() > 0
+			&& currentStage->GetTeam(teamIndex)->GetActivePet()->GetCurrentAction()->GetAction() < 4)
 	{
 		//Put the ability on cooldown.
-		currentStage->GetTeam(currentTeam)->GetActivePet()->GetAbility(currentStage->GetTeam(currentTeam)
+		currentStage->GetTeam(teamIndex)->GetActivePet()->GetAbility(currentStage->GetTeam(teamIndex)
 			->GetActivePet()->GetCurrentAction()->GetAction())->UseAbility();
 
 		//Set the number of rounds the ability will persist for.
-		currentStage->GetTeam(currentTeam)->GetActivePet()->GetCurrentAction()->SetRoundsRemaining(
-			currentStage->GetTeam(currentTeam)->GetActivePet()->GetAbility(currentStage->GetTeam(currentTeam)
+		currentStage->GetTeam(teamIndex)->GetActivePet()->GetCurrentAction()->SetRoundsRemaining(
+			currentStage->GetTeam(teamIndex)->GetActivePet()->GetAbility(currentStage->GetTeam(teamIndex)
 			->GetActivePet()->GetCurrentAction()->GetAction())->GetRounds());
 
 		//Set variables to be used.
-		quint16 abilityId = currentStage->GetTeam(currentTeam)->GetActivePet()->GetAbility(currentStage->GetTeam(currentTeam)->GetActivePet()->GetCurrentAction()->GetAction())->GetAbilityId();
+		quint16 abilityId = currentStage->GetTeam(teamIndex)->GetActivePet()->GetAbility(currentStage->GetTeam(teamIndex)->GetActivePet()->GetCurrentAction()->GetAction())->GetAbilityId();
 		float avoidanceRating, accuracyRating, criticalRating, chanceOnHitRating;
 		QVariant variantAccuracyRating, variantCriticalRating, variantChanceOnHitRating;
 
@@ -375,246 +406,246 @@ float AI::ActionOutcomes(PetStage *stageNode, quint8 depth, quint8 currentTeam, 
 		object = component->create(objectContext);
 
 		//Set QVariants based on script info.
-		QMetaObject::invokeMethod(object, "getAccuracyRating", Q_RETURN_ARG(QVariant, variantAccuracyRating), Q_ARG(QVariant, currentTeam));
-		QMetaObject::invokeMethod(object, "getCriticalRating", Q_RETURN_ARG(QVariant, variantCriticalRating), Q_ARG(QVariant, currentTeam));
-		QMetaObject::invokeMethod(object, "getChanceOnHitRating", Q_RETURN_ARG(QVariant, variantChanceOnHitRating), Q_ARG(QVariant, currentTeam));
+		QMetaObject::invokeMethod(object, "getAccuracyRating", Q_RETURN_ARG(QVariant, variantAccuracyRating), Q_ARG(QVariant, teamIndex));
+		QMetaObject::invokeMethod(object, "getCriticalRating", Q_RETURN_ARG(QVariant, variantCriticalRating), Q_ARG(QVariant, teamIndex));
+		QMetaObject::invokeMethod(object, "getChanceOnHitRating", Q_RETURN_ARG(QVariant, variantChanceOnHitRating), Q_ARG(QVariant, teamIndex));
 
 		//Catch any exceptions and report them.
 		if (component->status() != QQmlComponent::Ready)
 			emit OutputToGUI(component->errorString());
 
 		//Set ratings based on pet info and QVariants.
-		avoidanceRating = currentStage->GetTeam((currentTeam%2)+1)->GetActivePet()->GetAvoidanceRating();
-		accuracyRating = variantAccuracyRating.toFloat() + currentStage->GetTeam(currentTeam)->GetActivePet()->GetAccuracyOffset();
-		criticalRating = variantCriticalRating.toFloat() + currentStage->GetTeam(currentTeam)->GetActivePet()->GetCriticalStrikeRating();
+		avoidanceRating = currentStage->GetTeam((teamIndex%2)+1)->GetActivePet()->GetAvoidanceRating();
+		accuracyRating = variantAccuracyRating.toFloat() + currentStage->GetTeam(teamIndex)->GetActivePet()->GetAccuracyOffset();
+		criticalRating = variantCriticalRating.toFloat() + currentStage->GetTeam(teamIndex)->GetActivePet()->GetCriticalStrikeRating();
 		chanceOnHitRating = variantChanceOnHitRating.toFloat();
 
 		//Check current team's opponent's pet's avoidance rating and if it is in between 0 and 1.
 		//This is important as guaranteed dodge or none will not affect the move outcome in later steps.
-		avoidanceRating = currentStage->GetTeam((currentTeam%2)+1)->GetActivePet()->GetAvoidanceRating();
-		if (avoidanceRating > 0.00 && avoidanceRating < 1.00)
+		avoidanceRating = currentStage->GetTeam((teamIndex%2)+1)->GetActivePet()->GetAvoidanceRating();
+		if (avoidanceRating > minAvoidanceThreshold && avoidanceRating < maxAvoidanceThreshold)
 		{
 			//Determine if ability can miss.
-			if (accuracyRating > 0.00 && accuracyRating < 1.00)
+			if (accuracyRating > minHitThreshold && accuracyRating < maxHitThreshold)
 			{
 				//Determine if the ability can crit.
-				if (criticalRating > 0.00 && criticalRating < 1.00)
+				if (criticalRating > minCritThreshold && criticalRating < maxCritThreshold)
 				{
 					//Determine if ability has a chance on hit ability that can proc.
-					if (chanceOnHitRating > 0.00 && chanceOnHitRating < 1.00)
+					if (chanceOnHitRating > minChanceOnHitThreshold && chanceOnHitRating < maxChanceOnHitThreshold)
 					{	//16 possible outcomes, does (not) avoid, does (not) hit, does (not) crit, chance on hit does (not) proc.
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, avoidanceRating, accuracyRating, criticalRating, chanceOnHitRating, true, true, true, true);
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, avoidanceRating, accuracyRating, criticalRating, 1-chanceOnHitRating, true, true, true, false);
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, avoidanceRating, accuracyRating, 1-criticalRating, chanceOnHitRating, true, true, false, true);
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, avoidanceRating, accuracyRating, 1-criticalRating, 1-chanceOnHitRating, true, true, false, false);
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, avoidanceRating, 1-accuracyRating, criticalRating, chanceOnHitRating, true, false, true, true);
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, avoidanceRating, 1-accuracyRating, criticalRating, 1-chanceOnHitRating, true, false, true, false);
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, avoidanceRating, 1-accuracyRating, 1-criticalRating, chanceOnHitRating, true, false, false, true);
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, avoidanceRating, 1-accuracyRating, 1-criticalRating, 1-chanceOnHitRating, true, false, false, false);
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, 1-avoidanceRating, accuracyRating, criticalRating, chanceOnHitRating, false, true, true, true);
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, 1-avoidanceRating, accuracyRating, criticalRating, 1-chanceOnHitRating, false, true, true, false);
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, 1-avoidanceRating, accuracyRating, 1-criticalRating, chanceOnHitRating, false, true, false, true);
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, 1-avoidanceRating, accuracyRating, 1-criticalRating, 1-chanceOnHitRating, false, true, false, false);
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, 1-avoidanceRating, 1-accuracyRating, criticalRating, chanceOnHitRating, false, false, true, true);
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, 1-avoidanceRating, 1-accuracyRating, criticalRating, 1-chanceOnHitRating, false, false, true, false);
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, 1-avoidanceRating, 1-accuracyRating, 1-criticalRating, chanceOnHitRating, false, false, false, true);
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, 1-avoidanceRating, 1-accuracyRating, 1-criticalRating, 1-chanceOnHitRating, false, false, false, false);
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, avoidanceRating, accuracyRating, criticalRating, chanceOnHitRating, true, true, true, true);
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, avoidanceRating, accuracyRating, criticalRating, 1-chanceOnHitRating, true, true, true, false);
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, avoidanceRating, accuracyRating, 1-criticalRating, chanceOnHitRating, true, true, false, true);
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, avoidanceRating, accuracyRating, 1-criticalRating, 1-chanceOnHitRating, true, true, false, false);
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, avoidanceRating, 1-accuracyRating, criticalRating, chanceOnHitRating, true, false, true, true);
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, avoidanceRating, 1-accuracyRating, criticalRating, 1-chanceOnHitRating, true, false, true, false);
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, avoidanceRating, 1-accuracyRating, 1-criticalRating, chanceOnHitRating, true, false, false, true);
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, avoidanceRating, 1-accuracyRating, 1-criticalRating, 1-chanceOnHitRating, true, false, false, false);
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, 1-avoidanceRating, accuracyRating, criticalRating, chanceOnHitRating, false, true, true, true);
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, 1-avoidanceRating, accuracyRating, criticalRating, 1-chanceOnHitRating, false, true, true, false);
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, 1-avoidanceRating, accuracyRating, 1-criticalRating, chanceOnHitRating, false, true, false, true);
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, 1-avoidanceRating, accuracyRating, 1-criticalRating, 1-chanceOnHitRating, false, true, false, false);
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, 1-avoidanceRating, 1-accuracyRating, criticalRating, chanceOnHitRating, false, false, true, true);
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, 1-avoidanceRating, 1-accuracyRating, criticalRating, 1-chanceOnHitRating, false, false, true, false);
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, 1-avoidanceRating, 1-accuracyRating, 1-criticalRating, chanceOnHitRating, false, false, false, true);
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, 1-avoidanceRating, 1-accuracyRating, 1-criticalRating, 1-chanceOnHitRating, false, false, false, false);
 					}
 					else	//Proc is either guaranteed or simply doesn't have one.
 					{	//8 possible outcomes, does (not) avoid, does (not) hit, does (not) crit, chance on hit does (not) proc.
-						bool isProcing = (chanceOnHitRating <= 0.00) ? false : true;
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, avoidanceRating, accuracyRating, criticalRating, 1.00, true, true, true, isProcing);
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, avoidanceRating, accuracyRating, 1-criticalRating, 1.00, true, true, false, isProcing);
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, avoidanceRating, 1-accuracyRating, criticalRating, 1.00, true, false, true, isProcing);
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, avoidanceRating, 1-accuracyRating, 1-criticalRating, 1.00, true, false, false, isProcing);
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, 1-avoidanceRating, accuracyRating, criticalRating, 1.00, false, true, true, isProcing);
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, 1-avoidanceRating, accuracyRating, 1-criticalRating, 1.00, false, true, false, isProcing);
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, 1-avoidanceRating, 1-accuracyRating, criticalRating, 1.00, false, false, true, isProcing);
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, 1-avoidanceRating, 1-accuracyRating, 1-criticalRating, 1.00, false, false, false, isProcing);
+						bool isProcing = (chanceOnHitRating <= minChanceOnHitThreshold) ? false : true;
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, avoidanceRating, accuracyRating, criticalRating, 1.00, true, true, true, isProcing);
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, avoidanceRating, accuracyRating, 1-criticalRating, 1.00, true, true, false, isProcing);
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, avoidanceRating, 1-accuracyRating, criticalRating, 1.00, true, false, true, isProcing);
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, avoidanceRating, 1-accuracyRating, 1-criticalRating, 1.00, true, false, false, isProcing);
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, 1-avoidanceRating, accuracyRating, criticalRating, 1.00, false, true, true, isProcing);
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, 1-avoidanceRating, accuracyRating, 1-criticalRating, 1.00, false, true, false, isProcing);
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, 1-avoidanceRating, 1-accuracyRating, criticalRating, 1.00, false, false, true, isProcing);
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, 1-avoidanceRating, 1-accuracyRating, 1-criticalRating, 1.00, false, false, false, isProcing);
 					}
 				}
 				else	//Ability is either guaranteed to crit or not crit at all.
 				{	
-					bool isCritting = (criticalRating <= 0.00) ? false : true;
+					bool isCritting = (criticalRating <= minCritThreshold) ? false : true;
 
 					//Determine if ability has a chance on hit ability that can proc.
-					if (chanceOnHitRating > 0.00 && chanceOnHitRating < 1.00)
+					if (chanceOnHitRating > minChanceOnHitThreshold && chanceOnHitRating < maxChanceOnHitThreshold)
 					{	//8 possible outcomes, does (not) avoid, does (not) hit, does (not) crit, chance on hit does (not) proc.
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, avoidanceRating, accuracyRating, 1.00, chanceOnHitRating, true, true, isCritting, true);
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, avoidanceRating, accuracyRating, 1.00, 1-chanceOnHitRating, true, true, isCritting, false);
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, avoidanceRating, 1-accuracyRating, 1.00, chanceOnHitRating, true, false, isCritting, true);
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, avoidanceRating, 1-accuracyRating, 1.00, 1-chanceOnHitRating, true, false, isCritting, false);
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, 1-avoidanceRating, accuracyRating, 1.00, chanceOnHitRating, false, true, isCritting, true);
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, 1-avoidanceRating, accuracyRating, 1.00, 1-chanceOnHitRating, false, true, isCritting, false);
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, 1-avoidanceRating, 1-accuracyRating, 1.00, chanceOnHitRating, false, false, isCritting, true);
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, 1-avoidanceRating, 1-accuracyRating, 1.00, 1-chanceOnHitRating, false, false, isCritting, false);
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, avoidanceRating, accuracyRating, 1.00, chanceOnHitRating, true, true, isCritting, true);
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, avoidanceRating, accuracyRating, 1.00, 1-chanceOnHitRating, true, true, isCritting, false);
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, avoidanceRating, 1-accuracyRating, 1.00, chanceOnHitRating, true, false, isCritting, true);
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, avoidanceRating, 1-accuracyRating, 1.00, 1-chanceOnHitRating, true, false, isCritting, false);
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, 1-avoidanceRating, accuracyRating, 1.00, chanceOnHitRating, false, true, isCritting, true);
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, 1-avoidanceRating, accuracyRating, 1.00, 1-chanceOnHitRating, false, true, isCritting, false);
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, 1-avoidanceRating, 1-accuracyRating, 1.00, chanceOnHitRating, false, false, isCritting, true);
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, 1-avoidanceRating, 1-accuracyRating, 1.00, 1-chanceOnHitRating, false, false, isCritting, false);
 					}
 					else	//Proc is either guaranteed or simply doesn't have one.
 					{	//4 possible outcomes, does (not) avoid, does (not) hit, does (not) crit, chance on hit does (not) proc.
-						bool isProcing = (chanceOnHitRating <= 0.00) ? false : true;
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, avoidanceRating, accuracyRating, 1.00, 1.00, true, true, isCritting, isProcing);
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, avoidanceRating, 1-accuracyRating, 1.00, 1.00, true, false, isCritting, isProcing);
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, 1-avoidanceRating, accuracyRating, 1.00, 1.00, false, true, isCritting, isProcing);
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, 1-avoidanceRating, 1-accuracyRating, 1.00, 1.00, false, false, isCritting, isProcing);
+						bool isProcing = (chanceOnHitRating <= minChanceOnHitThreshold) ? false : true;
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, avoidanceRating, accuracyRating, 1.00, 1.00, true, true, isCritting, isProcing);
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, avoidanceRating, 1-accuracyRating, 1.00, 1.00, true, false, isCritting, isProcing);
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, 1-avoidanceRating, accuracyRating, 1.00, 1.00, false, true, isCritting, isProcing);
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, 1-avoidanceRating, 1-accuracyRating, 1.00, 1.00, false, false, isCritting, isProcing);
 					}
 				}
 			}
 			else	//We are going to hit no matter what or not at all.
 			{
-				bool isHitting = (accuracyRating <= 0.00) ? false : true;
+				bool isHitting = (accuracyRating <= minHitThreshold) ? false : true;
 
 				//Determine if the ability can crit.
-				if (criticalRating > 0.00 && criticalRating < 1.00)
+				if (criticalRating > minCritThreshold && criticalRating < maxCritThreshold)
 				{	
 					//Determine if ability has a chance on hit ability that can proc.
-					if (chanceOnHitRating > 0.00 && chanceOnHitRating < 1.00)
+					if (chanceOnHitRating > minChanceOnHitThreshold && chanceOnHitRating < maxChanceOnHitThreshold)
 					{	//8 possible outcomes, does (not) avoid, does (not) hit, does (not) crit, chance on hit does (not) proc.
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, avoidanceRating, 1.00, criticalRating, chanceOnHitRating, true, isHitting, true, true);
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, avoidanceRating, 1.00, criticalRating, 1-chanceOnHitRating, true, isHitting, true, false);
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, avoidanceRating, 1.00, 1-criticalRating, chanceOnHitRating, true, isHitting, false, true);
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, avoidanceRating, 1.00, 1-criticalRating, 1-chanceOnHitRating, true, isHitting, false, false);
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, 1-avoidanceRating, 1.00, criticalRating, chanceOnHitRating, false, isHitting, true, true);
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, 1-avoidanceRating, 1.00, criticalRating, 1-chanceOnHitRating, false, isHitting, true, false);
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, 1-avoidanceRating, 1.00, 1-criticalRating, chanceOnHitRating, false, isHitting, false, true);
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, 1-avoidanceRating, 1.00, 1-criticalRating, 1-chanceOnHitRating, false, isHitting, false, false);
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, avoidanceRating, 1.00, criticalRating, chanceOnHitRating, true, isHitting, true, true);
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, avoidanceRating, 1.00, criticalRating, 1-chanceOnHitRating, true, isHitting, true, false);
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, avoidanceRating, 1.00, 1-criticalRating, chanceOnHitRating, true, isHitting, false, true);
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, avoidanceRating, 1.00, 1-criticalRating, 1-chanceOnHitRating, true, isHitting, false, false);
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, 1-avoidanceRating, 1.00, criticalRating, chanceOnHitRating, false, isHitting, true, true);
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, 1-avoidanceRating, 1.00, criticalRating, 1-chanceOnHitRating, false, isHitting, true, false);
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, 1-avoidanceRating, 1.00, 1-criticalRating, chanceOnHitRating, false, isHitting, false, true);
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, 1-avoidanceRating, 1.00, 1-criticalRating, 1-chanceOnHitRating, false, isHitting, false, false);
 					}
 					else	//Proc is either guaranteed or simply doesn't have one.
 					{	//4 possible outcomes, does (not) avoid, does (not) hit, does (not) crit, chance on hit does (not) proc.
-						bool isProcing = (chanceOnHitRating <= 0.00) ? false : true;
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, avoidanceRating, 1.00, criticalRating, 1.00, true, isHitting, true, isProcing);
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, avoidanceRating, 1.00, 1-criticalRating, 1.00, true, isHitting, false, isProcing);
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, 1-avoidanceRating, 1.00, criticalRating, 1.00, false, isHitting, true, isProcing);
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, 1-avoidanceRating, 1.00, 1-criticalRating, 1.00, false, isHitting, false, isProcing);
+						bool isProcing = (chanceOnHitRating <= minChanceOnHitThreshold) ? false : true;
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, avoidanceRating, 1.00, criticalRating, 1.00, true, isHitting, true, isProcing);
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, avoidanceRating, 1.00, 1-criticalRating, 1.00, true, isHitting, false, isProcing);
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, 1-avoidanceRating, 1.00, criticalRating, 1.00, false, isHitting, true, isProcing);
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, 1-avoidanceRating, 1.00, 1-criticalRating, 1.00, false, isHitting, false, isProcing);
 					}
 				}
 				else	//Ability is either guaranteed to crit or not crit at all.
 				{
-					bool isCritting = (criticalRating <= 0.00) ? false : true;
+					bool isCritting = (criticalRating <= minCritThreshold) ? false : true;
 
 					//Determine if ability has a chance on hit ability that can proc.
-					if (chanceOnHitRating > 0.00 && chanceOnHitRating < 1.00)
+					if (chanceOnHitRating > minChanceOnHitThreshold && chanceOnHitRating < maxChanceOnHitThreshold)
 					{	//4 possible outcomes, does (not) avoid, does (not) hit, does (not) crit, chance on hit does (not) proc.
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, avoidanceRating, 1.00, 1.00, chanceOnHitRating, true, isHitting, isCritting, true);
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, avoidanceRating, 1.00, 1.00, 1-chanceOnHitRating, true, isHitting, isCritting, false);
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, 1-avoidanceRating, 1.00, 1.00, chanceOnHitRating, false, isHitting, isCritting, true);
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, 1-avoidanceRating, 1.00, 1.00, 1-chanceOnHitRating, false, isHitting, isCritting, false);
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, avoidanceRating, 1.00, 1.00, chanceOnHitRating, true, isHitting, isCritting, true);
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, avoidanceRating, 1.00, 1.00, 1-chanceOnHitRating, true, isHitting, isCritting, false);
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, 1-avoidanceRating, 1.00, 1.00, chanceOnHitRating, false, isHitting, isCritting, true);
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, 1-avoidanceRating, 1.00, 1.00, 1-chanceOnHitRating, false, isHitting, isCritting, false);
 					}
 					else	//Proc is either guaranteed or simply doesn't have one.
 					{	//2 possible outcomes, does (not) avoid, does (not) hit, does (not) crit, chance on hit does (not) proc.
-						bool isProcing = (chanceOnHitRating <= 0.00) ? false : true;
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, avoidanceRating, 1.00, 1.00, 1.00, true, isHitting, isCritting, isProcing);
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, 1-avoidanceRating, 1.00, 1.00, 1.00, false, isHitting, isCritting, isProcing);
+						bool isProcing = (chanceOnHitRating <= minChanceOnHitThreshold) ? false : true;
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, avoidanceRating, 1.00, 1.00, 1.00, true, isHitting, isCritting, isProcing);
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, 1-avoidanceRating, 1.00, 1.00, 1.00, false, isHitting, isCritting, isProcing);
 					}
 				}
 			}
 		}
 		else	//We are either avoiding or not avoiding.
 		{
-			bool isAvoiding = (avoidanceRating <= 0.00) ? false : true;
+			bool isAvoiding = (avoidanceRating <= minAvoidanceThreshold) ? false : true;
 
 			//Determine if ability can miss.
-			if (accuracyRating > 0.00 && accuracyRating < 1.00)
+			if (accuracyRating > minHitThreshold && accuracyRating < maxHitThreshold)
 			{
 				//Determine if the ability can crit.
-				if (criticalRating > 0.00 && criticalRating < 1.00)
+				if (criticalRating > minCritThreshold && criticalRating < maxCritThreshold)
 				{	
 					//Determine if ability has a chance on hit ability that can proc.
-					if (chanceOnHitRating > 0.00 && chanceOnHitRating < 1.00)
+					if (chanceOnHitRating > minChanceOnHitThreshold && chanceOnHitRating < maxChanceOnHitThreshold)
 					{	//8 possible outcomes, does (not) avoid, does (not) hit, does (not) crit, chance on hit does (not) proc.
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, 1.00, accuracyRating, criticalRating, chanceOnHitRating, isAvoiding, true, true, true);
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, 1.00, accuracyRating, criticalRating, 1-chanceOnHitRating, isAvoiding, true, true, false);
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, 1.00, accuracyRating, 1-criticalRating, chanceOnHitRating, isAvoiding, true, false, true);
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, 1.00, accuracyRating, 1-criticalRating, 1-chanceOnHitRating, isAvoiding, true, false, false);
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, 1.00, 1-accuracyRating, criticalRating, chanceOnHitRating, isAvoiding, false, true, true);
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, 1.00, 1-accuracyRating, criticalRating, 1-chanceOnHitRating, isAvoiding, false, true, false);
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, 1.00, 1-accuracyRating, 1-criticalRating, chanceOnHitRating, isAvoiding, false, false, true);
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, 1.00, 1-accuracyRating, 1-criticalRating, 1-chanceOnHitRating, isAvoiding, false, false, false);
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, 1.00, accuracyRating, criticalRating, chanceOnHitRating, isAvoiding, true, true, true);
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, 1.00, accuracyRating, criticalRating, 1-chanceOnHitRating, isAvoiding, true, true, false);
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, 1.00, accuracyRating, 1-criticalRating, chanceOnHitRating, isAvoiding, true, false, true);
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, 1.00, accuracyRating, 1-criticalRating, 1-chanceOnHitRating, isAvoiding, true, false, false);
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, 1.00, 1-accuracyRating, criticalRating, chanceOnHitRating, isAvoiding, false, true, true);
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, 1.00, 1-accuracyRating, criticalRating, 1-chanceOnHitRating, isAvoiding, false, true, false);
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, 1.00, 1-accuracyRating, 1-criticalRating, chanceOnHitRating, isAvoiding, false, false, true);
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, 1.00, 1-accuracyRating, 1-criticalRating, 1-chanceOnHitRating, isAvoiding, false, false, false);
 					}
 					else
 					{	//4 possible outcomes, does (not) avoid, does (not) hit, does (not) crit, chance on hit does (not) proc.
-						bool isProcing = (chanceOnHitRating <= 0.00) ? false : true;
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, 1.00, accuracyRating, criticalRating, 1.00, isAvoiding, true, true, isProcing);
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, 1.00, accuracyRating, 1-criticalRating, 1.00, isAvoiding, true, false, isProcing);
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, 1.00, 1-accuracyRating, criticalRating, 1.00, isAvoiding, false, true, isProcing);
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, 1.00, 1-accuracyRating, 1-criticalRating, 1.00, isAvoiding, false, false, isProcing);
+						bool isProcing = (chanceOnHitRating <= minChanceOnHitThreshold) ? false : true;
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, 1.00, accuracyRating, criticalRating, 1.00, isAvoiding, true, true, isProcing);
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, 1.00, accuracyRating, 1-criticalRating, 1.00, isAvoiding, true, false, isProcing);
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, 1.00, 1-accuracyRating, criticalRating, 1.00, isAvoiding, false, true, isProcing);
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, 1.00, 1-accuracyRating, 1-criticalRating, 1.00, isAvoiding, false, false, isProcing);
 					}
 				}
 				else	//Ability is either guaranteed to crit or not crit at all.
 				{	
-					bool isCritting = (criticalRating <= 0.00) ? false : true;
+					bool isCritting = (criticalRating <= minCritThreshold) ? false : true;
 
 					//Determine if ability has a chance on hit ability that can proc.
-					if (chanceOnHitRating > 0.00 && chanceOnHitRating < 1.00)
+					if (chanceOnHitRating > minChanceOnHitThreshold && chanceOnHitRating < maxChanceOnHitThreshold)
 					{	//4 possible outcomes, does (not) avoid, does (not) hit, does (not) crit, chance on hit does (not) proc.
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, 1.00, accuracyRating, 1.00, chanceOnHitRating, isAvoiding, true, isCritting, true);
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, 1.00, accuracyRating, 1.00, 1-chanceOnHitRating, isAvoiding, true, isCritting, false);
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, 1.00, 1-accuracyRating, 1.00, chanceOnHitRating, isAvoiding, false, isCritting, true);
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, 1.00, 1-accuracyRating, 1.00, 1-chanceOnHitRating, isAvoiding, false, isCritting, false);
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, 1.00, accuracyRating, 1.00, chanceOnHitRating, isAvoiding, true, isCritting, true);
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, 1.00, accuracyRating, 1.00, 1-chanceOnHitRating, isAvoiding, true, isCritting, false);
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, 1.00, 1-accuracyRating, 1.00, chanceOnHitRating, isAvoiding, false, isCritting, true);
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, 1.00, 1-accuracyRating, 1.00, 1-chanceOnHitRating, isAvoiding, false, isCritting, false);
 					}
 					else
 					{	//2 possible outcomes, does (not) avoid, does (not) hit, does (not) crit, chance on hit does (not) proc.
-						bool isProcing = (chanceOnHitRating <= 0.00) ? false : true;
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, 1.00, accuracyRating, 1.00, 1.00, isAvoiding, true, isCritting, isProcing);
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, 1.00, 1-accuracyRating, 1.00, 1.00, isAvoiding, false, isCritting, isProcing);
+						bool isProcing = (chanceOnHitRating <= minChanceOnHitThreshold) ? false : true;
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, 1.00, accuracyRating, 1.00, 1.00, isAvoiding, true, isCritting, isProcing);
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, 1.00, 1-accuracyRating, 1.00, 1.00, isAvoiding, false, isCritting, isProcing);
 					}
 				}
 			}
 			else	//We are going to hit no matter what or not at all.
 			{
-				bool isHitting = (accuracyRating <= 0.00) ? false : true;
+				bool isHitting = (accuracyRating <= minHitThreshold) ? false : true;
 				//Determine if the ability can crit.
-				if (criticalRating > 0.00 && criticalRating < 1.00)
+				if (criticalRating > minCritThreshold && criticalRating < maxCritThreshold)
 				{	
 					//Determine if ability has a chance on hit ability that can proc.
-					if (chanceOnHitRating > 0.00 && chanceOnHitRating < 1.00)
+					if (chanceOnHitRating > minChanceOnHitThreshold && chanceOnHitRating < maxChanceOnHitThreshold)
 					{	//4 possible outcomes, does (not) avoid, does (not) hit, does (not) crit, chance on hit does (not) proc.
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, 1.00, 1.00, criticalRating, chanceOnHitRating, isAvoiding, isHitting, true, true);
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, 1.00, 1.00, criticalRating, 1-chanceOnHitRating, isAvoiding, isHitting, true, false);
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, 1.00, 1.00, 1-criticalRating, chanceOnHitRating, isAvoiding, isHitting, false, true);
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, 1.00, 1.00, 1-criticalRating, 1-chanceOnHitRating, isAvoiding, isHitting, false, false);
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, 1.00, 1.00, criticalRating, chanceOnHitRating, isAvoiding, isHitting, true, true);
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, 1.00, 1.00, criticalRating, 1-chanceOnHitRating, isAvoiding, isHitting, true, false);
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, 1.00, 1.00, 1-criticalRating, chanceOnHitRating, isAvoiding, isHitting, false, true);
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, 1.00, 1.00, 1-criticalRating, 1-chanceOnHitRating, isAvoiding, isHitting, false, false);
 					}
 					else
 					{	//2 possible outcomes, does (not) avoid, does (not) hit, does (not) crit, chance on hit does (not) proc.
-						bool isProcing = (chanceOnHitRating <= 0.00) ? false : true;
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, 1.00, 1.00, criticalRating, 1.00, isAvoiding, isHitting, true, isProcing);
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, 1.00, 1.00, 1-criticalRating, 1.00, isAvoiding, isHitting, false, isProcing);
+						bool isProcing = (chanceOnHitRating <= minChanceOnHitThreshold) ? false : true;
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, 1.00, 1.00, criticalRating, 1.00, isAvoiding, isHitting, true, isProcing);
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, 1.00, 1.00, 1-criticalRating, 1.00, isAvoiding, isHitting, false, isProcing);
 					}
 				}
 				else	//Ability is either guaranteed to crit or not crit at all.
 				{
-					bool isCritting = (criticalRating <= 0.00) ? false : true;
+					bool isCritting = (criticalRating <= minCritThreshold) ? false : true;
 
 					//Determine if ability has a chance on hit ability that can proc.
-					if (chanceOnHitRating > 0.00 && chanceOnHitRating < 1.00)
+					if (chanceOnHitRating > minChanceOnHitThreshold && chanceOnHitRating < maxChanceOnHitThreshold)
 					{
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, 1.00, 1.00, 1.00, chanceOnHitRating, isAvoiding, isHitting, isCritting, true);
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, 1.00, 1.00, 1.00, 1-chanceOnHitRating, isAvoiding, isHitting, isCritting, false);
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, 1.00, 1.00, 1.00, chanceOnHitRating, isAvoiding, isHitting, isCritting, true);
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, 1.00, 1.00, 1.00, 1-chanceOnHitRating, isAvoiding, isHitting, isCritting, false);
 					}
 					else
 					{
-						bool isProcing = (chanceOnHitRating <= 0.00) ? false : true;
-						heuristic += UseAction(currentStage, depth, currentTeam, firstCall, 1.00, 1.00, 1.00, 1.00, isAvoiding, isHitting, isCritting, chanceOnHitRating);
+						bool isProcing = (chanceOnHitRating <= minChanceOnHitThreshold) ? false : true;
+						heuristic += UseAction(currentStage, depth, teamIndex, firstCall, 1.00, 1.00, 1.00, 1.00, isAvoiding, isHitting, isCritting, chanceOnHitRating);
 					}
 				}
 			}
 		}
 	}
 	//Pet swap occuring.
-	else if (currentStage->GetTeam(currentTeam)->GetActivePet()->GetCurrentAction()->GetAction() > 3
-			&& currentStage->GetTeam(currentTeam)->GetActivePet()->GetCurrentAction()->GetAction() < 7)		
+	else if (currentStage->GetTeam(teamIndex)->GetActivePet()->GetCurrentAction()->GetAction() > 3
+			&& currentStage->GetTeam(teamIndex)->GetActivePet()->GetCurrentAction()->GetAction() < 7)		
 	{
-		quint8 tempAction = currentStage->GetTeam(currentTeam)->GetActivePet()->GetCurrentAction()->GetAction() - 3;
+		quint8 tempAction = currentStage->GetTeam(teamIndex)->GetActivePet()->GetCurrentAction()->GetAction() - 3;
 
 		//Empty the pet's current action.
-		currentStage->GetTeam(currentTeam)->GetActivePet()->GetCurrentAction()->SetAction(PetAction::None);
-		currentStage->GetTeam(currentTeam)->GetActivePet()->GetCurrentAction()->SetRoundsRemaining(0);
+		currentStage->GetTeam(teamIndex)->GetActivePet()->GetCurrentAction()->SetAction(PetAction::None);
+		currentStage->GetTeam(teamIndex)->GetActivePet()->GetCurrentAction()->SetRoundsRemaining(0);
 
 		//Change to the designated pet.
-		currentStage->GetTeam(currentTeam)->SetActivePet(tempAction);
+		currentStage->GetTeam(teamIndex)->SetActivePet(tempAction);
 
 		//Call other teams move or end turn.
 		if (firstCall)
-			heuristic += ActionOutcomes(currentStage, depth, (currentTeam%2)+1, !firstCall);
+			heuristic += ActionOutcomes(currentStage, depth, (teamIndex%2)+1, !firstCall);
 		else
 			heuristic += EndTurn(currentStage, depth);
 	}
@@ -623,7 +654,7 @@ float AI::ActionOutcomes(PetStage *stageNode, quint8 depth, quint8 currentTeam, 
 	{
 		//Call other teams move or end turn.
 		if (firstCall)
-			heuristic += ActionOutcomes(currentStage, depth, (currentTeam%2)+1, !firstCall);
+			heuristic += ActionOutcomes(currentStage, depth, (teamIndex%2)+1, !firstCall);
 		else
 			heuristic += EndTurn(currentStage, depth);
 	}
@@ -634,7 +665,7 @@ float AI::ActionOutcomes(PetStage *stageNode, quint8 depth, quint8 currentTeam, 
 }
 
 //Uses action given certain conditions.
-float AI::UseAction(PetStage* stageNode, quint8 depth, quint8 currentTeam, bool firstCall,
+float AI::UseAction(PetStage* stageNode, quint8 depth, quint8 teamIndex, bool firstCall,
 						 float avoidanceRating, float hitRating, float critRating, float chanceOnHitRating,
 						 bool isAvoiding, bool isHitting, bool isCritting, bool isProcing)
 {
@@ -646,10 +677,10 @@ float AI::UseAction(PetStage* stageNode, quint8 depth, quint8 currentTeam, bool 
 	PetStage *outcome = new PetStage(*stageNode);
 	objectContext->setContextProperty("petStage", outcome);
 	object = component->create(objectContext);
-	//Parameters are currentTeam, priority, isAvoiding, isHitting, isCritting and isPrcoing.
-	QMetaObject::invokeMethod(object, "useAbility", Q_RETURN_ARG(QVariant, variantNumHits), Q_ARG(QVariant, currentTeam), Q_ARG(QVariant, (-1)
-								* (outcome->GetTeam(currentTeam)->GetActivePet()->GetCurrentAction()->GetRoundsRemaining() - outcome->GetTeam(currentTeam)
-								->GetActivePet()->GetAbility(outcome->GetTeam(currentTeam)->GetActivePet()->GetCurrentAction()->GetAction())->GetRounds()) + 1),
+	//Parameters are teamIndex, priority, isAvoiding, isHitting, isCritting and isPrcoing.
+	QMetaObject::invokeMethod(object, "useAbility", Q_RETURN_ARG(QVariant, variantNumHits), Q_ARG(QVariant, teamIndex), Q_ARG(QVariant, (-1)
+								* (outcome->GetTeam(teamIndex)->GetActivePet()->GetCurrentAction()->GetRoundsRemaining() - outcome->GetTeam(teamIndex)
+								->GetActivePet()->GetAbility(outcome->GetTeam(teamIndex)->GetActivePet()->GetCurrentAction()->GetAction())->GetRounds()) + 1),
 								Q_ARG(QVariant, firstCall), Q_ARG(QVariant, isAvoiding), Q_ARG(QVariant, isHitting), Q_ARG(QVariant, isCritting), Q_ARG(QVariant, isProcing));
 	//Catch any exceptions and report them.
 	if (component->status() != QQmlComponent::Ready)
@@ -688,7 +719,7 @@ float AI::UseAction(PetStage* stageNode, quint8 depth, quint8 currentTeam, bool 
 		//If it is the first time this function was called we must still process the other team's action.
 		if (firstCall)
 			//If there is more than one option divide by the size.
-			heuristic += avoidanceRating * hitRating * critRating * ActionOutcomes(curPossibleStage, depth, (currentTeam%2)+1, false) / possibleStagesSize;
+			heuristic += avoidanceRating * hitRating * critRating * ActionOutcomes(curPossibleStage, depth, (teamIndex%2)+1, false) / possibleStagesSize;
 		else
 			heuristic += avoidanceRating * hitRating * critRating * EndTurn(curPossibleStage, depth) / possibleStagesSize;
 

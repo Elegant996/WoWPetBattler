@@ -7,9 +7,6 @@ WoWPetBattler::WoWPetBattler(QWidget *parent)
 	//Set up the UI.
 	this->ui.setupUi(this);
 
-	//Set the layout.
-	this->setLayout(ui.gridLayout);
-
 	//Set position of main GUI.
 	if (taskbar.Synchronize())
 		this->move(taskbar.GetBounds().W - size().width() - 15, taskbar.GetBounds().Y - size().height() - 35);
@@ -18,19 +15,25 @@ WoWPetBattler::WoWPetBattler(QWidget *parent)
 
 	//Initialize Preferences.
 	this->preferences = new Preferences(this);
-	connect(preferences, SIGNAL(WritePreferences()), this, SLOT(LoadPreferences()));
 
-	//Initialize interpreter.
+	//Initialize Interpreter.
 	this->interpreter = new Interpreter(petStage, ai, &WoWWindow);
-	connect(interpreter, SIGNAL(OutputToGUI(QString, QString)), this, SLOT(Output(QString, QString)));
-	connect(interpreter, SIGNAL(OutputToGUI(QString)), this, SLOT(Output("", QString)));
-	connect(interpreter, SIGNAL(Stop(QString)), this, SLOT(Stop(QString)));
 
 	//Initialize AI.
 	this->ai = new AI(petStage, &WoWWindow);
 	this->ai->moveToThread(interpreter);
-	connect(ai, SIGNAL(OutputToGUI(QString, QString)), this, SLOT(Output(QString, QString)));
-	connect(ai, SIGNAL(OutputToGUI(QString)), this, SLOT(Output("", QString)));
+
+	//Initialize AI connections.
+	connect(this->preferences, SIGNAL(LoadPreferences()), this->ai, SLOT(LoadPreferences()));
+
+	//Initialize Interpreter connections.
+	connect(this->interpreter, SIGNAL(OutputToGUI(QString, QString)), this, SLOT(Output(QString, QString)));
+	connect(this->interpreter, SIGNAL(OutputToGUI(QString)), this, SLOT(Output(QString)));
+	connect(this->interpreter, SIGNAL(Stop(QString)), this, SLOT(Stop(QString)));
+
+	//Initialize AI connections.
+	connect(this->ai, SIGNAL(OutputToGUI(QString, QString)), this, SLOT(Output(QString, QString)));
+	connect(this->ai, SIGNAL(OutputToGUI(QString)), this, SLOT(Output(QString)));
 
 	//Testing data
 	petStage->GetTeam(1)->AddPet(1229, 5, 4, 25);
@@ -79,18 +82,18 @@ WoWPetBattler::~WoWPetBattler()
 	delete preferences;
 }
 
-//Saves preferences to *.ini file.
-void WoWPetBattler::LoadPreferences()
-{
-	
-}
-
 //Output to browser.
 void WoWPetBattler::Output(QString caption, QString info)
 {
 	if (!caption.isEmpty())
 		ui.statusLabel->setText(caption);
 	ui.outputBrowser->append(info);
+}
+
+//Output to browser without caption.
+void WoWPetBattler::Output(QString info)
+{
+	Output("", info);
 }
 
 //Stop the bot.

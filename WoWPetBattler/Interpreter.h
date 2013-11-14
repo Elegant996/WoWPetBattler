@@ -5,6 +5,7 @@
 #include <QThread>
 #include <QElapsedTimer>
 #include <QDebug>
+
 #include <Robot.h>
 
 #include "AI.h"
