@@ -21,6 +21,12 @@ Interpreter::~Interpreter(void)
 	delete image;
 }
 
+//Set the status of PvP Queuing.
+void Interpreter::QueueEnabled(bool queueEnabled)
+{
+	this->queueEnabled = queueEnabled;
+}
+
 //Exits the loop.
 void Interpreter::Exit()
 {

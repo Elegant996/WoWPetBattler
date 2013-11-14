@@ -33,6 +33,7 @@ public slots:
 	void Stop(QString);
 
 private slots:
+	void LoadPreferences();
 	void on_actionPreferences_triggered();
 	void on_playButton_clicked();
 
@@ -45,10 +46,10 @@ private:
 	Robot::Process process;
 
 	PetStage *petStage;
-
 	Interpreter *interpreter;
-
 	AI *ai;
+
+	bool disableAero;
 
 	QQmlEngine engine;
 };

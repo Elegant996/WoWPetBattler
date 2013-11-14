@@ -36,7 +36,7 @@ public:
     QSplitter *checkBoxSplitter;
     QCheckBox *aeroCheckBox;
     QCheckBox *tieCheckBox;
-    QCheckBox *passingCheckBox;
+    QCheckBox *passCheckBox;
     QCheckBox *PvPCheckBox;
     QGridLayout *thresholdsGridLayout;
     QSplitter *maxChanceOnHitSplitter;
@@ -70,7 +70,7 @@ public:
             PreferencesDialog->setObjectName(QStringLiteral("PreferencesDialog"));
         PreferencesDialog->resize(600, 477);
         PreferencesDialog->setMinimumSize(QSize(430, 440));
-        PreferencesDialog->setBaseSize(QSize(430, 435));
+        PreferencesDialog->setBaseSize(QSize(430, 440));
         layoutWidget = new QWidget(PreferencesDialog);
         layoutWidget->setObjectName(QStringLiteral("layoutWidget"));
         layoutWidget->setGeometry(QRect(10, 10, 581, 460));
@@ -123,11 +123,11 @@ public:
         tieCheckBox->setFont(font2);
         tieCheckBox->setChecked(true);
         checkBoxSplitter->addWidget(tieCheckBox);
-        passingCheckBox = new QCheckBox(checkBoxSplitter);
-        passingCheckBox->setObjectName(QStringLiteral("passingCheckBox"));
-        passingCheckBox->setFont(font2);
-        passingCheckBox->setChecked(false);
-        checkBoxSplitter->addWidget(passingCheckBox);
+        passCheckBox = new QCheckBox(checkBoxSplitter);
+        passCheckBox->setObjectName(QStringLiteral("passCheckBox"));
+        passCheckBox->setFont(font2);
+        passCheckBox->setChecked(false);
+        checkBoxSplitter->addWidget(passCheckBox);
         PvPCheckBox = new QCheckBox(checkBoxSplitter);
         PvPCheckBox->setObjectName(QStringLiteral("PvPCheckBox"));
         PvPCheckBox->setFont(font2);
@@ -358,7 +358,7 @@ public:
         optionsLabel->setText(QApplication::translate("PreferencesDialog", "Options", 0));
         aeroCheckBox->setText(QApplication::translate("PreferencesDialog", "Disables Aero (Increases Performance)", 0));
         tieCheckBox->setText(QApplication::translate("PreferencesDialog", "Random When Speeds Are Equal", 0));
-        passingCheckBox->setText(QApplication::translate("PreferencesDialog", "Considering Passing As A Move", 0));
+        passCheckBox->setText(QApplication::translate("PreferencesDialog", "Consider Passing As A Move", 0));
         PvPCheckBox->setText(QApplication::translate("PreferencesDialog", "Enable PvP Queuing", 0));
         maxChanceOnHitLabel->setText(QApplication::translate("PreferencesDialog", "Maximum Chance On Hit %", 0));
         minChanceOnHitLabel->setText(QApplication::translate("PreferencesDialog", "Minimum Chance On Hit %", 0));

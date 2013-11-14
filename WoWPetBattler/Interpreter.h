@@ -6,7 +6,11 @@
 #include <QElapsedTimer>
 #include <QDebug>
 
-#include <Robot.h>
+#include <Bounds.h>
+#include <Color.h>
+#include <Image.h>
+#include <Point.h>
+#include <Window.h>
 
 #include "AI.h"
 #include "PetStage.h"
@@ -18,6 +22,8 @@ class Interpreter : public QThread
 public:
 	Interpreter(PetStage*, AI*, Robot::Window*);
 	~Interpreter(void);
+
+	void QueueEnabled(bool);
 
 signals:
 	void OutputToGUI(QString, QString);

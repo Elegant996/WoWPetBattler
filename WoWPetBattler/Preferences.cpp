@@ -94,12 +94,18 @@ void Preferences::Save()
 	//Grab QSettings.
 	QSettings setting("Preferences.ini", QSettings::IniFormat);
 
-	//Open the group.
-	setting.beginGroup("Thresholds");
+	//Open Preferences group.
+	setting.beginGroup("Preferences");
 
 	//Store size and position of the Preferences GUI.
 	setting.setValue("preferencesSize", this->size());
 	setting.setValue("preferencesPosition", this->pos());
+
+	//Close Preferences group.
+	setting.endGroup();
+
+	//Open Thresholds group.
+	setting.beginGroup("Thresholds");
 
 	//Store avoidance rating.
 	setting.setValue("minAvoidanceThreshold", this->ui.minAvoidanceSlider->value());
@@ -117,7 +123,18 @@ void Preferences::Save()
 	setting.setValue("minChanceOnHitThreshold", this->ui.minChanceOnHitSlider->value());
 	setting.setValue("maxChanceOnHitThreshold", this->ui.maxChanceOnHitSlider->value());
 
-	//Close the group.
+	//Close Thresholds group.
+	setting.endGroup();
+
+	//Open Options group.
+	setting.beginGroup("Options");
+
+	setting.setValue("DisableAero", this->ui.aeroCheckBox->isChecked());		//Set whether to disable Aero.
+	setting.setValue("AutoDecideTies", this->ui.aeroCheckBox->isChecked());		//Set whether to auto decide ties.
+	setting.setValue("CanPass", this->ui.aeroCheckBox->isChecked());			//Set whether a pet can pass.
+	setting.setValue("PvPEnabled", this->ui.aeroCheckBox->isChecked());			//Set whether PvP is enabled.
+
+	//Close Options group.
 	setting.endGroup();
 }
 
@@ -127,12 +144,18 @@ void Preferences::Load()
 	//Grab QSettings.
 	QSettings setting("Preferences.ini", QSettings::IniFormat);
 
-	//Open the group.
-	setting.beginGroup("Thresholds");
+	//Open Preferences group.
+	setting.beginGroup("Preferences");
 
 	//Fetch size and position of the Preferences GUI.
 	this->resize(setting.value("preferencesSize", QSize(430, 440)).toSize());
 	this->move(setting.value("preferencesPosition", QPoint(this->size().width() / 2, this->size().height() / 2)).toPoint());
+
+	//Close Preferences group.
+	setting.endGroup();
+
+	//Open Thresholds group.
+	setting.beginGroup("Thresholds");
 
 	//Fetch avoidance rating.
 	this->ui.minAvoidanceSlider->setValue(setting.value("minAvoidanceThreshold", 0).toInt());
@@ -150,6 +173,17 @@ void Preferences::Load()
 	this->ui.minChanceOnHitSlider->setValue(setting.value("minChanceOnHitThreshold", 0).toInt());
 	this->ui.maxChanceOnHitSlider->setValue(setting.value("maxChanceOnHitThreshold", 0).toInt());
 
-	//Close the group.
+	//Close Thresholds group.
+	setting.endGroup();
+
+	//Open Options group.
+	setting.beginGroup("Options");
+
+	this->ui.aeroCheckBox->setChecked(setting.value("DisableAero", true).toBool());		//Fetch whether to disable Aero.
+	this->ui.tieCheckBox->setChecked(setting.value("AutoDecideTies", true).toBool());	//Fetch whether to auto decide ties.
+	this->ui.passCheckBox->setChecked(setting.value("CanPass", false).toBool());		//Fetch whether a pet can pass.
+	this->ui.PvPCheckBox->setChecked(setting.value("PvPEnabled", true).toBool());		//Fetch whether PvP is enabled.
+
+	//Close Options group.
 	setting.endGroup();
 }

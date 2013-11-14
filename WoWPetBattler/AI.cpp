@@ -22,8 +22,6 @@ AI::AI(PetStage *petStage, Robot::Window *window)
 
 	this->LoadPreferences();		//Setup thresholds.
 
-	this->tieBreaker = false;		//Used to decide if more nodes should be created.
-
 	this-> totalCalls = 0;
 }
 
@@ -61,6 +59,15 @@ void AI::LoadPreferences()
 	this->maxChanceOnHitThreshold = setting.value("maxChanceOnHitThreshold", 0).toFloat() * 0.05;
 
 	//Close the group.
+	setting.endGroup();
+
+	//Open Options group.
+	setting.beginGroup("Options");
+
+	this->tieBreaker = setting.value("AutoDecideTies", true).toBool();
+	this->canPass = setting.value("CanPass", false).toBool();
+
+	//Close Options group.
 	setting.endGroup();
 }
 
@@ -267,16 +274,19 @@ Move AI::SelectAction(PetStage *stageNode, quint8 depth, quint8 turnIndex)
 					nextMoves.append(nextMove);
 				}
 
-		//Passing is a valid option in some unique cases so we'll add it.
-		PetStage *actionNode = new PetStage(*stageNode);
-		actionNode->GetTeam(turnIndex)->GetActivePet()->GetCurrentAction()->SetAction(PetAction::Pass);
-		actionNode->GetTeam(turnIndex)->GetActivePet()->GetCurrentAction()->SetRoundsRemaining(1);
-		stageMoves.append(actionNode);
+		//If passing is enabled, add it to the list of possible moves.
+		if (this->canPass)
+		{
+			PetStage *actionNode = new PetStage(*stageNode);
+			actionNode->GetTeam(turnIndex)->GetActivePet()->GetCurrentAction()->SetAction(PetAction::Pass);
+			actionNode->GetTeam(turnIndex)->GetActivePet()->GetCurrentAction()->SetRoundsRemaining(1);
+			stageMoves.append(actionNode);
 
-		//Set the action and add the move to the list.
-		Move nextMove;
-		nextMove.SetAction(PetAction::Pass);
-		nextMoves.append(nextMove);
+			//Set the action and add the move to the list.
+			Move nextMove;
+			nextMove.SetAction(PetAction::Pass);
+			nextMoves.append(nextMove);
+		}
 	}
 
 	//Set the action for each move.

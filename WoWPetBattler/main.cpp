@@ -13,7 +13,7 @@ void qMessageHandler(QtMsgType type, const QMessageLogContext &context, const QS
 		mainWindow->Output(QString("Debug: %1").arg(msg));
 		break;
 	case QtWarningMsg:
-		mainWindow->Output(QString("Warning: %1 (%2:%3, %4)").arg(msg, QString(context.file), QString::number(context.line), QString(context.function)));
+		mainWindow->Output(QString("Warning: %1").arg(msg));
 		break;
 	case QtCriticalMsg:
 		mainWindow->Output(QString("Critical: %1 (%2:%3, %4)").arg(msg, QString(context.file), QString::number(context.line), QString(context.function)));
@@ -31,5 +31,8 @@ int main(int argc, char *argv[])
 	mainWindow = new WoWPetBattler;
 	qInstallMessageHandler(qMessageHandler);
 	mainWindow->show();
+	mainWindow->activateWindow();
+	if (mainWindow->isMinimized())
+		mainWindow->showNormal();
 	return app.exec();
 }

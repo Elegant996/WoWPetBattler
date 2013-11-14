@@ -11,6 +11,10 @@ WoWPetBattler::WoWPetBattler(QWidget *parent)
 	if (taskbar.Synchronize())
 		this->move(taskbar.GetBounds().W - size().width() - 15, taskbar.GetBounds().Y - size().height() - 35);
 
+	//Load preferences.
+	this->LoadPreferences();
+
+	//Initialize the stage.
 	this->petStage = new PetStage();
 
 	//Initialize Preferences.
@@ -24,7 +28,7 @@ WoWPetBattler::WoWPetBattler(QWidget *parent)
 	this->ai->moveToThread(interpreter);
 
 	//Initialize Preferences connections.
-	connect(this->preferences, SIGNAL(LoadPreferences()), this->ai, SLOT(LoadPreferences()));
+	connect(this->preferences, SIGNAL(LoadPreferences()), this, SLOT(LoadPreferences()));
 
 	//Initialize Interpreter connections.
 	connect(this->interpreter, SIGNAL(OutputToGUI(QString, QString)), this, SLOT(Output(QString, QString)));
@@ -73,8 +77,8 @@ WoWPetBattler::WoWPetBattler(QWidget *parent)
 //Destructor
 WoWPetBattler::~WoWPetBattler()
 {
-	if (interpreter->isRunning())
-		interpreter->Exit();
+	if (this->interpreter->isRunning())
+		this->interpreter->Exit();
 
 	delete interpreter;
 	delete ai;
@@ -86,39 +90,60 @@ WoWPetBattler::~WoWPetBattler()
 void WoWPetBattler::Output(QString caption, QString info)
 {
 	if (!caption.isEmpty())
-		ui.statusLabel->setText(caption);
-	ui.outputBrowser->append(info);
+		this->ui.statusLabel->setText(caption);
+	this->ui.outputBrowser->append(info);
 }
 
 //Output to browser without caption.
 void WoWPetBattler::Output(QString info)
 {
-	Output("", info);
+	this->Output("", info);
 }
 
 //Stop the bot.
 void WoWPetBattler::Stop(QString output)
 {
-	ui.statusLabel->setText("Stopping");
-	ui.outputBrowser->append(output);
-	ui.playButton->setChecked(false);
+	this->ui.statusLabel->setText("Stopping");
+	this->ui.outputBrowser->append(output);
+	this->ui.playButton->setChecked(false);
 
-	interpreter->Exit();					//Stop the update thread.
+	this->interpreter->Exit();					//Stop the update thread.
 
-	ui.statusLabel->setText("Not Running");
-	ui.outputBrowser->append("Stopped.");
+	this->ui.statusLabel->setText("Not Running");
+	this->ui.outputBrowser->append("Stopped.");
 
-	GUIWindow.SetTopMost(false);			//Stop the GUI from being the top most window.
+	this->GUIWindow.SetTopMost(false);			//Stop the GUI from being the top most window.
+}
+
+//Load preferences for main window.
+void WoWPetBattler::LoadPreferences()
+{
+	//Grab QSettings.
+	QSettings setting("Preferences.ini", QSettings::IniFormat);
+
+	//Open Options group.
+	setting.beginGroup("Options");
+
+	this->disableAero = setting.value("DisableAero", true).toBool();
+	this->interpreter->QueueEnabled(setting.value("PvPEnabled", true).toBool());
+
+	//Close Options group.
+	setting.endGroup();
 }
 
 //Handler for opening preferences window.
 void WoWPetBattler::on_actionPreferences_triggered()
 {
 	//Show the window if we're currently not running the program.
-	if (!ui.playButton->isChecked())
-		preferences->show();
+	if (!this->ui.playButton->isChecked())
+	{
+		this->preferences->show();
+		this->preferences->activateWindow();
+		if (this->preferences->isMinimized())
+			this->preferences->showNormal();
+	}
 	else
-		ui.outputBrowser->append("Please stop the current session to change preferences.");
+		this->ui.outputBrowser->append("Please stop the current session to change preferences.");
 }
 
 //Handler for play button.
@@ -159,41 +184,49 @@ void WoWPetBattler::on_playButton_clicked()
 
 	delete objectContext;*/
 
-	/*	
+		
 	if (ui.playButton->isChecked())
 	{
+		//Disable aero if setting demands it.
+		if (this->disableAero)
+			Robot::Screen::EnableAero(false);
+
 		//Make the GUI the top most window while running.
 		Robot::Window((Robot::uintptr)winId()).SetTopMost(true);
-		GUIWindow.SetTopMost(true);
+		this->GUIWindow.SetTopMost(true);
 
 		//Empty the output browser.
-		ui.outputBrowser->setText("");
+		this->ui.outputBrowser->setText("");
 
 		//Find the WoW Process.
 		//Multiple copies is not permitted at this time so we'll only the grab the first one we find.
 		ui.statusLabel->setText("Finding WoW Process");
 		Robot::Window::Find("World of Warcraft", &WoWWindow, 1);
-		process = WoWWindow.GetProcess();
+		this->process = WoWWindow.GetProcess();
 
 		//WoW Process could not be located.
-		if (process.GetID() == 0)
+		if (this->process.GetID() == 0)
 		{
-			ui.statusLabel->setText("Not Running");
-			ui.outputBrowser->append("Cannot find WoW process. Check that it is running.");
-			ui.playButton->setChecked(false);
+			this->ui.statusLabel->setText("Not Running");
+			this->ui.outputBrowser->append("Cannot find WoW process. Check that it is running.");
+			this->ui.playButton->setChecked(false);
 			return;
 		}
 
-		ui.outputBrowser->append("Found WoW process with ID " + QString::number(process.GetID()) + ".");
+		this->ui.outputBrowser->append("Found WoW process with ID " + QString::number(process.GetID()) + ".");
 
-		ui.playButton->setChecked(true);
-		ui.statusLabel->setText("Starting Interpreter");
+		this->ui.playButton->setChecked(true);
+		this->ui.statusLabel->setText("Starting Interpreter");
 
-		interpreter->start();
-		ui.outputBrowser->append("Starting...");
+		this->interpreter->start();
+		this->ui.outputBrowser->append("Starting...");
 		Robot::Window::SetActive(WoWWindow);
 	}
 	else
-		Stop("Stopping..."); //We have clicked the stop button, so let's stop everything.
-	*/
+	{
+		this->Stop("Stopping..."); //We have clicked the stop button, so let's stop everything.
+
+		if (this->disableAero)
+			Robot::Screen::EnableAero(true);
+	}
 }

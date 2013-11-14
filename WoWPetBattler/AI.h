@@ -62,7 +62,7 @@ private:
 	float minAvoidanceThreshold, minHitThreshold, minCritThreshold, minChanceOnHitThreshold;
 	float maxAvoidanceThreshold, maxHitThreshold, maxCritThreshold, maxChanceOnHitThreshold;
 
-	bool tieBreaker;
+	bool canPass, tieBreaker;
 
 	int totalCalls;
 };
