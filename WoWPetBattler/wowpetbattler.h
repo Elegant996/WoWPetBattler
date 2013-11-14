@@ -24,6 +24,8 @@ public:
 	WoWPetBattler(QWidget *parent = 0);
 	~WoWPetBattler();
 
+	void qDebugMessageHandler(QtMsgType, const QMessageLogContext&, const QString&);
+
 public slots:
 	void Output(QString, QString);
 	void Output(QString);
