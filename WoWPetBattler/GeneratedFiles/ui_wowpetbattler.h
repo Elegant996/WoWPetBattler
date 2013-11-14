@@ -13,38 +13,73 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QButtonGroup>
+#include <QtWidgets/QGridLayout>
+#include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QMainWindow>
+#include <QtWidgets/QMenu>
 #include <QtWidgets/QMenuBar>
 #include <QtWidgets/QPushButton>
-#include <QtWidgets/QStatusBar>
 #include <QtWidgets/QTextBrowser>
 #include <QtWidgets/QWidget>
 
 QT_BEGIN_NAMESPACE
 
-class Ui_WoWPetBattlerClass
+class Ui_WoWPetBattlerMainWindow
 {
 public:
+    QAction *actionPreferences;
+    QAction *actionQuit;
     QWidget *centralWidget;
+    QGridLayout *gridLayout_2;
+    QGridLayout *gridLayout;
+    QHBoxLayout *horizontalLayout;
     QPushButton *playButton;
-    QTextBrowser *outputBrowser;
     QLabel *statusLabel;
+    QTextBrowser *outputBrowser;
     QMenuBar *menuBar;
-    QStatusBar *statusBar;
+    QMenu *menuSettings;
+    QMenu *menuFile;
 
-    void setupUi(QMainWindow *WoWPetBattlerClass)
+    void setupUi(QMainWindow *WoWPetBattlerMainWindow)
     {
-        if (WoWPetBattlerClass->objectName().isEmpty())
-            WoWPetBattlerClass->setObjectName(QStringLiteral("WoWPetBattlerClass"));
-        WoWPetBattlerClass->resize(461, 545);
-        centralWidget = new QWidget(WoWPetBattlerClass);
+        if (WoWPetBattlerMainWindow->objectName().isEmpty())
+            WoWPetBattlerMainWindow->setObjectName(QStringLiteral("WoWPetBattlerMainWindow"));
+        WoWPetBattlerMainWindow->resize(460, 545);
+        WoWPetBattlerMainWindow->setMinimumSize(QSize(460, 545));
+        WoWPetBattlerMainWindow->setBaseSize(QSize(460, 545));
+        actionPreferences = new QAction(WoWPetBattlerMainWindow);
+        actionPreferences->setObjectName(QStringLiteral("actionPreferences"));
+        actionQuit = new QAction(WoWPetBattlerMainWindow);
+        actionQuit->setObjectName(QStringLiteral("actionQuit"));
+        centralWidget = new QWidget(WoWPetBattlerMainWindow);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
+        gridLayout_2 = new QGridLayout(centralWidget);
+        gridLayout_2->setSpacing(6);
+        gridLayout_2->setContentsMargins(11, 11, 11, 11);
+        gridLayout_2->setObjectName(QStringLiteral("gridLayout_2"));
+        gridLayout = new QGridLayout();
+        gridLayout->setSpacing(6);
+        gridLayout->setObjectName(QStringLiteral("gridLayout"));
+        gridLayout->setContentsMargins(0, 0, 0, -1);
+        horizontalLayout = new QHBoxLayout();
+        horizontalLayout->setSpacing(6);
+        horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
+        horizontalLayout->setSizeConstraint(QLayout::SetDefaultConstraint);
+        horizontalLayout->setContentsMargins(0, -1, -1, -1);
         playButton = new QPushButton(centralWidget);
         playButton->setObjectName(QStringLiteral("playButton"));
         playButton->setEnabled(true);
-        playButton->setGeometry(QRect(50, 40, 71, 71));
+        QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
+        sizePolicy.setHorizontalStretch(0);
+        sizePolicy.setVerticalStretch(0);
+        sizePolicy.setHeightForWidth(playButton->sizePolicy().hasHeightForWidth());
+        playButton->setSizePolicy(sizePolicy);
+        playButton->setMinimumSize(QSize(75, 75));
+        playButton->setMaximumSize(QSize(75, 75));
+        playButton->setSizeIncrement(QSize(0, 0));
+        playButton->setBaseSize(QSize(75, 75));
         QIcon icon;
         icon.addFile(QStringLiteral(":/WoWPetBattler/Resources/Play Icon.png"), QSize(), QIcon::Normal, QIcon::Off);
         icon.addFile(QStringLiteral("Resources/Stop Icon.png"), QSize(), QIcon::Normal, QIcon::On);
@@ -52,41 +87,71 @@ public:
         playButton->setIconSize(QSize(48, 48));
         playButton->setCheckable(true);
         playButton->setChecked(false);
-        outputBrowser = new QTextBrowser(centralWidget);
-        outputBrowser->setObjectName(QStringLiteral("outputBrowser"));
-        outputBrowser->setGeometry(QRect(20, 160, 421, 361));
+
+        horizontalLayout->addWidget(playButton);
+
         statusLabel = new QLabel(centralWidget);
         statusLabel->setObjectName(QStringLiteral("statusLabel"));
-        statusLabel->setGeometry(QRect(150, 50, 291, 51));
+        QSizePolicy sizePolicy1(QSizePolicy::Ignored, QSizePolicy::Ignored);
+        sizePolicy1.setHorizontalStretch(0);
+        sizePolicy1.setVerticalStretch(0);
+        sizePolicy1.setHeightForWidth(statusLabel->sizePolicy().hasHeightForWidth());
+        statusLabel->setSizePolicy(sizePolicy1);
         QFont font;
         font.setPointSize(18);
         font.setBold(true);
         font.setWeight(75);
         statusLabel->setFont(font);
-        WoWPetBattlerClass->setCentralWidget(centralWidget);
-        menuBar = new QMenuBar(WoWPetBattlerClass);
+
+        horizontalLayout->addWidget(statusLabel);
+
+
+        gridLayout->addLayout(horizontalLayout, 0, 0, 1, 1);
+
+        outputBrowser = new QTextBrowser(centralWidget);
+        outputBrowser->setObjectName(QStringLiteral("outputBrowser"));
+
+        gridLayout->addWidget(outputBrowser, 1, 0, 1, 1);
+
+
+        gridLayout_2->addLayout(gridLayout, 0, 0, 1, 1);
+
+        WoWPetBattlerMainWindow->setCentralWidget(centralWidget);
+        menuBar = new QMenuBar(WoWPetBattlerMainWindow);
         menuBar->setObjectName(QStringLiteral("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 461, 21));
-        WoWPetBattlerClass->setMenuBar(menuBar);
-        statusBar = new QStatusBar(WoWPetBattlerClass);
-        statusBar->setObjectName(QStringLiteral("statusBar"));
-        WoWPetBattlerClass->setStatusBar(statusBar);
+        menuBar->setGeometry(QRect(0, 0, 460, 21));
+        menuSettings = new QMenu(menuBar);
+        menuSettings->setObjectName(QStringLiteral("menuSettings"));
+        menuFile = new QMenu(menuBar);
+        menuFile->setObjectName(QStringLiteral("menuFile"));
+        WoWPetBattlerMainWindow->setMenuBar(menuBar);
+        QWidget::setTabOrder(playButton, outputBrowser);
 
-        retranslateUi(WoWPetBattlerClass);
+        menuBar->addAction(menuFile->menuAction());
+        menuBar->addAction(menuSettings->menuAction());
+        menuSettings->addAction(actionPreferences);
+        menuFile->addAction(actionQuit);
 
-        QMetaObject::connectSlotsByName(WoWPetBattlerClass);
+        retranslateUi(WoWPetBattlerMainWindow);
+        QObject::connect(actionQuit, SIGNAL(triggered()), WoWPetBattlerMainWindow, SLOT(close()));
+
+        QMetaObject::connectSlotsByName(WoWPetBattlerMainWindow);
     } // setupUi
 
-    void retranslateUi(QMainWindow *WoWPetBattlerClass)
+    void retranslateUi(QMainWindow *WoWPetBattlerMainWindow)
     {
-        WoWPetBattlerClass->setWindowTitle(QApplication::translate("WoWPetBattlerClass", "WoW Pet Battler", 0));
-        statusLabel->setText(QApplication::translate("WoWPetBattlerClass", "Not Running", 0));
+        WoWPetBattlerMainWindow->setWindowTitle(QApplication::translate("WoWPetBattlerMainWindow", "WoW Pet Battler", 0));
+        actionPreferences->setText(QApplication::translate("WoWPetBattlerMainWindow", "Preferences...", 0));
+        actionQuit->setText(QApplication::translate("WoWPetBattlerMainWindow", "Quit", 0));
+        statusLabel->setText(QApplication::translate("WoWPetBattlerMainWindow", "Not Running", 0));
+        menuSettings->setTitle(QApplication::translate("WoWPetBattlerMainWindow", "Settings", 0));
+        menuFile->setTitle(QApplication::translate("WoWPetBattlerMainWindow", "File", 0));
     } // retranslateUi
 
 };
 
 namespace Ui {
-    class WoWPetBattlerClass: public Ui_WoWPetBattlerClass {};
+    class WoWPetBattlerMainWindow: public Ui_WoWPetBattlerMainWindow {};
 } // namespace Ui
 
 QT_END_NAMESPACE

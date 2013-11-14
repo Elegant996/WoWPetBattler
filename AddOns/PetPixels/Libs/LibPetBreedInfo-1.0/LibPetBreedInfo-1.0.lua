@@ -1074,6 +1074,8 @@ lib.breedData.speciesToBaseStatProfile = {
 	[1351] = {8, 8, 8},
 	[1352] = {33, 8, 8},
 	[1354] = {12, 15.25, 7.35},
+	[1363] = {8, 8, 8},
+	[1364] = {8.3, 7.9, 7.8},
 }
 
 
@@ -1889,6 +1891,8 @@ lib.breedData.speciesToAvailableBreeds = {
 	[1351] = {7}, -- NEW: Macabre Marionette
 	[1352] = {6}, -- TAMER: Chubbs
 	[1354] = {3}, -- HIDDEN: C92 Annihilator
+	[1363] = {3}, -- HIDDEN: Alterac Brew-Pup
+	[1364] = {4}, -- NEW: Murkalot
 }
 
 --[[

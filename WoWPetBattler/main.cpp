@@ -3,8 +3,8 @@
 
 int main(int argc, char *argv[])
 {
-	QApplication a(argc, argv);
-	WoWPetBattler w;
-	w.show();
-	return a.exec();
+	QApplication prog(argc, argv);
+	WoWPetBattler window;
+	window.show();
+	return prog.exec();
 }

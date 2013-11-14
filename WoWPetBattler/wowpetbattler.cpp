@@ -4,18 +4,29 @@
 WoWPetBattler::WoWPetBattler(QWidget *parent)
 	: QMainWindow(parent)
 {
-	ui.setupUi(this);
+	//Set up the UI.
+	this->ui.setupUi(this);
 
+	//Set the layout.
+	this->setLayout(ui.gridLayout);
+
+	//Set position of main GUI.
 	if (taskbar.Synchronize())
-		move(taskbar.GetBounds().W - size().width() - 15, taskbar.GetBounds().Y - size().height() - 35);
+		this->move(taskbar.GetBounds().W - size().width() - 15, taskbar.GetBounds().Y - size().height() - 35);
 
 	this->petStage = new PetStage();
 
+	//Initialize Preferences.
+	this->preferences = new Preferences(this);
+	connect(preferences, SIGNAL(WritePreferences()), this, SLOT(LoadPreferences()));
+
+	//Initialize interpreter.
 	this->interpreter = new Interpreter(petStage, ai, &WoWWindow);
 	connect(interpreter, SIGNAL(OutputToGUI(QString, QString)), this, SLOT(Output(QString, QString)));
 	connect(interpreter, SIGNAL(OutputToGUI(QString)), this, SLOT(Output("", QString)));
 	connect(interpreter, SIGNAL(Stop(QString)), this, SLOT(Stop(QString)));
 
+	//Initialize AI.
 	this->ai = new AI(petStage, &WoWWindow);
 	this->ai->moveToThread(interpreter);
 	connect(ai, SIGNAL(OutputToGUI(QString, QString)), this, SLOT(Output(QString, QString)));
@@ -65,6 +76,13 @@ WoWPetBattler::~WoWPetBattler()
 	delete interpreter;
 	delete ai;
 	delete petStage;
+	delete preferences;
+}
+
+//Saves preferences to *.ini file.
+void WoWPetBattler::LoadPreferences()
+{
+	
 }
 
 //Output to browser.
@@ -88,6 +106,16 @@ void WoWPetBattler::Stop(QString output)
 	ui.outputBrowser->append("Stopped.");
 
 	GUIWindow.SetTopMost(false);			//Stop the GUI from being the top most window.
+}
+
+//Handler for opening preferences window.
+void WoWPetBattler::on_actionPreferences_triggered()
+{
+	//Show the window if we're currently not running the program.
+	if (!ui.playButton->isChecked())
+		preferences->show();
+	else
+		ui.outputBrowser->append("Please stop the current session to change preferences.");
 }
 
 //Handler for play button.

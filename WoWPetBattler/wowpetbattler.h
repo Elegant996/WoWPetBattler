@@ -6,14 +6,13 @@
 #include <QDebug> //To be removed.
 #include <QtQml>
 
-#include <QQmlListProperty>
-
 #include <Process.h>
 #include <Screen.h>
 #include <Window.h>
 
 #include "UI_WoWPetBattler.h"
 #include "PetStage.h"
+#include "Preferences.h"
 #include "Interpreter.h"
 #include "AI.h"
 
@@ -26,14 +25,17 @@ public:
 	~WoWPetBattler();
 
 public slots:
+	void LoadPreferences();
 	void Output(QString, QString);
 	void Stop(QString);
 
 private slots:
+	void on_actionPreferences_triggered();
 	void on_playButton_clicked();
 
 private:
-	Ui::WoWPetBattlerClass ui;
+	Ui::WoWPetBattlerMainWindow ui;
+	Preferences *preferences;
 
 	Robot::Taskbar taskbar;
 	Robot::Window GUIWindow, WoWWindow;
