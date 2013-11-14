@@ -136,6 +136,9 @@ App_Data/*.ldf
 #Qt generated files
 WoWPetBattler/GeneratedFiles*/
 
+#Ignore settings
+*.ini
+
 # =========================
 # Windows detritus
 # =========================

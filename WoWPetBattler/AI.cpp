@@ -35,28 +35,14 @@ AI::~AI(void)
 	delete engine;
 }
 
-//Accept the queue when it has popped.
-void AI::QueueUp()
-{
-	//keyboard.Click("`");		//Accept Queue.
-	qDebug() << "`";
-}
-
-//Queue up for PvP Battle.
-void AI::AcceptQueue()
-{
-	//keyboard.Click("`");		//Queue Up.	
-	qDebug() << "`";
-}
-
 //Load preferences.
 void AI::LoadPreferences()
 {
-	qDebug() << "Here.";
+	//Grab QSettings.
+	QSettings setting("Preferences.ini", QSettings::IniFormat);
 
-	//Grab QSettings and open the group.
-	QSettings setting("N/A", "WoWPetBattler");
-	setting.beginGroup("AI");
+	//Open the group.
+	setting.beginGroup("Thresholds");
 
 	//Fetch avoidance rating.
 	this->minAvoidanceThreshold = setting.value("minAvoidanceThreshold", 0).toFloat() * 0.05;
@@ -76,6 +62,20 @@ void AI::LoadPreferences()
 
 	//Close the group.
 	setting.endGroup();
+}
+
+//Accept the queue when it has popped.
+void AI::QueueUp()
+{
+	//keyboard.Click("`");		//Accept Queue.
+	qDebug() << "`";
+}
+
+//Queue up for PvP Battle.
+void AI::AcceptQueue()
+{
+	//keyboard.Click("`");		//Queue Up.	
+	qDebug() << "`";
 }
 
 //Begin AI simulation and respond with best move.

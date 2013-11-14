@@ -25,6 +25,8 @@ public:
 	AI(PetStage*, Robot::Window*);
 	~AI(void);
 
+	void LoadPreferences();
+
 	void QueueUp();
 	void AcceptQueue();
 
@@ -35,7 +37,6 @@ signals:
 	void OutputToGUI(QString);
 
 public slots:
-	void LoadPreferences();
 	void Run();
 
 private:

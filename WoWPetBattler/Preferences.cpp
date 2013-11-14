@@ -91,9 +91,11 @@ void Preferences::on_maxChanceOnHitSlider_valueChanged(int value)
 //Save Preferences.
 void Preferences::Save()
 {
-	//Grab QSettings and open the group.
-	QSettings setting("N/A", "WoWPetBattler");
-	setting.beginGroup("AI");
+	//Grab QSettings.
+	QSettings setting("Preferences.ini", QSettings::IniFormat);
+
+	//Open the group.
+	setting.beginGroup("Thresholds");
 
 	//Store size and position of the Preferences GUI.
 	setting.setValue("preferencesSize", this->size());
@@ -122,9 +124,11 @@ void Preferences::Save()
 //Load Preferences.
 void Preferences::Load()
 {
-	//Grab QSettings and open the group.
-	QSettings setting("N/A", "WoWPetBattler");
-	setting.beginGroup("AI");
+	//Grab QSettings.
+	QSettings setting("Preferences.ini", QSettings::IniFormat);
+
+	//Open the group.
+	setting.beginGroup("Thresholds");
 
 	//Fetch size and position of the Preferences GUI.
 	this->resize(setting.value("preferencesSize", QSize(430, 440)).toSize());

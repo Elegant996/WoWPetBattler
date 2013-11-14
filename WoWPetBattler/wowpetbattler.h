@@ -11,10 +11,11 @@
 #include <Window.h>
 
 #include "UI_WoWPetBattler.h"
+
+#include "AI.h"
 #include "PetStage.h"
 #include "Preferences.h"
 #include "Interpreter.h"
-#include "AI.h"
 
 class WoWPetBattler : public QMainWindow
 {

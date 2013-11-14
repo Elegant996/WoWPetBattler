@@ -1,8 +1,8 @@
 #include "Interpreter.h"
 
-
+//Constructor
 Interpreter::Interpreter(PetStage* petStage, AI* ai, Robot::Window *window) :
-	BUILD(56), running(true), queueEnabled(false), readSuccess(false), oneTimeNotifier(false)
+	build(56), running(true), queueEnabled(false), readSuccess(false), oneTimeNotifier(false)
 {
 	this->petStage = petStage;
 	this->ai = ai;
@@ -13,7 +13,7 @@ Interpreter::Interpreter(PetStage* petStage, AI* ai, Robot::Window *window) :
 	this->timeoutCount = 0;
 }
 
-
+//Destructor
 Interpreter::~Interpreter(void)
 {
 	delete[] pixels;
@@ -21,6 +21,7 @@ Interpreter::~Interpreter(void)
 	delete image;
 }
 
+//Exits the loop.
 void Interpreter::Exit()
 {
 	running = false;
@@ -30,8 +31,12 @@ void Interpreter::Exit()
 	petStage->Reinitialize();		//Thread activity has stopped; reinitialize the stage.
 }
 
+//Override function from QThread to run out own loop.
 void Interpreter::run()
 {
+	//Make AI reload its settings incase something changed.
+	ai->LoadPreferences();
+
 	//Update bools in case we run it again.
 	running = true;
 	readSuccess = false;
@@ -82,11 +87,11 @@ void Interpreter::run()
 			pixels[i] = image->GetPixel(points[i]);
 
 		//Run checksums again to be sure it didn't move.
-		if (pixels[0].B != BUILD || pixels[11].R != pixels[9].B || pixels[11].G != pixels[2].R || pixels[11].B != pixels[6].G
+		if (pixels[0].B != build || pixels[11].R != pixels[9].B || pixels[11].G != pixels[2].R || pixels[11].B != pixels[6].G
 				|| pixels[19].R != pixels[16].G || pixels[19].G != pixels[12].B || pixels[19].B != pixels[14].R
-				|| pixels[22].R != BUILD || pixels[22].G != pixels[20].R || pixels[22].B != pixels[21].G
-				|| pixels[28].R != pixels[3].G || pixels[28].G != BUILD || pixels[28].B != pixels[12].R
-				|| pixels[36].R != BUILD || pixels[36].G != pixels[0].R || pixels[36].B != pixels[9].G)
+				|| pixels[22].R != build || pixels[22].G != pixels[20].R || pixels[22].B != pixels[21].G
+				|| pixels[28].R != pixels[3].G || pixels[28].G != build || pixels[28].B != pixels[12].R
+				|| pixels[36].R != build || pixels[36].G != pixels[0].R || pixels[36].B != pixels[9].G)
 		{
 			readSuccess = false;
 			oneTimeNotifier = false;
@@ -264,7 +269,7 @@ bool Interpreter::Locate()
 				}
 
 				//Verify the results.
-				Robot::Color p01 = image->GetPixel(x1 + start + points[0].X, y1 + center); // Uses BUILD; Check for p37
+				Robot::Color p01 = image->GetPixel(x1 + start + points[0].X, y1 + center); // Uses build; Check for p37
 				Robot::Color p03 = image->GetPixel(x1 + start + points[2].X, y1 + center); //Check for p12
 				Robot::Color p04 = image->GetPixel(x1 + start + points[3].X, y1 + center); //Check for p29
 				Robot::Color p07 = image->GetPixel(x1 + start + points[6].X, y1 + center); //Check for p12
@@ -276,15 +281,15 @@ bool Interpreter::Locate()
 				Robot::Color p20 = image->GetPixel(x1 + start + points[19].X, y1 + center); //Uses p13, p15 and p17
 				Robot::Color p21 = image->GetPixel(x1 + start + points[20].X, y1 + 34 + center); //Check for p23
 				Robot::Color p22 = image->GetPixel(x1 + start + points[21].X, y1 + 34 + center); //Check for p23
-				Robot::Color p23 = image->GetPixel(x1 + start + points[22].X, y1 + 34 + center); //Uses p21, p22 and BUILD
-				Robot::Color p29 = image->GetPixel(x1 + start + points[28].X, y1 + 34 + center); //Uses p04, BUILD, p13
+				Robot::Color p23 = image->GetPixel(x1 + start + points[22].X, y1 + 34 + center); //Uses p21, p22 and build
+				Robot::Color p29 = image->GetPixel(x1 + start + points[28].X, y1 + 34 + center); //Uses p04, build, p13
 				Robot::Color p37 = image->GetPixel(x1 + start + points[36].X, y1 + 34 + center);
 
-				if (p01.B != BUILD || p12.R != p10.B || p12.G != p03.R || p12.B != p07.G
+				if (p01.B != build || p12.R != p10.B || p12.G != p03.R || p12.B != p07.G
 						|| p20.R != p17.G || p20.G != p13.B || p20.B != p15.R
-						|| p23.R != BUILD || p23.G != p21.R || p23.B != p22.G
-						|| p29.R != p04.G || p29.G != BUILD || p29.B != p13.R
-						|| p37.R != BUILD || p37.G != p01.R || p37.B != p10.G)
+						|| p23.R != build || p23.G != p21.R || p23.B != p22.G
+						|| p29.R != p04.G || p29.G != build || p29.B != p13.R
+						|| p37.R != build || p37.G != p01.R || p37.B != p10.G)
 					continue;
 
 				//Update addon position.

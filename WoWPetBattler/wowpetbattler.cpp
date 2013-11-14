@@ -23,7 +23,7 @@ WoWPetBattler::WoWPetBattler(QWidget *parent)
 	this->ai = new AI(petStage, &WoWWindow);
 	this->ai->moveToThread(interpreter);
 
-	//Initialize AI connections.
+	//Initialize Preferences connections.
 	connect(this->preferences, SIGNAL(LoadPreferences()), this->ai, SLOT(LoadPreferences()));
 
 	//Initialize Interpreter connections.

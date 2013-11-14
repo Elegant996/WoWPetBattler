@@ -11,8 +11,7 @@
 #include "AI.h"
 #include "PetStage.h"
 
-class Interpreter :
-	public QThread
+class Interpreter : public QThread
 {
 	Q_OBJECT
 
@@ -40,7 +39,7 @@ private:
 	void UpdateAuras();
 
 	volatile bool running, queueEnabled;
-	const quint8 BUILD;
+	const quint8 build;
 
 	PetStage *petStage;
 	AI* ai;
