@@ -30,7 +30,7 @@ public:
 	void QueueUp();
 	void AcceptQueue();
 
-	Move Expectiminimax(PetStage*, quint8, quint8);
+	Move Expectiminimax(PetStage*, quint8, float, float, quint8);
 
 signals:
 	void OutputToGUI(QString, QString);
@@ -41,11 +41,11 @@ public slots:
 
 private:
 	//Move Expectiminimax(PetStage*, quint8, quint8);
-	Move SelectAction(PetStage*, quint8, quint8);
+	Move SelectAction(PetStage*, quint8, float, float, quint8);
 	quint8 CalculatePriority(PetStage*);
-	float ActionOutcomes(PetStage*, quint8, quint8, bool);
-	float UseAction(PetStage*, quint8, quint8, bool, float, float, float, float, bool, bool, bool, bool);
-	float EndTurn(PetStage*, quint8);
+	float ActionOutcomes(PetStage*, quint8, float, float, quint8, bool);
+	float UseAction(PetStage*, quint8, float, float, quint8, bool, float, float, float, float, bool, bool, bool, bool);
+	float EndTurn(PetStage*, quint8, float, float);
 
 	bool CanAttack(Pet*);
 	bool CanSwap(PetStage*, quint8);
