@@ -132,7 +132,7 @@ Move AI::Expectiminimax(PetStage* petStage, quint8 depth, quint8 turnIndex)
 	if (turnIndex == 1)
 	{
 		//Apply weather conditions once.
-		for (quint8 i=0; i < stageNode->GetTeam(0)->GetPet(0)->GetNumAuras(); i+=1)
+		for (quint8 i=1; i < stageNode->GetTeam(0)->GetPet(0)->GetNumAuras()+1; i+=1)
 		{
 			objectContext->setContextProperty("petStage", stageNode);	
 			component->loadUrl(QUrl::fromLocalFile("Scripts/" + QString::number(stageNode->GetTeam(0)->GetPet(0)->GetAura(i)->GetAuraId()) + ".qml"));

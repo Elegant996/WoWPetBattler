@@ -344,6 +344,18 @@ public:
         minAvoidanceLabel->setBuddy(minAvoidanceSlider);
         minHitLabel->setBuddy(minHitSlider);
 #endif // QT_NO_SHORTCUT
+        QWidget::setTabOrder(minAvoidanceSlider, maxAvoidanceSlider);
+        QWidget::setTabOrder(maxAvoidanceSlider, minHitSlider);
+        QWidget::setTabOrder(minHitSlider, maxHitSlider);
+        QWidget::setTabOrder(maxHitSlider, minCritSlider);
+        QWidget::setTabOrder(minCritSlider, maxCritSlider);
+        QWidget::setTabOrder(maxCritSlider, minChanceOnHitSlider);
+        QWidget::setTabOrder(minChanceOnHitSlider, maxChanceOnHitSlider);
+        QWidget::setTabOrder(maxChanceOnHitSlider, aeroCheckBox);
+        QWidget::setTabOrder(aeroCheckBox, tieCheckBox);
+        QWidget::setTabOrder(tieCheckBox, passCheckBox);
+        QWidget::setTabOrder(passCheckBox, PvPCheckBox);
+        QWidget::setTabOrder(PvPCheckBox, buttonBox);
 
         retranslateUi(PreferencesDialog);
         QObject::connect(buttonBox, SIGNAL(rejected()), PreferencesDialog, SLOT(close()));

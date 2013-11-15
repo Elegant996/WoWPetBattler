@@ -590,6 +590,21 @@
    </layout>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>minAvoidanceSlider</tabstop>
+  <tabstop>maxAvoidanceSlider</tabstop>
+  <tabstop>minHitSlider</tabstop>
+  <tabstop>maxHitSlider</tabstop>
+  <tabstop>minCritSlider</tabstop>
+  <tabstop>maxCritSlider</tabstop>
+  <tabstop>minChanceOnHitSlider</tabstop>
+  <tabstop>maxChanceOnHitSlider</tabstop>
+  <tabstop>aeroCheckBox</tabstop>
+  <tabstop>tieCheckBox</tabstop>
+  <tabstop>passCheckBox</tabstop>
+  <tabstop>PvPCheckBox</tabstop>
+  <tabstop>buttonBox</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>
@@ -599,8 +614,8 @@
    <slot>close()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>426</x>
-     <y>418</y>
+     <x>580</x>
+     <y>459</y>
     </hint>
     <hint type="destinationlabel">
      <x>299</x>
