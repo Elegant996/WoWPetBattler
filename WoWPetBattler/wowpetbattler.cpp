@@ -139,8 +139,8 @@ void WoWPetBattler::LoadPreferences()
 	//Open Options group.
 	setting.beginGroup("Options");
 
+	//Fetch Aero preferences.
 	this->disableAero = setting.value("DisableAero", true).toBool();
-	//this->interpreter->QueueEnabled(setting.value("PvPEnabled", true).toBool());
 
 	//Close Options group.
 	setting.endGroup();

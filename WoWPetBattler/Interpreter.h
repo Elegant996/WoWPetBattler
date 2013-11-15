@@ -23,8 +23,6 @@ public:
 	Interpreter(PetStage*, AI*, Robot::Window*);
 	~Interpreter(void);
 
-	void QueueEnabled(bool);
-
 signals:
 	void OutputToGUI(QString, QString);
 	void OutputToGUI(QString);
@@ -38,6 +36,8 @@ protected:
 	void run();
 
 private:
+	void LoadPreferences();
+
 	bool Locate();
 	void SetupPetTeams();
 	void UpdateHealthPools();

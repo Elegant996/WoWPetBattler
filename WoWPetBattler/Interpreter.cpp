@@ -11,6 +11,9 @@ Interpreter::Interpreter(PetStage* petStage, AI* ai, Robot::Window *window) :
 	this->points = new Robot::Point[40];
 	this->pixels = new Robot::Color[40];
 	this->timeoutCount = 0;
+
+	//Load preferences.
+	this->LoadPreferences();
 }
 
 //Destructor
@@ -19,12 +22,6 @@ Interpreter::~Interpreter(void)
 	delete[] pixels;
 	delete[] points;
 	delete image;
-}
-
-//Set the status of PvP Queuing.
-void Interpreter::QueueEnabled(bool queueEnabled)
-{
-	this->queueEnabled = queueEnabled;
 }
 
 //Exits the loop.
@@ -40,6 +37,9 @@ void Interpreter::Exit()
 //Override function from QThread to run out own loop.
 void Interpreter::run()
 {
+	//In case anything was changed prior to running.
+	this->LoadPreferences();
+
 	//Make AI reload its settings incase something changed.
 	ai->LoadPreferences();
 
@@ -186,6 +186,22 @@ void Interpreter::run()
 		timer.restart();
 		mutex.unlock();
 	}
+}
+
+//Load preferences for main window.
+void Interpreter::LoadPreferences()
+{
+	//Grab QSettings.
+	QSettings setting("Preferences.ini", QSettings::IniFormat);
+
+	//Open Options group.
+	setting.beginGroup("Options");
+
+	//Fetch Queue preferences.
+	this->queueEnabled = setting.value("PvPEnabled", true).toBool();
+
+	//Close Options group.
+	setting.endGroup();
 }
 
 //Locates the addon in the game.
