@@ -292,83 +292,46 @@ Move AI::SelectAction(PetStage *stageNode, quint8 depth, float alpha, float beta
 	QList<Move>::iterator iter = nextMoves.begin();		//Used to set the action for each move.
 	Move desiredMove, tempMove;							//Used to store the desired and temp move.
 
-	//Maximize.
-	if (turnIndex == 1)
+	//For each stage.
+	while (!stageMoves.isEmpty())
 	{
-		while (!stageMoves.isEmpty())
-		{
-			PetStage *nextStage = stageMoves.takeFirst();										//Remove the stageMove from the list.
-			Move currentMove = Expectiminimax(nextStage, depth, alpha, beta, (turnIndex+1)%3);	//Set currentMove to call our Expectiminimax again.
-			(*iter).SetHeuristic(currentMove.GetHeuristic());									//Set the heuristic of the move in the nextMoves list.
-			delete (nextStage);																	//Delete the stageMove we removed from the list earlier.
+		PetStage *nextStage = stageMoves.takeFirst();										//Remove the stageMove from the list.
+		Move currentMove = Expectiminimax(nextStage, depth, alpha, beta, (turnIndex+1)%3);	//Set currentMove to call our Expectiminimax again.
+		(*iter).SetHeuristic(currentMove.GetHeuristic());									//Set the heuristic of the move in the nextMoves list.
+		delete (nextStage);																	//Delete the stageMove we removed from the list earlier.
 
-			//If the current heuristic is greater than the beta.
-			if ((*iter).GetHeuristic() > beta)
+		//If the current heuristic is less than the alpha.
+		if ((turnIndex == 1 && (*iter).GetHeuristic() > beta)
+			|| (turnIndex == 2 && (*iter).GetHeuristic() < alpha))
+		{
+			//Remove the moves not explored.
+			while (nextMoves.last().GetAction() != (*iter).GetAction())
 			{
-				//Remove the moves not explored.
-				while (nextMoves.last().GetAction() != (*iter).GetAction())
-				{
-					nextMoves.removeLast();														//Remove excess move.
-					delete stageMoves.takeLast();												//Remove excess stage.
-				}
-
-				break;																	
+				nextMoves.removeLast();														//Remove excess move.
+				delete stageMoves.takeLast();												//Remove excess stage.
 			}
+
+			break;																
+		}
+		else
+			if (turnIndex == 1)
+				beta = (*iter).GetHeuristic();												//Set new beta.
 			else
-				beta = (*iter).GetHeuristic();													//Set new beta.
+				alpha = (*iter).GetHeuristic();												//Set new alpha.
 
-			++iter;																				//Increment the iterator to the next index of nextMoves.
-		}
-
-		//Take first move as desired move initially.
-		desiredMove = nextMoves.takeFirst();
-
-		//Find the best move for player.
-		while (!nextMoves.isEmpty())
-		{
-			tempMove = nextMoves.takeFirst();
-			if (tempMove.GetHeuristic() > desiredMove.GetHeuristic())
-				desiredMove = tempMove;
-		}
+		++iter;																				//Increment the iterator to the next index of nextMoves.
 	}
-	//Minimize.
-	else	//turnIndex == 2;
+
+	//Take first move as desired move initially.
+	desiredMove = nextMoves.takeFirst();
+
+	//Find the best move for opponent.
+	while (!nextMoves.isEmpty())
 	{
-		while (!stageMoves.isEmpty())
-		{
-			PetStage *nextStage = stageMoves.takeFirst();										//Remove the stageMove from the list.
-			Move currentMove = Expectiminimax(nextStage, depth, alpha, beta, (turnIndex+1)%3);	//Set currentMove to call our Expectiminimax again.
-			(*iter).SetHeuristic(currentMove.GetHeuristic());									//Set the heuristic of the move in the nextMoves list.
-			delete (nextStage);																	//Delete the stageMove we removed from the list earlier.
-
-			//If the current heuristic is less than the alpha.
-			if ((*iter).GetHeuristic() < alpha)
-			{
-				//Remove the moves not explored.
-				while (nextMoves.last().GetAction() != (*iter).GetAction())
-				{
-					nextMoves.removeLast();														//Remove excess move.
-					delete stageMoves.takeLast();												//Remove excess stage.
-				}
-
-				break;																
-			}
-			else
-				alpha = (*iter).GetHeuristic();													//Set new alpha.
-
-			++iter;																				//Increment the iterator to the next index of nextMoves.
-		}
-
-		//Take first move as desired move initially.
-		desiredMove = nextMoves.takeFirst();
-
-		//Find the best move for opponent.
-		while (!nextMoves.isEmpty())
-		{
-			tempMove = nextMoves.takeFirst();
-			if (tempMove.GetHeuristic() < desiredMove.GetHeuristic())
-				desiredMove = tempMove;
-		}
+		tempMove = nextMoves.takeFirst();
+		if (turnIndex == 1 && tempMove.GetHeuristic() > desiredMove.GetHeuristic()
+				|| (turnIndex == 2 &&tempMove.GetHeuristic() < desiredMove.GetHeuristic()))
+			desiredMove = tempMove;
 	}
 
 	//Empty stageMoves QList.
