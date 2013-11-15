@@ -174,7 +174,7 @@ void WoWPetBattler::on_playButton_clicked()
 	qmlRegisterType<PetHelper>("PetHelper", 1, 0, "PetHelper");
 
 	Move testMove;
-	testMove = ai->Expectiminimax(petStage, 3, -4500, 4500, 1);
+	testMove = ai->Expectiminimax(petStage, 4, -4500, 4500, 1);
 	qDebug() << "Move: " + QString::number(testMove.GetAction());
 	qDebug() << "Heuristic: " + QString::number(testMove.GetHeuristic());
 

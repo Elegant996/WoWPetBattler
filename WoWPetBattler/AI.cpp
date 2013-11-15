@@ -289,8 +289,8 @@ Move AI::SelectAction(PetStage *stageNode, quint8 depth, float alpha, float beta
 		}
 	}
 	
-	QList<Move>::iterator iter = nextMoves.begin();		//Used to set the action for each move.
-	Move desiredMove, tempMove;							//Used to store the desired and temp move.
+	QList<Move>::iterator iter = nextMoves.begin();											//Used to set the action for each move.
+	Move desiredMove, tempMove;																//Used to store the desired and temp move.
 
 	//For each stage.
 	while (!stageMoves.isEmpty())

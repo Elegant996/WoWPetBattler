@@ -35,57 +35,97 @@ void Preferences::on_buttonBox_accepted()
 //Ensure that the min slider can't pass the max slider without increasing the max slider.
 void Preferences::on_minAvoidanceSlider_valueChanged(int value)
 {
-	if (value > ui.maxAvoidanceSlider->value())
-		ui.maxAvoidanceSlider->setValue(value);
+	//Do not allow minimum slider to reach a maximum value.
+	if (value == ui.minAvoidanceSlider->maximum())
+		ui.minAvoidanceSlider->setValue(value-1);
+
+	//Do not allow minimum slider to equal the maximum slider; bump the maximum up by 1.
+	if (value+1 > ui.maxAvoidanceSlider->value())
+		ui.maxAvoidanceSlider->setValue(value+1);
 }
 
 //Ensure that the max slider can't pass the min slider without increasing the min slider.
 void Preferences::on_maxAvoidanceSlider_valueChanged(int value)
 {
-	if (value < ui.minAvoidanceSlider->value())
-		ui.minAvoidanceSlider->setValue(value);
+	//Do not allow maximum slider to reach a minimum value.
+	if (value == ui.maxAvoidanceSlider->minimum())
+		ui.maxAvoidanceSlider->setValue(value+1);
+
+	//Do not allow maximum slider to equal the minimum slider; bump the minimum down by 1.
+	if (value-1 < ui.minAvoidanceSlider->value())
+		ui.minAvoidanceSlider->setValue(value-1);
 }
 
 //Ensure that the min slider can't pass the max slider without increasing the max slider.
 void Preferences::on_minHitSlider_valueChanged(int value)
 {
-	if (value > ui.maxHitSlider->value())
-		ui.maxHitSlider->setValue(value);
+	//Do not allow minimum slider to reach a maximum value.
+	if (value == ui.minHitSlider->maximum())
+		ui.minHitSlider->setValue(value-1);
+
+	//Do not allow minimum slider to equal the maximum slider; bump the maximum up by 1.
+	if (value+1 > ui.maxHitSlider->value())
+		ui.maxHitSlider->setValue(value+1);
 }
 
 //Ensure that the max slider can't pass the min slider without increasing the min slider.
 void Preferences::on_maxHitSlider_valueChanged(int value)
 {
-	if (value < ui.minHitSlider->value())
-		ui.minHitSlider->setValue(value);
+	//Do not allow maximum slider to reach a minimum value.
+	if (value == ui.maxHitSlider->minimum())
+		ui.maxHitSlider->setValue(value+1);
+
+	//Do not allow maximum slider to equal the minimum slider; bump the minimum down by 1.
+	if (value-1 < ui.minHitSlider->value())
+		ui.minHitSlider->setValue(value-1);
 }
 
 //Ensure that the min slider can't pass the max slider without increasing the max slider.
 void Preferences::on_minCritSlider_valueChanged(int value)
 {
-	if (value > ui.maxCritSlider->value())
-		ui.maxCritSlider->setValue(value);
+	//Do not allow minimum slider to reach a maximum value.
+	if (value == ui.minCritSlider->maximum())
+		ui.minCritSlider->setValue(value-1);
+
+	//Do not allow minimum slider to equal the maximum slider; bump the maximum up by 1.
+	if (value+1 > ui.maxCritSlider->value())
+		ui.maxCritSlider->setValue(value+1);
 }
 
 //Ensure that the max slider can't pass the min slider without increasing the min slider.
 void Preferences::on_maxCritSlider_valueChanged(int value)
 {
-	if (value < ui.minCritSlider->value())
-		ui.minCritSlider->setValue(value);
+	//Do not allow maximum slider to reach a minimum value.
+	if (value == ui.maxCritSlider->minimum())
+		ui.maxCritSlider->setValue(value+1);
+
+	//Do not allow maximum slider to equal the minimum slider; bump the minimum down by 1.
+	if (value-1 < ui.minCritSlider->value())
+		ui.minCritSlider->setValue(value-1);
 }
 
 //Ensure that the min slider can't pass the max slider without increasing the max slider.
 void Preferences::on_minChanceOnHitSlider_valueChanged(int value)
 {
-	if (value > ui.maxChanceOnHitSlider->value())
-		ui.maxChanceOnHitSlider->setValue(value);
+	//Do not allow minimum slider to reach a maximum value.
+	if (value == ui.minChanceOnHitSlider->maximum())
+		ui.minChanceOnHitSlider->setValue(value-1);
+
+	//Do not allow minimum slider to equal the maximum slider; bump the maximum up by 1.
+	if (value+1 > ui.maxChanceOnHitSlider->value())
+		ui.maxChanceOnHitSlider->setValue(value+1);
 }
 
 //Ensure that the max slider can't pass the min slider without increasing the min slider.
 void Preferences::on_maxChanceOnHitSlider_valueChanged(int value)
 {
-	if (value < ui.minChanceOnHitSlider->value())
-		ui.minChanceOnHitSlider->setValue(value);
+	//Do not allow maximum slider to reach a minimum value.
+	if (value == ui.maxChanceOnHitSlider->minimum())
+		ui.maxChanceOnHitSlider->setValue(value+1);
+
+	//Do not allow maximum slider to equal the minimum slider; bump the minimum down by 1.
+	if (value-1 < ui.minChanceOnHitSlider->value())
+		ui.minChanceOnHitSlider->setValue(value-1);
 }
 
 //Save Preferences.

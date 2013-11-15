@@ -27,8 +27,8 @@ public:
 
 	void RoundUpdate();
 
-	void UpdateAura(int, bool);
-	void UpdateAura(int, bool, quint16);
+	Q_INVOKABLE void UpdateAura(int, bool);
+	Q_INVOKABLE void UpdateAura(int, bool, quint16);
 
 	void SetPower(quint16);
 	void SetCharges(quint8);
