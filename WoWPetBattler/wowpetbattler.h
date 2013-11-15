@@ -36,8 +36,11 @@ private slots:
 	void LoadPreferences();
 	void on_actionPreferences_triggered();
 	void on_playButton_clicked();
+	void closeEvent(QCloseEvent*);
 
 private:
+	void SavePreferences();
+
 	Ui::WoWPetBattlerMainWindow ui;
 	Preferences *preferences;
 

@@ -133,7 +133,7 @@ public:
         menuFile->addAction(actionQuit);
 
         retranslateUi(WoWPetBattlerMainWindow);
-        QObject::connect(actionQuit, SIGNAL(triggered()), WoWPetBattlerMainWindow, SLOT(close()));
+        QObject::connect(actionQuit, SIGNAL(triggered()), WoWPetBattlerMainWindow, SLOT(deleteLater()));
 
         QMetaObject::connectSlotsByName(WoWPetBattlerMainWindow);
     } // setupUi

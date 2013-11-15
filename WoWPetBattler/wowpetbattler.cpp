@@ -7,9 +7,9 @@ WoWPetBattler::WoWPetBattler(QWidget *parent)
 	//Set up the UI.
 	this->ui.setupUi(this);
 
-	//Set position of main GUI.
-	if (taskbar.Synchronize())
-		this->move(taskbar.GetBounds().W - size().width() - 15, taskbar.GetBounds().Y - size().height() - 35);
+	//(OLD) Set position of main GUI.
+	//if (this->taskbar.Synchronize())
+		//this->move(taskbar.GetBounds().W - size().width() - 15, taskbar.GetBounds().Y - size().height() - 35);
 
 	//Load preferences.
 	this->LoadPreferences();
@@ -77,9 +77,14 @@ WoWPetBattler::WoWPetBattler(QWidget *parent)
 //Destructor
 WoWPetBattler::~WoWPetBattler()
 {
+	//Stop the interpreter if it's running.
 	if (this->interpreter->isRunning())
 		this->interpreter->Exit();
 
+	//Save preferences.
+	this->SavePreferences();
+
+	//Clean up.
 	delete interpreter;
 	delete ai;
 	delete petStage;
@@ -121,11 +126,21 @@ void WoWPetBattler::LoadPreferences()
 	//Grab QSettings.
 	QSettings setting("Preferences.ini", QSettings::IniFormat);
 
+	//Open MainWindow group.
+	setting.beginGroup("MainWindow");
+
+	//Fetch size and position of the Preferences GUI.
+	this->resize(setting.value("mainWindowSize", QSize(460, 545)).toSize());
+	this->move(setting.value("mainWindowPosition", QPoint(this->size().width() / 2, this->size().height() / 2)).toPoint());
+
+	//Close MainWindow group.
+	setting.endGroup();
+
 	//Open Options group.
 	setting.beginGroup("Options");
 
 	this->disableAero = setting.value("DisableAero", true).toBool();
-	this->interpreter->QueueEnabled(setting.value("PvPEnabled", true).toBool());
+	//this->interpreter->QueueEnabled(setting.value("PvPEnabled", true).toBool());
 
 	//Close Options group.
 	setting.endGroup();
@@ -185,7 +200,7 @@ void WoWPetBattler::on_playButton_clicked()
 	delete objectContext;*/
 
 		
-	if (ui.playButton->isChecked())
+	/*if (ui.playButton->isChecked())
 	{
 		//Disable aero if setting demands it.
 		if (this->disableAero)
@@ -228,5 +243,27 @@ void WoWPetBattler::on_playButton_clicked()
 
 		if (this->disableAero)
 			Robot::Screen::EnableAero(true);
-	}
+	}*/
+}
+
+//When the user clicks the X button on the QMenuBar we don't delete anything, so let's override that.
+void WoWPetBattler::closeEvent(QCloseEvent *event)
+{
+	delete this;
+}
+
+void WoWPetBattler::SavePreferences()
+{
+	//Grab QSettings.
+	QSettings setting("Preferences.ini", QSettings::IniFormat);
+
+	//Open MainWindow group.
+	setting.beginGroup("MainWindow");
+
+	//Store size and position of the MainWindow GUI.
+	setting.setValue("mainWindowSize", this->size());
+	setting.setValue("mainWindowPosition", this->pos());
+
+	//Close MainWindow group.
+	setting.endGroup();
 }

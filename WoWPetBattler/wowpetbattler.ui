@@ -177,7 +177,7 @@
    <sender>actionQuit</sender>
    <signal>triggered()</signal>
    <receiver>WoWPetBattlerMainWindow</receiver>
-   <slot>close()</slot>
+   <slot>deleteLater()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>-1</x>
