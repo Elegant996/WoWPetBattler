@@ -225,7 +225,7 @@ Move AI::SelectAction(PetStage *stageNode, quint8 depth, quint8 turnIndex)
 	else	//There is no active ability, use selection process.
 	{
 		//Check to see if we can select an ability for the current round.
-		if (CanAttack(stageNode->GetTeam(turnIndex)->GetActivePet()))
+		if (this->CanAttack(stageNode->GetTeam(turnIndex)->GetActivePet()))
 			for (quint8 i=1; i < stageNode->GetTeam(turnIndex)->GetActivePet()->GetNumAbilities()+1; i+=1)
 				//Use the ability if it is off cooldown.
 				if (stageNode->GetTeam(turnIndex)->GetActivePet()->GetAbility(i)->GetCooldown() == 0)
@@ -255,7 +255,7 @@ Move AI::SelectAction(PetStage *stageNode, quint8 depth, quint8 turnIndex)
 				}
 		
 		//Check to see if swapping a pet is possible.
-		if (!stageNode->GetTeam(turnIndex)->GetActivePet()->HasStatus(Pet::Rooted))
+		if (this->CanSwap(stageNode, turnIndex))
 			//Swap to each pet that is still able to battle.
 			for (quint8 i=1; i < stageNode->GetTeam(turnIndex)->GetNumPets()+1; i+=1)
 				//Ignore same index an dead pets.
@@ -828,6 +828,19 @@ bool AI::CanAttack(Pet* currentPet)
 	else if (currentPet->HasStatus(Pet::Stunned))
 		return false;
 	//Pet can attack.
+	else
+		return true;
+}
+
+//Returns whether or not the pet can swap out.
+bool AI::CanSwap(PetStage *stageNode, quint8 teamIndex)
+{
+	//If the pet is rooted, it can't swap out.
+	if (stageNode->GetTeam(teamIndex)->GetActivePet()->HasStatus(Pet::Rooted))
+		return false;
+	//If the it is not a PvP match, the opponent will never swap.
+	else if (teamIndex == 2 && !stageNode->IsPvPBattle())
+		return false;
 	else
 		return true;
 }

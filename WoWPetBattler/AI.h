@@ -48,6 +48,7 @@ private:
 	float EndTurn(PetStage*, quint8);
 
 	bool CanAttack(Pet*);
+	bool CanSwap(PetStage*, quint8);
 	QList<PetStage*> IsPetDead(PetStage*, quint8);
 
 	PetStage *petStage;

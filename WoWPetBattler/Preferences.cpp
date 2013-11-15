@@ -130,9 +130,9 @@ void Preferences::Save()
 	setting.beginGroup("Options");
 
 	setting.setValue("DisableAero", this->ui.aeroCheckBox->isChecked());		//Set whether to disable Aero.
-	setting.setValue("AutoDecideTies", this->ui.aeroCheckBox->isChecked());		//Set whether to auto decide ties.
-	setting.setValue("CanPass", this->ui.aeroCheckBox->isChecked());			//Set whether a pet can pass.
-	setting.setValue("PvPEnabled", this->ui.aeroCheckBox->isChecked());			//Set whether PvP is enabled.
+	setting.setValue("AutoDecideTies", this->ui.tieCheckBox->isChecked());		//Set whether to auto decide ties.
+	setting.setValue("CanPass", this->ui.passCheckBox->isChecked());			//Set whether a pet can pass.
+	setting.setValue("PvPEnabled", this->ui.PvPCheckBox->isChecked());			//Set whether PvP is enabled.
 
 	//Close Options group.
 	setting.endGroup();
