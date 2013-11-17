@@ -27,7 +27,7 @@ WoWPetBattler::WoWPetBattler(QWidget *parent)
 	this->interpreter = new Interpreter(petStage, ai, &WoWWindow);
 
 	//Move AI to Interpreter thread.
-	this->ai->moveToThread(interpreter);
+	//this->ai->moveToThread(interpreter);
 
 	//Setup Preferences connections.
 	connect(this->preferences, SIGNAL(LoadPreferences()), this, SLOT(LoadPreferences()));
@@ -175,11 +175,25 @@ void WoWPetBattler::on_playButton_clicked()
 	qmlRegisterType<PetAura>();
 	qmlRegisterType<PetHelper>("PetHelper", 1, 0, "PetHelper");
 
-	petStage->WonLastBattle(true);
-	Recorder::RecordBattle(petStage);
+	//petStage->WonLastBattle(true);
+	//Recorder::RecordBattle(petStage);
+
+	ai->LoadQMLResources();
 
 	Move testMove;
-	//testMove = ai->Expectiminimax(petStage, 4, -4500, 4500, 1);
+	testMove = ai->Expectiminimax(petStage, 4, -4500, 4500, 1);
+	qDebug() << "Move: " + QString::number(testMove.GetAction());
+	qDebug() << "Heuristic: " + QString::number(testMove.GetHeuristic());
+
+	qDebug() << "Processing move.";
+	petStage->GetTeam(1)->GetActivePet()->SetHealth(petStage->GetTeam(1)->GetActivePet()->GetHealth() - 144);
+	petStage->GetTeam(1)->GetActivePet()->AddAura(542, 2, true);
+	petStage->GetTeam(1)->GetActivePet()->SetDefenseModifier(petStage->GetTeam(1)->GetActivePet()->GetDefenseModifier() + 1);
+	petStage->GetTeam(1)->GetActivePet()->GetAbility(3)->SetCooldown(5);
+	petStage->GetTeam(2)->GetActivePet()->SetHealth(petStage->GetTeam(2)->GetActivePet()->GetHealth() - 280);
+	petStage->GetTeam(2)->SetActivePet(2);
+
+	testMove = ai->Expectiminimax(petStage, 4, -4500, 4500, 1);
 	qDebug() << "Move: " + QString::number(testMove.GetAction());
 	qDebug() << "Heuristic: " + QString::number(testMove.GetHeuristic());*/
 

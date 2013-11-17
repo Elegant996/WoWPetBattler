@@ -142,8 +142,7 @@ void Interpreter::run()
 			UpdateAuras();
 
 			//Call AI and have it determine our next move.
-			//qDebug() << "Run AI";
-			ai->Run(true);
+			ai->Run((petStage->Initialized() || pixels[0].G & 64) != 0);
 
 			//Delete all auras.
 			for (quint8 i=0; i < 3; i+=1)
@@ -398,7 +397,6 @@ void Interpreter::SetupPetTeams()
 //Updates the health pools of all pets.
 void Interpreter::UpdateHealthPools()
 {
-	qDebug() << (pixels[14].R << 16) << (pixels[14].G << 8) << pixels[14].B;
 	quint32 healthBlock[] = {(pixels[14].R << 16) + (pixels[14].G << 8) + pixels[14].B,
 							(pixels[15].R << 16) + (pixels[15].G << 8) + pixels[15].B,
 							(pixels[16].R << 16) + (pixels[16].G << 8) + pixels[16].B};

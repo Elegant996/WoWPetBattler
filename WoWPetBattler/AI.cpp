@@ -98,15 +98,15 @@ void AI::AcceptQueue()
 }
 
 //Begin AI simulation and respond with best move.
-void AI::Run(bool value)
+void AI::Run(bool initialized)
 {
 	Move nextMove;		//Holds next ability.
 
 	//Run Expectiminimax if select ability or select pet is present.
-	if (value || petStage->SelectAbility() || (petStage->SelectPet() && petStage->Initialized()))
+	if (initialized)
 		nextMove = this->Expectiminimax(petStage, 4, -4500, 4500, 1);
 	//If we are not initialized select the first pet.
-	else if (petStage->SelectPet() && !petStage->Initialized())
+	else
 	{
 		PostMessage((HWND)(*window).GetHandle(), WM_KEYDOWN, Robot::KeyF1, NULL);
 		QThread::msleep(33);
@@ -391,10 +391,8 @@ Move AI::SelectAction(PetStage *stageNode, quint8 depth, float alpha, float beta
 	while (!stageMoves.isEmpty())
 	{
 		PetStage *nextStage = stageMoves.takeFirst();										//Remove the stageMove from the list.
-		Move currentMove = Expectiminimax(nextStage, depth, alpha, beta,
-			(stageNode->GetTeam(turnIndex)->GetActivePet()->IsDead()
-			&& !stageNode->GetTeam(turnIndex)->IsTeamDead())
-			? turnIndex : (turnIndex+1)%3);													//Set currentMove to call our Expectiminimax again.
+		//TODO: Change this!
+		Move currentMove = Expectiminimax(nextStage, depth, alpha, beta, (turnIndex+1)%3);	//Set currentMove to call our Expectiminimax again.
 		(*iter).SetHeuristic(currentMove.GetHeuristic());									//Set the heuristic of the move in the nextMoves list.
 		delete (nextStage);																	//Delete the stageMove we removed from the list earlier.
 
@@ -912,7 +910,7 @@ float AI::EndTurn(PetStage* stageNode, quint8 depth, float alpha, float beta)
 		stageNode->RoundUpdate();
 
 		//Call Expectiminimax again, reduce depth by 1 as we are proceeding into the next turn.
-		nextTurn = Expectiminimax(stageNode, depth-1, alpha, beta, 1);
+		nextTurn = Expectiminimax(curPossibleStage, depth-1, alpha, beta, 1);
 
 		//Add results to heuristic divided by the size of the list.
 		heuristic += nextTurn.GetHeuristic() / possibleStagesSize;
@@ -999,6 +997,8 @@ QList<PetStage*> AI::IsPetDead(PetStage *stageNode, quint8 teamIndex)
 	}
 	else
 		possibleStages.append(new PetStage(*stageNode));
+
+	//TODO: Consider expanding this function to be recursive.
 
 	//Return the list of possible outcomes.
 	return possibleStages;

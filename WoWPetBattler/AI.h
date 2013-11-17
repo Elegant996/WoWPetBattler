@@ -33,12 +33,14 @@ public:
 
 	void Run(bool);
 
+	Move Expectiminimax(PetStage*, quint8, float, float, quint8);
+
 signals:
 	void OutputToGUI(QString, QString);
 	void OutputToGUI(QString);
 
 private:
-	Move Expectiminimax(PetStage*, quint8, float, float, quint8);
+	//Move Expectiminimax(PetStage*, quint8, float, float, quint8);
 	Move SelectAction(PetStage*, quint8, float, float, quint8);
 	quint8 CalculatePriority(PetStage*);
 	float ActionOutcomes(PetStage*, quint8, float, float, quint8, bool);

@@ -123,7 +123,7 @@ void PetHelper::CheckRacials(Pet *currentPet)
 }
 
 //Finds the power of the first pet who most likely cast the aura.
-void PetHelper::CheckAuraPower(PetStage* petStage, PetAura *curAura, quint8 teamIndex, quint8 abilityId)
+void PetHelper::CheckAuraPower(PetStage* petStage, PetAura *curAura, quint8 teamIndex, quint16 abilityId)
 {
 	//Find the first pet with has the ability and use it's power.
 	if (teamIndex == 3)
@@ -139,7 +139,10 @@ void PetHelper::CheckAuraPower(PetStage* petStage, PetAura *curAura, quint8 team
 		for (quint8 i=1; i < petStage->GetTeam(teamIndex)->GetNumPets()+1; i+=1)
 			for (quint8 j=1; j < petStage->GetTeam(teamIndex)->GetPet(i)->GetNumAbilities()+1; j+=1)
 					if (petStage->GetTeam(teamIndex)->GetPet(i)->GetAbility(j)->GetAbilityId() == abilityId)
+					{
 						curAura->SetPower(petStage->GetTeam(teamIndex)->GetPet(i)->GetPower());
+						break;		//Found it!
+					}
 	}
 }
 
