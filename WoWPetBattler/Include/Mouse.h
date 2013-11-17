@@ -57,8 +57,6 @@ public:
 	void				SetPos			(const Point& point) const;
 	void				SetPos			(uint32 x, uint32 y) const;
 
-	// TODO: Button state
-
 public:
 	// Properties
 	Range				AutoDelay;		// Auto delay range

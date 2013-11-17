@@ -40,7 +40,7 @@ namespace Robot {
 ////////////////////////////////////////////////////////////////////////////////
 /// <summary> </summary>
 
-template <typename T> class Enum
+template <typename Type> class Enum
 {
 public:
 	//----------------------------------------------------------------------------//
@@ -62,36 +62,36 @@ public:
 	////////////////////////////////////////////////////////////////////////////////
 	/// <summary> </summary>
 
-	static T Parse (const char* key)
+	static Type Parse (const char* key)
 	{
 		// Check if key value is null
-		if (key == nullptr) return (T) -1;
+		if (key == nullptr) return (Type) -1;
 
 		// Initialize static parser
-		if (mMap.empty()) Enum<T>();
+		if (mMap.empty()) Enum<Type>();
 
 		// Search for matching key
-		typename std::map<const char*, T>::const_iterator i;
+		typename std::map<const char*, Type>::const_iterator i;
 		for (i = mMap.begin(); i != mMap.end(); ++i)
 			if (strcmp (i->first, key) == 0) return i->second;
 
-		return (T) -1;
+		return (Type) -1;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////
 	/// <summary> </summary>
 
-	static const char* Parse (T value)
+	static const char* Parse (Type value)
 	{
 		// Initialize static parser
-		if (mMap.empty()) Enum<T>();
+		if (mMap.empty()) Enum<Type>();
 
 		// Search for matching value
-		typename std::map<const char*, T>::const_iterator i;
+		typename std::map<const char*, Type>::const_iterator i;
 		for (i = mMap.begin(); i != mMap.end(); ++i)
 			if (i->second == value) return i->first;
 
-		return "";
+		return nullptr;
 	}
 
 
@@ -101,7 +101,7 @@ private:
 	// Fields                                                                     //
 	//----------------------------------------------------------------------------//
 
-	static std::map<const char*, T> mMap;
+	static std::map<const char*, Type> mMap;
 };
 
 } // namespace Robot

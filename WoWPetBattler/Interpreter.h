@@ -14,6 +14,7 @@
 
 #include "AI.h"
 #include "PetStage.h"
+#include "Recorder.h"
 
 class Interpreter : public QThread
 {

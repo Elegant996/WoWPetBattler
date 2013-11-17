@@ -261,6 +261,7 @@
     <ClCompile Include="PetTeam.cpp" />
     <ClCompile Include="PetType.cpp" />
     <ClCompile Include="Preferences.cpp" />
+    <ClCompile Include="Recorder.cpp" />
     <ClCompile Include="WoWPetBattler.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -304,6 +305,7 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Recorder.h" />
     <CustomBuild Include="Preferences.h">
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Moc%27ing Preferences.h...</Message>

@@ -35,8 +35,7 @@ Pet::Pet()
 
 Pet::Pet(quint16 speciesId, quint8 breed, quint8 quality, quint8 level)
 {
-	QFile speciesJson;
-	speciesJson.setFileName("Species/" + QString::number(speciesId) + ".json");
+	QFile speciesJson("Species/" + QString::number(speciesId) + ".json");
 	speciesJson.open(QIODevice::ReadOnly | QIODevice::Text);
 	QString speciesJsonContents = speciesJson.readAll();
 	speciesJson.close();

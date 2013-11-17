@@ -20,27 +20,29 @@ WoWPetBattler::WoWPetBattler(QWidget *parent)
 	//Initialize Preferences.
 	this->preferences = new Preferences(this);
 
+	//Initialize AI.
+	this->ai = new AI(petStage, &WoWWindow);
+
 	//Initialize Interpreter.
 	this->interpreter = new Interpreter(petStage, ai, &WoWWindow);
 
-	//Initialize AI.
-	this->ai = new AI(petStage, &WoWWindow);
+	//Move AI to Interpreter thread.
 	this->ai->moveToThread(interpreter);
 
-	//Initialize Preferences connections.
+	//Setup Preferences connections.
 	connect(this->preferences, SIGNAL(LoadPreferences()), this, SLOT(LoadPreferences()));
 
-	//Initialize Interpreter connections.
+	//Setup AI connections.
+	connect(this->ai, SIGNAL(OutputToGUI(QString, QString)), this, SLOT(Output(QString, QString)));
+	connect(this->ai, SIGNAL(OutputToGUI(QString)), this, SLOT(Output(QString)));
+
+	//Setup Interpreter connections.
 	connect(this->interpreter, SIGNAL(OutputToGUI(QString, QString)), this, SLOT(Output(QString, QString)));
 	connect(this->interpreter, SIGNAL(OutputToGUI(QString)), this, SLOT(Output(QString)));
 	connect(this->interpreter, SIGNAL(Stop(QString)), this, SLOT(Stop(QString)));
 
-	//Initialize AI connections.
-	connect(this->ai, SIGNAL(OutputToGUI(QString, QString)), this, SLOT(Output(QString, QString)));
-	connect(this->ai, SIGNAL(OutputToGUI(QString)), this, SLOT(Output(QString)));
-
 	//Testing data
-	petStage->GetTeam(1)->AddPet(1229, 5, 4, 25);
+	/*petStage->GetTeam(1)->AddPet(1229, 5, 4, 25);
 	petStage->GetTeam(1)->GetPet(1)->AddAbility(true, 1, 0);
 	petStage->GetTeam(1)->GetPet(1)->AddAbility(true, 1, 0);
 	petStage->GetTeam(1)->GetPet(1)->AddAbility(true, 2, 0);
@@ -71,7 +73,7 @@ WoWPetBattler::WoWPetBattler(QWidget *parent)
 	petStage->GetTeam(2)->GetPet(3)->AddAbility(true, 1, 0);
 
 	petStage->GetTeam(1)->SetActivePet(1);
-	petStage->GetTeam(2)->SetActivePet(1);
+	petStage->GetTeam(2)->SetActivePet(1);*/
 }
 
 //Destructor
@@ -164,7 +166,7 @@ void WoWPetBattler::on_actionPreferences_triggered()
 //Handler for play button.
 void WoWPetBattler::on_playButton_clicked()
 {
-	qmlRegisterType<PetStage>();
+	/*qmlRegisterType<PetStage>();
 	qmlRegisterType<PetTeam>();
 	qmlRegisterType<PetType>("PetType", 1, 0, "PetType");
 	qmlRegisterType<Pet>("PetStatus", 1, 0, "PetStatus");
@@ -173,10 +175,13 @@ void WoWPetBattler::on_playButton_clicked()
 	qmlRegisterType<PetAura>();
 	qmlRegisterType<PetHelper>("PetHelper", 1, 0, "PetHelper");
 
+	petStage->WonLastBattle(true);
+	Recorder::RecordBattle(petStage);
+
 	Move testMove;
-	testMove = ai->Expectiminimax(petStage, 4, -4500, 4500, 1);
+	//testMove = ai->Expectiminimax(petStage, 4, -4500, 4500, 1);
 	qDebug() << "Move: " + QString::number(testMove.GetAction());
-	qDebug() << "Heuristic: " + QString::number(testMove.GetHeuristic());
+	qDebug() << "Heuristic: " + QString::number(testMove.GetHeuristic());*/
 
 	/*QQmlContext *objectContext = new QQmlContext(engine.rootContext());
 	objectContext->setContextProperty("petStage", petStage);	
@@ -200,7 +205,7 @@ void WoWPetBattler::on_playButton_clicked()
 	delete objectContext;*/
 
 		
-	/*if (ui.playButton->isChecked())
+	if (ui.playButton->isChecked())
 	{
 		//Disable aero if setting demands it.
 		if (this->disableAero)
@@ -243,7 +248,7 @@ void WoWPetBattler::on_playButton_clicked()
 
 		if (this->disableAero)
 			Robot::Screen::EnableAero(true);
-	}*/
+	}
 }
 
 //When the user clicks the X button on the QMenuBar we don't delete anything, so let's override that.

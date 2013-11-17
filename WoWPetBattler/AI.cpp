@@ -88,9 +88,71 @@ void AI::AcceptQueue()
 //Begin AI simulation and respond with best move.
 void AI::Run()
 {
+	Move nextMove;		//Holds next ability.
+
+	//Run Expectiminimax if select ability or select pet is present.
+	if (petStage->SelectAbility() || (petStage->SelectPet() && petStage->Initialized()))
+		nextMove = this->Expectiminimax(petStage, 4, -4500, 4500, 1);
+	//If we are not initialized select the first pet.
+	else if (petStage->SelectPet() && !petStage->Initialized())
+	{
+		PostMessage((HWND)(*window).GetHandle(), WM_KEYDOWN, Robot::KeyF1, NULL);
+		QThread::msleep(33);
+		PostMessage((HWND)(*window).GetHandle(), WM_KEYUP, Robot::KeyF1, NULL);
+		return;		//Avoid the content below.
+	}
+
+	//If next move is to use ability 1 press '1'.
+	if (nextMove.GetAction() == PetAction::Ability1)
+	{
+		PostMessage((HWND)(*window).GetHandle(), WM_KEYDOWN, Robot::Key1, NULL);
+		QThread::msleep(33);
+		PostMessage((HWND)(*window).GetHandle(), WM_KEYUP, Robot::Key1, NULL);
+	}
+	//If next move is to use ability 2 press '2'.
+	else if (nextMove.GetAction() == PetAction::Ability2)
+	{
+		PostMessage((HWND)(*window).GetHandle(), WM_KEYDOWN, Robot::Key2, NULL);
+		QThread::msleep(33);
+		PostMessage((HWND)(*window).GetHandle(), WM_KEYUP, Robot::Key2, NULL);
+	}
+	//If next move is to use ability 3 press '3'.
+	else if (nextMove.GetAction() == PetAction::Ability3)
+	{
+		PostMessage((HWND)(*window).GetHandle(), WM_KEYDOWN, Robot::Key3, NULL);
+		QThread::msleep(33);
+		PostMessage((HWND)(*window).GetHandle(), WM_KEYUP, Robot::Key3, NULL);
+	}
+	//If next move is to swap to pet 1 press 'F1'.
+	else if (nextMove.GetAction() == PetAction::Pet1)
+	{
+		PostMessage((HWND)(*window).GetHandle(), WM_KEYDOWN, Robot::KeyF1, NULL);
+		QThread::msleep(33);
+		PostMessage((HWND)(*window).GetHandle(), WM_KEYUP, Robot::KeyF1, NULL);
+	}
+	//If next move is to swap to pet 2 press 'F2'.
+	else if (nextMove.GetAction() == PetAction::Pet2)
+	{
+		PostMessage((HWND)(*window).GetHandle(), WM_KEYDOWN, Robot::KeyF2, NULL);
+		QThread::msleep(33);
+		PostMessage((HWND)(*window).GetHandle(), WM_KEYUP, Robot::KeyF2, NULL);
+	}
+	//If next move is to swap to pet 3 press 'F3'.
+	else if (nextMove.GetAction() == PetAction::Pet3)
+	{
+		PostMessage((HWND)(*window).GetHandle(), WM_KEYDOWN, Robot::KeyF3, NULL);
+		QThread::msleep(33);
+		PostMessage((HWND)(*window).GetHandle(), WM_KEYUP, Robot::KeyF3, NULL);
+	}
+	//We are passing, so press 'T'.
+	else
+	{
+		PostMessage((HWND)(*window).GetHandle(), WM_KEYDOWN, Robot::KeyT, NULL);
+		QThread::msleep(33);
+		PostMessage((HWND)(*window).GetHandle(), WM_KEYUP, Robot::KeyT, NULL);
+	}
+
 	//Keyboard::Compile (Keyboard::CmdClick, "+hello+world", myList)
-	PostMessage((HWND)(*window).GetHandle(), WM_KEYDOWN, Robot::KeyA, NULL);
-	PostMessage((HWND)(*window).GetHandle(), WM_KEYUP, Robot::KeyA, NULL);
 	//keyboard.AutoDelay = (5, 10);
 	/*if (petStage->SelectAbility())
 		qDebug() << "Select Ability";
@@ -112,7 +174,7 @@ Move AI::Expectiminimax(PetStage* petStage, quint8 depth, float alpha, float bet
 		float score = 0.00;	//Default score.
 
 		totalCalls++;
-		qDebug() << totalCalls;
+		//qDebug() << totalCalls;
 
 		/*Use health values to calculate score of the node.
 		Note: 52 = 5 * 1.3 * 8 (where 8 is assumed to be the average health base of pets)
@@ -210,8 +272,27 @@ Move AI::SelectAction(PetStage *stageNode, quint8 depth, float alpha, float beta
 	QList<PetStage*> stageMoves;
 	QList<Move> nextMoves;
 
+	//Check of the pet is dead.
+    if (stageNode->GetTeam(turnIndex)->GetActivePet()->IsDead())
+		//Swap to each pet that is still able to battle.
+		for (quint8 i=1; i < stageNode->GetTeam(turnIndex)->GetNumPets()+1; i+=1)
+			//Ignore same index an dead pets.
+			if (stageNode->GetTeam(turnIndex)->GetActivePetIndex() != i || !stageNode->GetTeam(turnIndex)->GetPet(i)->IsDead())
+			{
+				//Copy the node and add it to the list.
+				PetStage *actionNode = new PetStage(*stageNode);
+				actionNode->GetTeam(turnIndex)->GetActivePet()->GetCurrentAction()->SetAction((PetAction::Action)(i+3));
+				actionNode->GetTeam(turnIndex)->GetActivePet()->GetCurrentAction()->SetRoundsRemaining(1);
+				actionNode->GetTeam(turnIndex)->GetActivePet()->AddStatus(Pet::Swapping);
+				stageMoves.append(actionNode);
+
+				//Set the action and add the move to the list.
+				Move nextMove;
+				nextMove.SetAction((PetAction::Action)(i+3));
+				nextMoves.append(nextMove);
+			}
 	//If an action is already in progress, continue to use that action.
-	if (stageNode->GetTeam(turnIndex)->GetActivePet()->GetCurrentAction()->GetRoundsRemaining() > 0)
+	else if (stageNode->GetTeam(turnIndex)->GetActivePet()->GetCurrentAction()->GetRoundsRemaining() > 0)
 	{
 		//Copy the node and add it to the list.
 		PetStage *actionNode = new PetStage(*stageNode);
@@ -296,7 +377,9 @@ Move AI::SelectAction(PetStage *stageNode, quint8 depth, float alpha, float beta
 	while (!stageMoves.isEmpty())
 	{
 		PetStage *nextStage = stageMoves.takeFirst();										//Remove the stageMove from the list.
-		Move currentMove = Expectiminimax(nextStage, depth, alpha, beta, (turnIndex+1)%3);	//Set currentMove to call our Expectiminimax again.
+		Move currentMove = Expectiminimax(nextStage, depth, alpha, beta,
+			(stageNode->GetTeam(turnIndex)->GetActivePet()->IsDead())
+			? turnIndex : (turnIndex+1)%3);													//Set currentMove to call our Expectiminimax again.
 		(*iter).SetHeuristic(currentMove.GetHeuristic());									//Set the heuristic of the move in the nextMoves list.
 		delete (nextStage);																	//Delete the stageMove we removed from the list earlier.
 

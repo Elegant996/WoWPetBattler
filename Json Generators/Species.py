@@ -9,14 +9,14 @@ import urllib.request
 
 #Open library.
 try:
-    baseStatsLib = open('..\\PetPixels\\Libs\\LibPetBreedInfo-1.0\\LibPetBreedInfo-1.0.lua', 'r').read()
+    baseStatsLib = open('..\\AddOns\\PetPixels\\Libs\\LibPetBreedInfo-1.0\\LibPetBreedInfo-1.0.lua', 'r').read()
 except IOError:
     #Failure
     print("Please move LibPetBreedInfo-1.0 folder into the script's folder.")
     exit(0)
 
 #Find our base stats section and set URL.     
-baseStatsSection = baseStatsLib.find("lib.breedData.speciesToBaseStats")
+baseStatsSection = baseStatsLib.find("lib.breedData.speciesToBaseStatProfile")
 speciesURL = "http://us.battle.net/api/wow/battlePet/species/"
 
 for i in range(1, 1501, 1):

@@ -15,6 +15,7 @@
 #define ROBOT_KEYBOARD_H
 
 #include "Common.h"
+#include <vector>
 namespace Robot {
 
 
@@ -375,6 +376,26 @@ enum Keycode
 class ROBOT_EXPORT Keyboard
 {
 public:
+	////////////////////////////////////////////////////////////////////////////////
+	/// <summary> </summary>
+
+	enum Command
+	{
+		CmdClick,
+		CmdPress,
+		CmdRelease,
+	};
+
+	////////////////////////////////////////////////////////////////////////////////
+	/// <summary> </summary>
+
+	struct Action
+	{
+		Command Cmd;
+		Keycode Key;
+	};
+
+public:
 	// Constructors
 	Keyboard							(void);
 
@@ -388,8 +409,9 @@ public:
 	void				Press			(Keycode key) const;
 	void				Release			(Keycode key) const;
 
-	// TODO: Key state
-	// TODO: Send Keys
+	void				Execute			(const std::vector<Action>& keys) const;
+	bool				Compile			(Command command, const char* keys,
+										 std::vector<Action>& result) const;
 
 public:
 	// Properties

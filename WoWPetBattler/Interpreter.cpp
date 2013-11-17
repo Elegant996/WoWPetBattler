@@ -107,10 +107,11 @@ void Interpreter::run()
 		//Lock the access so only this thread can access petStage to update it.
 		mutex.lock();
 
-		//Setup pet teams if we are now initialized.
+		//Setup pet teams if we are now initialized and inform the user of the opponent's pets.
 		if ((!petStage->Initialized() && (pixels[0].G & 64) != 0))
 		{
-			SetupPetTeams();
+			//Setup up teams.
+			this->SetupPetTeams();
 
 			//Create QString for the opponent's teams' pets.
 			QString teamComp = "Opponent's Team: " + petStage->GetTeam(2)->GetPet(1)->GetName();
@@ -137,8 +138,8 @@ void Interpreter::run()
 			UpdateAuras();
 
 			//Call AI and have it determine our next move.
-			qDebug() << "Run AI";
-			//ai->Run();
+			//qDebug() << "Run AI";
+			ai->Run();
 
 			//Delete all auras.
 			for (quint8 i=0; i < 3; i+=1)
@@ -147,7 +148,18 @@ void Interpreter::run()
 		}
 		else if (petStage->InPetBattle() && ((pixels[0].R & 128) == 0))
 		{
-			qDebug() << "Determine if victor";
+			//Inform us of who won.
+			if (petStage->WonLastBattle())
+				emit OutputToGUI("Victory!");
+			else
+				emit OutputToGUI("You lose.");
+			
+			//Record data.
+			emit OutputToGUI("Recording data...");
+			emit OutputToGUI(Recorder::RecordBattle(petStage));
+			//TODO: Record pet info.
+			emit OutputToGUI("Recording complete.");
+
 			petStage->Reinitialize();			//We've just left a pet battle so let's reset the stage.
 		}
 		else if (queueEnabled && petStage->QueueState() != 3 && (pixels[0].R & 3) == 3)
@@ -333,9 +345,9 @@ bool Interpreter::Locate()
 //Sets up pet teams after initializing.
 void Interpreter::SetupPetTeams()
 {
-	bool isWildBattle = ((pixels[0].G & 4) != 0);			//Opponent is a wild pet.
-	bool isPlayerNPC = ((pixels[0].G & 2) != 0);			//Opponent is NPC trainer.
-	petStage->IsPvPBattle(!isWildBattle && !isPlayerNPC);	//Set PvP flag.
+	bool isWildBattle = ((pixels[0].G & 4) != 0);					//Opponent is a wild pet.
+	bool isPlayerNPC = ((pixels[0].G & 2) != 0);					//Opponent is NPC trainer.
+	this->petStage->IsPvPBattle(!isWildBattle && !isPlayerNPC);		//Set PvP flag.
 
 	quint8 pixelCounter = 1;								//Used to determine what pixel block to look at.
 	for (quint8 i=1; i < 3; i+=1)

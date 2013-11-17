@@ -13,9 +13,10 @@
 #include "UI_WoWPetBattler.h"
 
 #include "AI.h"
+#include "Interpreter.h"
 #include "PetStage.h"
 #include "Preferences.h"
-#include "Interpreter.h"
+#include "Recorder.h"
 
 class WoWPetBattler : public QMainWindow
 {
