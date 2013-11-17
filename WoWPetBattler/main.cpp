@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
 {
 	QApplication app(argc, argv);
 	mainWindow = new WoWPetBattler;
-	qInstallMessageHandler(qMessageHandler);
+	//qInstallMessageHandler(qMessageHandler);
 	mainWindow->show();
 	mainWindow->activateWindow();
 	if (mainWindow->isMinimized())

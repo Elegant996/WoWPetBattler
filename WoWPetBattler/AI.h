@@ -26,21 +26,19 @@ public:
 	~AI(void);
 
 	void LoadPreferences();
+	void LoadQMLResources();
 
 	void QueueUp();
 	void AcceptQueue();
 
-	Move Expectiminimax(PetStage*, quint8, float, float, quint8);
+	void Run(bool);
 
 signals:
 	void OutputToGUI(QString, QString);
 	void OutputToGUI(QString);
 
-public slots:
-	void Run();
-
 private:
-	//Move Expectiminimax(PetStage*, quint8, quint8);
+	Move Expectiminimax(PetStage*, quint8, float, float, quint8);
 	Move SelectAction(PetStage*, quint8, float, float, quint8);
 	quint8 CalculatePriority(PetStage*);
 	float ActionOutcomes(PetStage*, quint8, float, float, quint8, bool);
@@ -63,7 +61,7 @@ private:
 	float minAvoidanceThreshold, minHitThreshold, minCritThreshold, minChanceOnHitThreshold;
 	float maxAvoidanceThreshold, maxHitThreshold, maxCritThreshold, maxChanceOnHitThreshold;
 
-	bool canPass, tieBreaker;
+	bool qmlResourcesLoaded, canPass, tieBreaker;
 
 	int totalCalls;
 };

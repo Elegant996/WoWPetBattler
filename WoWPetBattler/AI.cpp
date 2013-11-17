@@ -6,21 +6,9 @@ AI::AI(PetStage *petStage, Robot::Window *window)
 	this->petStage = petStage;	//Set stage.
 	this->window = window;		//Set the window.
 
-	qmlRegisterType<PetStage>();
-	qmlRegisterType<PetTeam>();
-	qmlRegisterType<Pet>("PetStatus", 1, 0, "PetStatus");
-	qmlRegisterType<PetAbility>();
-	qmlRegisterType<PetAction>("PetAction", 1, 0, "PetAction");
-	qmlRegisterType<PetAura>();
-	qmlRegisterType<PetType>("PetType", 1, 0, "PetType");
-	qmlRegisterType<PetHelper>();
+	this->LoadPreferences();	//Setup thresholds.
 
-	//QtQml member variables.
-	this->engine = new QQmlEngine;
-	this->objectContext = new QQmlContext(engine->rootContext());
-	this->component = new QQmlComponent(engine);
-
-	this->LoadPreferences();		//Setup thresholds.
+	this->qmlResourcesLoaded = false;
 
 	this-> totalCalls = 0;
 }
@@ -28,9 +16,12 @@ AI::AI(PetStage *petStage, Robot::Window *window)
 //Destructor
 AI::~AI(void)
 {
-	delete component;
-	delete objectContext;
-	delete engine;
+	if (qmlResourcesLoaded)
+	{
+		delete component;
+		delete objectContext;
+		delete engine;
+	}
 }
 
 //Load preferences.
@@ -71,6 +62,27 @@ void AI::LoadPreferences()
 	setting.endGroup();
 }
 
+void AI::LoadQMLResources()
+{
+	//Register all QML types.
+	qmlRegisterType<PetStage>();
+	qmlRegisterType<PetTeam>();
+	qmlRegisterType<Pet>("PetStatus", 1, 0, "PetStatus");
+	qmlRegisterType<PetAbility>();
+	qmlRegisterType<PetAction>("PetAction", 1, 0, "PetAction");
+	qmlRegisterType<PetAura>();
+	qmlRegisterType<PetType>("PetType", 1, 0, "PetType");
+	qmlRegisterType<PetHelper>("PetHelper", 1, 0, "PetHelper");
+
+	//QtQml member variables.
+	this->engine = new QQmlEngine;
+	this->objectContext = new QQmlContext(engine->rootContext());
+	this->component = new QQmlComponent(engine);
+
+	//Set QML resources loaded flag to true.
+	this->qmlResourcesLoaded = true;
+}
+
 //Accept the queue when it has popped.
 void AI::QueueUp()
 {
@@ -86,12 +98,12 @@ void AI::AcceptQueue()
 }
 
 //Begin AI simulation and respond with best move.
-void AI::Run()
+void AI::Run(bool value)
 {
 	Move nextMove;		//Holds next ability.
 
 	//Run Expectiminimax if select ability or select pet is present.
-	if (petStage->SelectAbility() || (petStage->SelectPet() && petStage->Initialized()))
+	if (value || petStage->SelectAbility() || (petStage->SelectPet() && petStage->Initialized()))
 		nextMove = this->Expectiminimax(petStage, 4, -4500, 4500, 1);
 	//If we are not initialized select the first pet.
 	else if (petStage->SelectPet() && !petStage->Initialized())
@@ -274,6 +286,7 @@ Move AI::SelectAction(PetStage *stageNode, quint8 depth, float alpha, float beta
 
 	//Check of the pet is dead.
     if (stageNode->GetTeam(turnIndex)->GetActivePet()->IsDead())
+	{
 		//Swap to each pet that is still able to battle.
 		for (quint8 i=1; i < stageNode->GetTeam(turnIndex)->GetNumPets()+1; i+=1)
 			//Ignore same index an dead pets.
@@ -291,6 +304,7 @@ Move AI::SelectAction(PetStage *stageNode, quint8 depth, float alpha, float beta
 				nextMove.SetAction((PetAction::Action)(i+3));
 				nextMoves.append(nextMove);
 			}
+	}
 	//If an action is already in progress, continue to use that action.
 	else if (stageNode->GetTeam(turnIndex)->GetActivePet()->GetCurrentAction()->GetRoundsRemaining() > 0)
 	{
@@ -378,7 +392,8 @@ Move AI::SelectAction(PetStage *stageNode, quint8 depth, float alpha, float beta
 	{
 		PetStage *nextStage = stageMoves.takeFirst();										//Remove the stageMove from the list.
 		Move currentMove = Expectiminimax(nextStage, depth, alpha, beta,
-			(stageNode->GetTeam(turnIndex)->GetActivePet()->IsDead())
+			(stageNode->GetTeam(turnIndex)->GetActivePet()->IsDead()
+			&& !stageNode->GetTeam(turnIndex)->IsTeamDead())
 			? turnIndex : (turnIndex+1)%3);													//Set currentMove to call our Expectiminimax again.
 		(*iter).SetHeuristic(currentMove.GetHeuristic());									//Set the heuristic of the move in the nextMoves list.
 		delete (nextStage);																	//Delete the stageMove we removed from the list earlier.
@@ -406,7 +421,8 @@ Move AI::SelectAction(PetStage *stageNode, quint8 depth, float alpha, float beta
 	}
 
 	//Take first move as desired move initially.
-	desiredMove = nextMoves.takeFirst();
+	//if (!nextMoves.isEmpty())
+		desiredMove = nextMoves.takeFirst();
 
 	//Find the best move for opponent.
 	while (!nextMoves.isEmpty())
