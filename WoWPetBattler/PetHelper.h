@@ -2,6 +2,7 @@
 #define PETHELPER_H
 
 #include <QObject>
+#include <QtCore/qmath.h>
 
 #include "PetStage.h"
 
@@ -16,6 +17,9 @@ public:
 	Q_INVOKABLE static void CheckAuraPower(PetStage*, PetAura*, quint8, quint16);
 	Q_INVOKABLE static void CheckCleansingRain(PetStage*, quint8, quint8, quint16, qint8, bool, quint16);
 	Q_INVOKABLE static float CheckWeatherBonus(PetStage*, PetType::Type);
+
+private:
+	static quint16 Round(float);
 };
 
 #endif

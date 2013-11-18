@@ -556,10 +556,14 @@ function UpdateEvent(self, elapsed)
 	uiBg1:SetVertexColor(mBorderR1, mBorderG1, mBorderB1);
 	uiBg2:SetVertexColor(mBorderR2, mBorderG2, mBorderB2);
 
-	--Constantly check this.
-	teamIsAlive = (C_PetJournal.GetPetStats(C_PetJournal.GetPetLoadOutInfo(1))) > 0 and
+	--Constantly check this to see if the team is alive.			
+	if ((C_PetJournal.GetPetStats(C_PetJournal.GetPetLoadOutInfo(1))) > 0 and
 			(C_PetJournal.GetPetStats(C_PetJournal.GetPetLoadOutInfo(2))) > 0 and
-			(C_PetJournal.GetPetStats(C_PetJournal.GetPetLoadOutInfo(3))) > 0 and true or false;
+			(C_PetJournal.GetPetStats(C_PetJournal.GetPetLoadOutInfo(3))) > 0) then
+		teamIsAlive = true;
+	else
+		teamIsAlive = false;
+	end
 	
 	encodeInitial();
 	encodeStates();

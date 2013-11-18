@@ -106,6 +106,18 @@ void PetAura::SetPower(quint16 power)
 	this->power = power;
 }
 
+//Set the team index of which team cast the aura.
+void PetAura::SetOriginTeam(quint8 originTeam)
+{
+	this->originTeam = originTeam;
+}
+
+//Set the pet index of which pet cast the aura.
+void PetAura::SetOriginPet(quint8 originPet)
+{
+	this->originPet = originPet;
+}
+
 //Set the number of charges left on the aura.
 void PetAura::SetCharges(quint8 charges)
 {
@@ -152,6 +164,18 @@ qint8 PetAura::GetDuration()
 quint16 PetAura::GetPower()
 {
 	return this->power;
+}
+
+//Return the team index of which team cast the aura.
+quint8 PetAura::GetOriginTeam()
+{
+	return this->originTeam;
+}
+
+//Return the pet index of which pet cast the aura.
+quint8 PetAura::GetOriginPet()
+{
+	return this->originPet;
 }
 
 //Return the number of charges left on the aura.

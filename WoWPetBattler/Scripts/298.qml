@@ -72,8 +72,7 @@ Item
         //Apply healing to all pets.
         for (var i=1; i < petStage.GetTeam(teamIndex).NumPets+1; i++)
         {
-            var healing = Math.round((normalHealing + petStage.GetTeam(teamIndex).GetPet(i).BonusHealing)
-                            * petStage.GetTeam(teamIndex).GetPet(i).HealingModifier);
+            var healing = Math.round(normalHealing * petStage.GetTeam(teamIndex).GetPet(i).HealingModifier);
 
             if (isCritting && i == randomPetIndex)
                 petHelper.CheckHealing(petStage, teamIndex, i, 2*healing, true);

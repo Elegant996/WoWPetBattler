@@ -104,8 +104,7 @@ Item
         //Now handle healing aspect.
         for (var i=1; i < petStage.GetTeam(teamIndex).NumPets+1; i++)
         {
-            var healing = Math.round((normalHealing + petStage.GetTeam(teamIndex).GetPet(i).BonusHealing)
-                            * petStage.GetTeam(teamIndex).GetPet(i).HealingModifier);
+            var healing = Math.round(normalHealing * petStage.GetTeam(teamIndex).GetPet(i).HealingModifier);
 
             petHelper.CheckHealing(petStage, teamIndex, i, healing, true);
         }

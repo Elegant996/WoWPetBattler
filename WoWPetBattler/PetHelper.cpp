@@ -9,7 +9,7 @@ void PetHelper::CheckDamage(PetStage *petStage, quint8 teamIndex, quint8 petInde
 	//Special exception is the use of Lightning Storm weather effect.
 	if (useLightning && petStage->GetTeam(0)->GetPet(0)->GetNumAuras() > 0
 			&& petStage->GetTeam(0)->GetPet(0)->GetAura(1)->GetAuraId() == 203)
-		totalDamage += 2 + petStage->GetTeam(0)->GetPet(0)->GetAura(1)->GetPower() * 0.10;
+		totalDamage += Round(2 + (float)petStage->GetTeam(0)->GetPet(0)->GetAura(1)->GetPower() * 0.10);
 
 	//Use Magic racial if applicable.
 	if (currentPet->GetType() == PetType::Magic && totalDamage > (int)(currentPet->GetMaxHealth() * 0.35))
@@ -43,6 +43,27 @@ void PetHelper::CheckDamage(PetStage *petStage, quint8 teamIndex, quint8 petInde
 		CheckRacialsProc(petStage, (teamIndex%2)+1);
 		petStage->GetTeam((teamIndex%2)+1)->GetActivePet()->AttackedThisRound(true);
 	}
+
+	//Scan over the auras for the current pet.
+	for (quint8 i=1; i < currentPet->GetNumAuras()+1; i+=1)
+		//Check for Plague Blood.
+		if (currentPet->GetAura(i)->GetAuraId() == 658)
+		{
+			quint16 normalHealing = Round(4 + (float)currentPet->GetAura(i)->GetPower() * 0.2);			
+
+			if (mainAttack)
+			{
+				//Opponent's active pet is healed; check his healing modifiers.
+				quint16 healing = Round(normalHealing * petStage->GetTeam((teamIndex%2)+1)->GetActivePet()->GetHealingModifier());
+				CheckHealing(petStage, (teamIndex%2)+1, petStage->GetTeam((teamIndex%2)+1)->GetActivePetIndex(), healing, false);
+			}
+			else
+			{
+				//Originator of the aura is healed; check his healing modifiers.
+				quint16 healing = Round(normalHealing * petStage->GetTeam(currentPet->GetAura(i)->GetOriginTeam())->GetPet(currentPet->GetAura(i)->GetOriginPet())->GetHealingModifier());
+				CheckHealing(petStage, currentPet->GetAura(i)->GetOriginTeam(), currentPet->GetAura(i)->GetOriginPet(), normalHealing, false);
+			}
+		}
 }
 
 //Check the healing done.
@@ -79,12 +100,12 @@ void PetHelper::CheckRacials(Pet *currentPet)
 	{
 		if (currentPet->GetHealthPercentage() > 0.50 && !currentPet->RacialUsed())
 		{
-			currentPet->SetSpeed(currentPet->GetSpeed() * 1.5);
+			currentPet->SetSpeed(Round((float)currentPet->GetSpeed() * 1.5));
 			currentPet->RacialUsed(true);
 		}
 		else if (currentPet->GetHealthPercentage() <= 0.50 && currentPet->RacialUsed())
 		{
-			currentPet->SetSpeed(currentPet->GetSpeed() / 1.5);
+			currentPet->SetSpeed(Round((float)currentPet->GetSpeed() / 1.5));
 			currentPet->RacialUsed(false);
 		}
 	}
@@ -132,7 +153,13 @@ void PetHelper::CheckAuraPower(PetStage* petStage, PetAura *curAura, quint8 team
 			for (quint8 j=1; j < petStage->GetTeam(i)->GetNumPets()+1; j+=1)
 				for (quint8 k=1; k < petStage->GetTeam(i)->GetPet(j)->GetNumAbilities()+1; k+=1)
 					 if (petStage->GetTeam(i)->GetPet(j)->GetAbility(k)->GetAbilityId() == abilityId)
+					 {
+						 //Set info about the aura's origins.
+						 curAura->SetOriginTeam(i);
+						 curAura->SetOriginPet(j);
 						 curAura->SetPower(petStage->GetTeam(i)->GetPet(j)->GetPower());
+						 break;		//Found it!
+					 }
 	}
 	else
 	{	//We know which team to check already.
@@ -140,6 +167,9 @@ void PetHelper::CheckAuraPower(PetStage* petStage, PetAura *curAura, quint8 team
 			for (quint8 j=1; j < petStage->GetTeam(teamIndex)->GetPet(i)->GetNumAbilities()+1; j+=1)
 					if (petStage->GetTeam(teamIndex)->GetPet(i)->GetAbility(j)->GetAbilityId() == abilityId)
 					{
+						//Set info about the aura's origins.
+						curAura->SetOriginTeam(teamIndex);
+						curAura->SetOriginPet(i);
 						curAura->SetPower(petStage->GetTeam(teamIndex)->GetPet(i)->GetPower());
 						break;		//Found it!
 					}
@@ -166,4 +196,10 @@ float PetHelper::CheckWeatherBonus(PetStage *petStage, PetType::Type petType)
 		return 0.25;
 	else
 		return 0;
+}
+
+//Rounds up or down depending on the decimal.
+quint16 PetHelper::Round(float value)
+{
+	return qFloor(value + 0.5);
 }

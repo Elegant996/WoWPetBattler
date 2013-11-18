@@ -35,13 +35,14 @@ Item
     //Apply the aura's effect at the start of the turn.
     function applyAuraStart(teamIndex, petIndex, auraIndex, duration)
     {
-
+        if (petStage.GetTeam(teamIndex).GetPet(petIndex).GetAura(auraIndex).Power == 0)
+            petHelper.CheckAuraPower(petStage, petStage.GetTeam(teamIndex).GetPet(petIndex).GetAura(auraIndex), (teamIndex%2)+1, 657);
     }
 
     //Applies the aura effect to the active pet.
     function applyAura(teamIndex)
     {
-        petHelper.CheckHealing(petStage, (teamIndex%2)+1, petStage.GetTeam((teamIndex%2)+1).ActivePetIndex, Math.round(petStage.GetTeam((teamIndex%2)+1).ActivePet.MaxHealth * 0.01), false);
+        //petHelper.CheckHealing(petStage, (teamIndex%2)+1, petStage.GetTeam((teamIndex%2)+1).ActivePetIndex, Math.round(petStage.GetTeam((teamIndex%2)+1).ActivePet.MaxHealth * 0.01), false);
     }
 
     //Apply the aura's effect at the end of the turn.
