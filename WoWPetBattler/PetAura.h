@@ -23,14 +23,14 @@ class PetAura : public QObject
 
 public:
 	PetAura(quint16, qint8, bool);
-	PetAura(quint16, qint8, bool, quint16);
+	PetAura(quint16, qint8, bool, quint8, quint8, quint16);
 	~PetAura(void);
 	PetAura(const PetAura&);
 
 	void RoundUpdate();
 
 	Q_INVOKABLE void UpdateAura(int, bool);
-	Q_INVOKABLE void UpdateAura(int, bool, quint16);
+	Q_INVOKABLE void UpdateAura(int, bool, quint8, quint8, quint16);
 
 	void SetPower(quint16);
 	void SetOriginTeam(quint8);

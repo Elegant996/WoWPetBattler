@@ -128,7 +128,7 @@ Item
             petStage.GetTeam(0).GetPet(0).RemoveAura(1);
         }
 
-        petStage.GetTeam(0).GetPet(0).AddAura(205, 9, true, petStage.GetTeam(teamIndex).ActivePet.Power);
+        petStage.GetTeam(0).GetPet(0).AddAura(205, 9, true, teamIndex, petStage.GetTeam(teamIndex).ActivePetIndex, petStage.GetTeam(teamIndex).ActivePet.Power);
 
         //Add Chilled status to all pets.
         for (var i=1; i < 3; i++)

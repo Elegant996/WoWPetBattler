@@ -1,0 +1,19 @@
+{
+    "id": "000000000000000",
+    "losses": 0,
+    "pets": [
+        {
+            "id": 1229,
+            "name": "Fiendish Imp"
+        },
+        {
+            "id": 439,
+            "name": "Restless Shadeling"
+        },
+        {
+            "id": 519,
+            "name": "Fel Flame"
+        }
+    ],
+    "wins": 2
+}

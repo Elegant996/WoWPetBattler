@@ -67,6 +67,9 @@ Item
             return 0;
         }
 
+        if (isAvoiding)
+            console.log("avoided");
+
         var numHits = 0;
         var scaleFactor = 1.75;
         var baseDamage = 35;
@@ -88,14 +91,9 @@ Item
         }
 
         //Regardless of if we hit the pet must surface.
-        for (var i=petStage.GetTeam(teamIndex).ActivePet.NumAuras; i > 0; i--)
-            if (petStage.GetTeam(teamIndex).ActivePet.GetAura(i).AuraId == 830)
-            {
-                petStage.GetTeam(teamIndex).ActivePet.RemoveStatus(PetStatus.Underwater);
-                petStage.GetTeam(teamIndex).ActivePet.AvoidanceRating -= 5;
-                petStage.GetTeam(teamIndex).ActivePet.RemoveAura(i);
-                break;
-            }
+        petStage.GetTeam(teamIndex).ActivePet.RemoveStatus(PetStatus.Underwater);
+        petStage.GetTeam(teamIndex).ActivePet.AvoidanceRating -= 5;
+        petStage.GetTeam(teamIndex).ActivePet.RemoveAuraId(830);
 
         return numHits;
     }

@@ -250,19 +250,36 @@ void Pet::AddAura(quint16 auraId, qint8 duration, bool isFresh)
 }
 
 //Add an aura to the current pet.
-void Pet::AddAura(quint16 auraId, qint8 duration, bool isFresh, quint16 power)
+void Pet::AddAura(quint16 auraId, qint8 duration, bool isFresh, quint8 teamIndex, quint8 petIndex, quint16 power)
 {
 	//Check to see if petAuras is empty, if not check to see if it exists already and overwrite.
 	if (!petAuras.isEmpty())
 		for (int i=0; i < this->petAuras.size(); i+=1)
 			if (auraId == this->petAuras.at(i)->GetAuraId())
 			{
-				this->petAuras.at(i)->UpdateAura(duration, isFresh, power);
+				this->petAuras.at(i)->UpdateAura(duration, isFresh, teamIndex, petIndex, power);
 				return;
 			}
 
 	//If it doesn't exist, add it.
-	this->petAuras.append(new PetAura(auraId, duration, isFresh, power));
+	this->petAuras.append(new PetAura(auraId, duration, isFresh, teamIndex, petIndex, power));
+}
+
+//Remove the aura at the specified index.
+void Pet::RemoveAura(quint8 index)
+{
+	delete (petAuras.takeAt(index-1));
+}
+
+//Remove the specified auraId should it exist in the list.
+void Pet::RemoveAuraId(quint16 auraId)
+{
+	for (quint8 i=0; i < petAuras.size(); i+=1)
+		if (petAuras.at(i)->GetAuraId() == auraId)
+		{
+			delete (petAuras.takeAt(i));
+			return;
+		}
 }
 
 //Removes all pet auras except the racial passive on the pet.
@@ -272,12 +289,6 @@ void Pet::RemoveAuras()
 	quint8 auraIndex = (speciesId==0)?0:1;
 	while (petAuras.size() != auraIndex)
 		delete (petAuras.takeAt(auraIndex));
-}
-
-//Remove the aura at the specified index.
-void Pet::RemoveAura(quint8 index)
-{
-	delete (petAuras.takeAt(index-1));
 }
 
 //Return number of auras on the pet.

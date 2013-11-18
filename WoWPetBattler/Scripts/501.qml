@@ -79,7 +79,7 @@ Item
             else
                 petHelper.CheckDamage(petStage, (teamIndex%2)+1, petStage.GetTeam((teamIndex%2)+1).ActivePetIndex, damage, true, true);
 
-            petStage.GetTeam((teamIndex%2)+1).ActivePet.AddAura(500, 4, true, petStage.GetTeam(teamIndex).ActivePet.Power);
+            petStage.GetTeam((teamIndex%2)+1).ActivePet.AddAura(500, 4, true, teamIndex, petStage.GetTeam(teamIndex).ActivePetIndex, petStage.GetTeam(teamIndex).ActivePet.Power);
         }
 
         return numHits;

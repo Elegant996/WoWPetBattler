@@ -60,7 +60,7 @@ Item
     function useAbility(teamIndex, curRound, isFirst, isAvoiding,
                         isHitting, isCritting, isProcing)
     {
-        petStage.GetTeam(teamIndex).ActivePet.AddAura(408, 9, true, petStage.GetTeam(teamIndex).ActivePet.Power);
+        petStage.GetTeam(teamIndex).ActivePet.AddAura(408, 9, true, teamIndex, petStage.GetTeam(teamIndex).ActivePetIndex, petStage.GetTeam(teamIndex).ActivePet.Power);
 
         return 0;
     }

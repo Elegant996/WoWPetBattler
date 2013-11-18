@@ -142,7 +142,7 @@ Item
                 petStage.GetTeam(i).GetPet(j).DamageOffset += 5 + petStage.GetTeam(teamIndex).ActivePet.Power * 0.25;
             }
 
-        petStage.GetTeam(0).GetPet(0).AddAura(454, 5, true, petStage.GetTeam(teamIndex).ActivePet.Power);
+        petStage.GetTeam(0).GetPet(0).AddAura(454, 5, true, teamIndex, petStage.GetTeam(teamIndex).ActivePetIndex, petStage.GetTeam(teamIndex).ActivePet.Power);
 
         return numHits;
     }

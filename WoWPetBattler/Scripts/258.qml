@@ -167,7 +167,7 @@ Item
             for (var j=1; j < petStage.GetTeam(teamIndex).NumPets+1; j++)
                 petStage.GetTeam(i).GetPet(j).HealingModifier += 0.25;
 
-        petStage.GetTeam(0).GetPet(0).AddAura(596, 9, true, petStage.GetTeam(teamIndex).ActivePet.Power);
+        petStage.GetTeam(0).GetPet(0).AddAura(596, 9, true, teamIndex, petStage.GetTeam(teamIndex).ActivePetIndex, petStage.GetTeam(teamIndex).ActivePet.Power);
 
         return numHits;
     }

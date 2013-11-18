@@ -27,6 +27,8 @@ Interpreter::~Interpreter(void)
 //Exits the loop.
 void Interpreter::Exit()
 {
+	//Unlock the thread.
+	mutex.unlock();
 	running = false;
 	if (!wait(2000))
 		terminate();

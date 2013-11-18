@@ -20,6 +20,8 @@ PetAura::PetAura(quint16 auraId, qint8 duration, bool isFresh)
 	this->duration = (duration == 0) ? -1 : duration;
 	this->petTypeId = (PetType::Type)(int)aura.value(QString("petTypeId")).toDouble();
 	this->isPassive = aura.value(QString("isPassive")).toBool();
+	this->originTeam = 0;
+	this->originPet = 0;
 	this->power = 0;
 	this->isFresh = isFresh;
 	this->isObject = false;
@@ -27,7 +29,7 @@ PetAura::PetAura(quint16 auraId, qint8 duration, bool isFresh)
 	this->charges = 0;
 }
 
-PetAura::PetAura(quint16 auraId, qint8 duration, bool isFresh, quint16 power)
+PetAura::PetAura(quint16 auraId, qint8 duration, bool isFresh, quint8 teamIndex, quint8 petIndex, quint16 power)
 	: QObject(NULL)
 {
 	QFile auraJson;
@@ -46,6 +48,8 @@ PetAura::PetAura(quint16 auraId, qint8 duration, bool isFresh, quint16 power)
 	this->duration = (duration == 0) ? -1 : duration;
 	this->petTypeId = (PetType::Type)(int)aura.value(QString("petTypeId")).toDouble();
 	this->isPassive = aura.value(QString("isPassive")).toBool();
+	this->originTeam = teamIndex;
+	this->originPet = petIndex;
 	this->power = power;
 	this->isFresh = isFresh;
 	this->isObject = false;
@@ -69,6 +73,8 @@ PetAura::PetAura(const PetAura& other)
 	this->duration = other.duration;
 	this->petTypeId = other.petTypeId;
 	this->isPassive = other.isPassive;
+	this->originTeam = other.originTeam;
+	this->originPet = other.originPet;
 	this->power = other.power;
 	this->isFresh = other.isFresh;
 	this->isObject = other.isObject;
@@ -93,10 +99,12 @@ void PetAura::UpdateAura(int duration, bool isFresh)
 }
 
 //Update the aura. Used when recasted.
-void PetAura::UpdateAura(int duration, bool isFresh, quint16 power)
+void PetAura::UpdateAura(int duration, bool isFresh, quint8 teamIndex, quint8 petIndex, quint16 power)
 {
 	this->duration = (duration == 0) ? -1 : duration;
 	this->isFresh = isFresh;
+	this->originTeam = teamIndex;
+	this->originPet = petIndex;
 	this->power = power;
 }
 

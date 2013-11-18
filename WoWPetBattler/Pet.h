@@ -74,8 +74,9 @@ public:
 	//QQmlListProperty<PetAbility> GetAbilities();
 
 	Q_INVOKABLE void AddAura(quint16, qint8, bool);
-	Q_INVOKABLE void AddAura(quint16, qint8, bool, quint16);
+	Q_INVOKABLE void AddAura(quint16, qint8, bool, quint8, quint8, quint16);
 	Q_INVOKABLE void RemoveAura(quint8);
+	Q_INVOKABLE void RemoveAuraId(quint16);
 	void RemoveAuras();
 	Q_INVOKABLE quint8 GetNumAuras();
 	Q_INVOKABLE PetAura* GetAura(quint8);
