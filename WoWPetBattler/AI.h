@@ -64,8 +64,6 @@ private:
 	float maxAvoidanceThreshold, maxHitThreshold, maxCritThreshold, maxChanceOnHitThreshold;
 
 	bool qmlResourcesLoaded, canPass, tieBreaker;
-
-	int totalCalls;
 };
 
 #endif

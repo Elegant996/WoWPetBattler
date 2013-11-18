@@ -31,7 +31,7 @@ void Interpreter::Exit()
 	if (!wait(2000))
 		terminate();
 
-	petStage->Reinitialize();		//Thread activity has stopped; reinitialize the stage.
+	this->petStage->Reinitialize();		//Thread activity has stopped; reinitialize the stage.
 }
 
 //Override function from QThread to run out own loop.
@@ -112,17 +112,17 @@ void Interpreter::run()
 		mutex.lock();
 
 		//Setup pet teams if we are now initialized and inform the user of the opponent's pets.
-		if ((!petStage->Initialized() && (pixels[0].G & 64) != 0))
+		if ((!this->petStage->Initialized() && (pixels[0].G & 64) != 0))
 		{
 			//Setup up teams.
 			this->SetupPetTeams();
 
 			//Create QString for the opponent's teams' pets.
-			QString teamComp = "Opponent's Team: " + petStage->GetTeam(2)->GetPet(1)->GetName();
-			if (petStage->GetTeam(2)->GetNumPets() > 1)
-				teamComp += ", " + petStage->GetTeam(2)->GetPet(2)->GetName();
-			if (petStage->GetTeam(2)->GetNumPets() > 2)
-				teamComp += ", " + petStage->GetTeam(2)->GetPet(3)->GetName();
+			QString teamComp = "Opponent's Team: " + this->petStage->GetTeam(2)->GetPet(1)->GetName();
+			if (this->petStage->GetTeam(2)->GetNumPets() > 1)
+				teamComp += ", " + this->petStage->GetTeam(2)->GetPet(2)->GetName();
+			if (this->petStage->GetTeam(2)->GetNumPets() > 2)
+				teamComp += ", " + this->petStage->GetTeam(2)->GetPet(3)->GetName();
 			teamComp += ".";
 
 			//Emit the QString to the GUI.
@@ -130,68 +130,58 @@ void Interpreter::run()
 		}
 
 		//Update the stage info if we need to make a move.
-		if ((!petStage->SelectAbility() && (pixels[0].G & 16) != 0) || (!petStage->SelectPet() && (pixels[0].G & 32) != 0))
+		if ((!this->petStage->SelectAbility() && (pixels[0].G & 16) != 0) || (!this->petStage->SelectPet() && (pixels[0].G & 32) != 0))
 		{
 			//Update health pools.
-			UpdateHealthPools();
+			this->UpdateHealthPools();
 
 			//Update abilities and CDs as well as the active pet for each team.
-			UpdateAbilities();
+			this->UpdateAbilities();
 
 			//Update auras on pets.
-			UpdateAuras();
+			this->UpdateAuras();
 
 			//Call AI and have it determine our next move.
-			ai->Run((petStage->Initialized() || pixels[0].G & 64) != 0);
+			this->ai->Run(this->petStage->Initialized() || (pixels[0].G & 64) != 0);
 
 			//Delete all auras.
 			for (quint8 i=0; i < 3; i+=1)
-				for (quint8 j=0; j < petStage->GetTeam(i)->GetNumPets()+1; j+=1)
-					petStage->GetTeam(i)->GetPet(j)->RemoveAuras();
+				for (quint8 j=0; j < this->petStage->GetTeam(i)->GetNumPets()+1; j+=1)
+					this->petStage->GetTeam(i)->GetPet(j)->RemoveAuras();
 		}
-		else if (petStage->InPetBattle() && ((pixels[0].R & 128) == 0))
+		else if (this->petStage->InPetBattle() && ((pixels[0].R & 128) == 0))
 		{
 			//Inform us of who won.
-			if (petStage->WonLastBattle())
+			if (this->petStage->WonLastBattle())
 				emit OutputToGUI("Victory!");
 			else
 				emit OutputToGUI("You lose.");
 			
 			//Record data.
 			emit OutputToGUI("Recording data...");
-			emit OutputToGUI(Recorder::RecordBattle(petStage));
+			QString outputRecord = Recorder::RecordBattle(this->petStage);
+			emit OutputToGUI(outputRecord);
 			//TODO: Record pet info.
 			emit OutputToGUI("Recording complete.");
 
-			petStage->Reinitialize();			//We've just left a pet battle so let's reset the stage.
+			this->petStage->Reinitialize();			//We've just left a pet battle so let's reset the stage.
 		}
-		else if (queueEnabled && petStage->QueueState() != 3 && (pixels[0].R & 3) == 3)
-			ai->AcceptQueue();
-		else if (queueEnabled && !petStage->InPetBattle() && petStage->QueueState() == 0 && (pixels[0].R & 3) == 0)
-			ai->QueueUp();
+		else if (queueEnabled && this->petStage->QueueState() != 3 && (pixels[0].R & 3) == 3)
+			this->ai->AcceptQueue();
+		else if (queueEnabled && !this->petStage->InPetBattle() && this->petStage->QueueState() == 0 && (pixels[0].R & 3) == 0)
+			this->ai->QueueUp();
 
 		//Update petStage.
-		petStage->InPetBattle((pixels[0].R & 128) != 0);
-		petStage->TeamIsAlive((pixels[0].R & 64) != 0);
-		petStage->PlayerIsGhost((pixels[0].R & 32) != 0);
-		petStage->PlayerIsDead((pixels[0].R & 16) != 0);
-		petStage->PlayerAffectingCombat((pixels[0].R & 8) != 0);
-		petStage->QueueEnabled((pixels[0].R & 4) != 0);
-		petStage->QueueState((pixels[0].R & 3) != 0);
-		petStage->CanAccept((pixels[0].G & 128) != 0);
-		petStage->Initialized((pixels[0].G & 64) != 0);
-		petStage->SelectPet((pixels[0].G & 32) != 0);
-		petStage->SelectAbility((pixels[0].G & 16) != 0);
-		petStage->WonLastBattle((pixels[0].G & 8) != 0);
+		this->UpdateStates();
 
 		//Stop if conditions are met.
-		if (!petStage->InPetBattle())
+		if (!this->petStage->InPetBattle())
 		{
-			if (!petStage->TeamIsAlive()) { emit Stop("A pet on your team has fainted. Stopping..."); continue; }
-			if (petStage->PlayerIsGhost()) { emit Stop("Cannot queue while a ghost. Stopping..."); continue; }
-			if (petStage->PlayerIsDead()) { emit Stop("Cannot queue while dead. Stopping..."); continue; }
-			if (petStage->PlayerAffectingCombat()) { emit Stop("Cannot queue while in combat. Stopping..."); continue; }
-			if (!petStage->QueueEnabled()) { emit Stop("Queue system not enabled. Stopping..."); continue; }
+			if (!this->petStage->TeamIsAlive()) { emit Stop("A pet on your team has fainted. Stopping..."); continue; }
+			if (this->petStage->PlayerIsGhost()) { emit Stop("Cannot queue while a ghost. Stopping..."); continue; }
+			if (this->petStage->PlayerIsDead()) { emit Stop("Cannot queue while dead. Stopping..."); continue; }
+			if (this->petStage->PlayerAffectingCombat()) { emit Stop("Cannot queue while in combat. Stopping..."); continue; }
+			if (!this->petStage->QueueEnabled()) { emit Stop("Queue system not enabled. Stopping..."); continue; }
 		}
 
 		//Stop timer, sleep if needed and then reset the timer.
@@ -219,14 +209,31 @@ void Interpreter::LoadPreferences()
 	setting.endGroup();
 }
 
+//Update the states of petStage.
+void Interpreter::UpdateStates()
+{
+	this->petStage->InPetBattle((pixels[0].R & 128) != 0);
+	this->petStage->TeamIsAlive((pixels[0].R & 64) != 0);
+	this->petStage->PlayerIsGhost((pixels[0].R & 32) != 0);
+	this->petStage->PlayerIsDead((pixels[0].R & 16) != 0);
+	this->petStage->PlayerAffectingCombat((pixels[0].R & 8) != 0);
+	this->petStage->QueueEnabled((pixels[0].R & 4) != 0);
+	this->petStage->QueueState((pixels[0].R & 3) != 0);
+	this->petStage->CanAccept((pixels[0].G & 128) != 0);
+	this->petStage->Initialized((pixels[0].G & 64) != 0);
+	this->petStage->SelectPet((pixels[0].G & 32) != 0);
+	this->petStage->SelectAbility((pixels[0].G & 16) != 0);
+	this->petStage->WonLastBattle((pixels[0].G & 8) != 0);
+}
+
 //Locates the addon in the game.
 bool Interpreter::Locate()
 {
 	Robot::Color border = Robot::Color(16, 8, 12);
-	Robot::Screen::GrabScreen(*window, image); //Grab an image of the screen.
+	Robot::Screen::GrabScreen(*(this->window), this->image); //Grab an image of the screen.
 
-	for (int y=0; y < image->GetHeight(); y+=4)
-		for (int x=0; x < image->GetWidth(); x+=248)
+	for (int y=0; y < this->image->GetHeight(); y+=4)
+		for (int x=0; x < this->image->GetWidth(); x+=248)
 		{
 			//Pixel is color of border
 			if (image->GetPixel(x, y) == border)
@@ -243,7 +250,7 @@ bool Interpreter::Locate()
 					a = b = false;
 
 					while(true)
-						if (image->GetPixel(x1 - 1, y1) == border)
+						if (this->image->GetPixel(x1 - 1, y1) == border)
 						{
 							a = true;
 							x1 -= 1;
@@ -252,7 +259,7 @@ bool Interpreter::Locate()
 							break;
 
 					while(true)
-						if (image->GetPixel(x1, y1 - 1) == border)
+						if (this->image->GetPixel(x1, y1 - 1) == border)
 						{
 							b = true;
 							y1 -= 1;
@@ -268,7 +275,7 @@ bool Interpreter::Locate()
 					a = b = false;
 
 					while(true)
-						if (image->GetPixel(x2 + 1, y1) == border)
+						if (this->image->GetPixel(x2 + 1, y1) == border)
 						{
 							a = true;
 							x2 += 1;
@@ -277,7 +284,7 @@ bool Interpreter::Locate()
 							break;
 
 					while(true)
-						if (image->GetPixel(x1, y2 + 1) == border)
+						if (this->image->GetPixel(x1, y2 + 1) == border)
 						{
 							b = true;
 							y2 += 1;
@@ -301,26 +308,26 @@ bool Interpreter::Locate()
 
 				for (quint8 i=0; i < 20; i+=1)
 				{
-					points[i].X = length * i;
-					points[i+20].X = length * i;
+					this->points[i].X = length * i;
+					this->points[i+20].X = length * i;
 				}
 
 				//Verify the results.
-				Robot::Color p01 = image->GetPixel(x1 + start + points[0].X, y1 + center); // Uses build; Check for p37
-				Robot::Color p03 = image->GetPixel(x1 + start + points[2].X, y1 + center); //Check for p12
-				Robot::Color p04 = image->GetPixel(x1 + start + points[3].X, y1 + center); //Check for p29
-				Robot::Color p07 = image->GetPixel(x1 + start + points[6].X, y1 + center); //Check for p12
-				Robot::Color p10 = image->GetPixel(x1 + start + points[9].X, y1 + center); //Check for p12; Check for p37
-				Robot::Color p12 = image->GetPixel(x1 + start + points[11].X, y1 + center); //Uses p03, p07 and p10
-				Robot::Color p13 = image->GetPixel(x1 + start + points[12].X, y1 + center); //Check for p20 and p29
-				Robot::Color p15 = image->GetPixel(x1 + start + points[14].X, y1 + center); //Check for p20
-				Robot::Color p17 = image->GetPixel(x1 + start + points[16].X, y1 + center); //Check for p20
-				Robot::Color p20 = image->GetPixel(x1 + start + points[19].X, y1 + center); //Uses p13, p15 and p17
-				Robot::Color p21 = image->GetPixel(x1 + start + points[20].X, y1 + 34 + center); //Check for p23
-				Robot::Color p22 = image->GetPixel(x1 + start + points[21].X, y1 + 34 + center); //Check for p23
-				Robot::Color p23 = image->GetPixel(x1 + start + points[22].X, y1 + 34 + center); //Uses p21, p22 and build
-				Robot::Color p29 = image->GetPixel(x1 + start + points[28].X, y1 + 34 + center); //Uses p04, build, p13
-				Robot::Color p37 = image->GetPixel(x1 + start + points[36].X, y1 + 34 + center);
+				Robot::Color p01 = this->image->GetPixel(x1 + start + points[0].X, y1 + center); // Uses build; Check for p37
+				Robot::Color p03 = this->image->GetPixel(x1 + start + points[2].X, y1 + center); //Check for p12
+				Robot::Color p04 = this->image->GetPixel(x1 + start + points[3].X, y1 + center); //Check for p29
+				Robot::Color p07 = this->image->GetPixel(x1 + start + points[6].X, y1 + center); //Check for p12
+				Robot::Color p10 = this->image->GetPixel(x1 + start + points[9].X, y1 + center); //Check for p12; Check for p37
+				Robot::Color p12 = this->image->GetPixel(x1 + start + points[11].X, y1 + center); //Uses p03, p07 and p10
+				Robot::Color p13 = this->image->GetPixel(x1 + start + points[12].X, y1 + center); //Check for p20 and p29
+				Robot::Color p15 = this->image->GetPixel(x1 + start + points[14].X, y1 + center); //Check for p20
+				Robot::Color p17 = this->image->GetPixel(x1 + start + points[16].X, y1 + center); //Check for p20
+				Robot::Color p20 = this->image->GetPixel(x1 + start + points[19].X, y1 + center); //Uses p13, p15 and p17
+				Robot::Color p21 = this->image->GetPixel(x1 + start + points[20].X, y1 + 34 + center); //Check for p23
+				Robot::Color p22 = this->image->GetPixel(x1 + start + points[21].X, y1 + 34 + center); //Check for p23
+				Robot::Color p23 = this->image->GetPixel(x1 + start + points[22].X, y1 + 34 + center); //Uses p21, p22 and build
+				Robot::Color p29 = this->image->GetPixel(x1 + start + points[28].X, y1 + 34 + center); //Uses p04, build, p13
+				Robot::Color p37 = this->image->GetPixel(x1 + start + points[36].X, y1 + 34 + center);
 
 				if (p01.B != build || p12.R != p10.B || p12.G != p03.R || p12.B != p07.G
 						|| p20.R != p17.G || p20.G != p13.B || p20.B != p15.R
@@ -330,13 +337,13 @@ bool Interpreter::Locate()
 					continue;
 
 				//Update addon position.
-				addonBar1.X = x1 + start;
-				addonBar1.Y = y1 + center;
-				addonBar1.W = points[19].X + 1;
-				addonBar1.H = 1;
+				this->addonBar1.X = x1 + start;
+				this->addonBar1.Y = y1 + center;
+				this->addonBar1.W = points[19].X + 1;
+				this->addonBar1.H = 1;
 
-				addonBar2 = addonBar1;
-				addonBar2.Y = y1 + 34 + center; //34 is the pixel offset.
+				this->addonBar2 = addonBar1;
+				this->addonBar2.Y = y1 + 34 + center; //34 is the pixel offset.
 
 				//All done.
 				return true;
@@ -361,29 +368,29 @@ void Interpreter::SetupPetTeams()
 			if (species != 0)
 			{
 				//Add the pet to the team.
-				petStage->GetTeam(i)->AddPet(species, (pixels[pixelCounter].G & 31), ((pixels[pixelCounter].B >> 5) & 7),
+				this->petStage->GetTeam(i)->AddPet(species, (pixels[pixelCounter].G & 31), ((pixels[pixelCounter].B >> 5) & 7),
 												((((pixels[pixelCounter].B & 31) << 1) + ((pixels[pixelCounter+1].R >> 7) & 1)) & 63));
 
 				//Every pet has at least one ability.
-				petStage->GetTeam(i)->GetPet(((j-1)/2)+1)->AddAbility(((pixels[pixelCounter+1].R & 1) != 0),
+				this->petStage->GetTeam(i)->GetPet(((j-1)/2)+1)->AddAbility(((pixels[pixelCounter+1].R & 1) != 0),
 																		(((pixels[pixelCounter+1].R >> 5) & 1) + 1),
 																		((pixels[pixelCounter+1].R >> 1) & 15));
 
 				//Check if the pet is able to have a second ability.
-				if ( petStage->GetTeam(i)->GetPet(((j-1)/2)+1)->GetLevel() >= 2 || (isPlayerNPC && i==2))
-					petStage->GetTeam(i)->GetPet(((j-1)/2)+1)->AddAbility(((pixels[pixelCounter+1].R & 64) != 0),
+				if (this->petStage->GetTeam(i)->GetPet(((j-1)/2)+1)->GetLevel() >= 2 || (isPlayerNPC && i==2))
+					this->petStage->GetTeam(i)->GetPet(((j-1)/2)+1)->AddAbility(((pixels[pixelCounter+1].R & 64) != 0),
 																			(((pixels[pixelCounter+1].G >> 7) & 1) + 1),
 																			((pixels[pixelCounter+1].G >> 3) & 15));
 
 				//Check if the pet is able to have a third ability.
-				if (petStage->GetTeam(i)->GetPet(((j-1)/2)+1)->GetLevel() >= 4 || (isPlayerNPC && i==2))
-					petStage->GetTeam(i)->GetPet(((j-1)/2)+1)->AddAbility(((pixels[pixelCounter+1].G & 4) != 0),
+				if (this->petStage->GetTeam(i)->GetPet(((j-1)/2)+1)->GetLevel() >= 4 || (isPlayerNPC && i==2))
+					this->petStage->GetTeam(i)->GetPet(((j-1)/2)+1)->AddAbility(((pixels[pixelCounter+1].G & 4) != 0),
 																			(((pixels[pixelCounter+1].G >> 1) & 1) + 1),
 																			(((pixels[pixelCounter+1].G << 3) + (pixels[pixelCounter+1].B >> 5)) & 15));
 
 				//Check if the current pet is the active pet of the team.
 				if (((pixels[pixelCounter+1].B & 16) != 0))
-					petStage->GetTeam(i)->SetActivePet(((j-1)/2)+1);
+					this->petStage->GetTeam(i)->SetActivePet(((j-1)/2)+1);
 			}
 
 			pixelCounter += 2;			//Increment pixel counter.
@@ -401,17 +408,12 @@ void Interpreter::UpdateHealthPools()
 							(pixels[15].R << 16) + (pixels[15].G << 8) + pixels[15].B,
 							(pixels[16].R << 16) + (pixels[16].G << 8) + pixels[16].B};
 
-	quint8 healthCounter = 0;
-	for (quint8 i=1; i < 3; i+=1)
-		for (quint8 j=i; j < 4; j+=2)
-		{
-			if (petStage->GetTeam(i)->GetNumPets() >= j)
-				petStage->GetTeam(i)->GetPet(j)->SetHealth(((healthBlock[healthCounter] >> 12) & 4095));
-			if (petStage->GetTeam(i)->GetNumPets() >= j || (i == 1 && j == 3))
-				petStage->GetTeam((j+1>3)?i+1:i)->GetPet((j+1>3)?1:j+1)->SetHealth((healthBlock[healthCounter] & 4095));
+	quint16 currentHealth[2][3] = {{((healthBlock[0] >> 12) & 4095), (healthBlock[0] & 4095), ((healthBlock[1] >> 12) & 4095)},
+									{(healthBlock[1] & 4095), ((healthBlock[2] >> 12) & 4095), (healthBlock[2] & 4095)}};
 
-			healthCounter += 1;
-		}
+	for (quint8 i=1; i < 3; i+=1)
+		for (quint8 j=i; j < this->petStage->GetTeam(i)->GetNumPets()+1; j+=1)
+				this->petStage->GetTeam(i)->GetPet(j)->SetHealth(currentHealth[i-1][j-1]);
 }
 
 //Updates all the pets' abilities and each team's active pet.
@@ -419,17 +421,17 @@ void Interpreter::UpdateAbilities()
 {
 	quint8 pixelCounter = 2;			//Used to determine what pixel block to look at.
 	for (quint8 i=1; i < 3; i+=1)
-		for (quint8 j=1; j < petStage->GetTeam(i)->GetNumPets()+1; j+=1)
+		for (quint8 j=1; j < this->petStage->GetTeam(i)->GetNumPets()+1; j+=1)
 		{
-			petStage->GetTeam(i)->GetPet(j)->GetAbility(1)->SetCooldown(((pixels[pixelCounter].R >> 1) & 15));
-			if (petStage->GetTeam(i)->GetPet(j)->GetNumAbilities() >= 2)
-				petStage->GetTeam(i)->GetPet(j)->GetAbility(2)->SetCooldown(((pixels[pixelCounter].G >> 3) & 15));
-			if (petStage->GetTeam(i)->GetPet(j)->GetNumAbilities() == 3)
-				petStage->GetTeam(i)->GetPet(j)->GetAbility(3)->SetCooldown((((pixels[pixelCounter].G << 3) + (pixels[pixelCounter].B >> 5)) & 15));
+			this->petStage->GetTeam(i)->GetPet(j)->GetAbility(1)->SetCooldown(((pixels[pixelCounter].R >> 1) & 15));
+			if (this->petStage->GetTeam(i)->GetPet(j)->GetNumAbilities() >= 2)
+				this->petStage->GetTeam(i)->GetPet(j)->GetAbility(2)->SetCooldown(((pixels[pixelCounter].G >> 3) & 15));
+			if (this->petStage->GetTeam(i)->GetPet(j)->GetNumAbilities() == 3)
+				this->petStage->GetTeam(i)->GetPet(j)->GetAbility(3)->SetCooldown((((pixels[pixelCounter].G << 3) + (pixels[pixelCounter].B >> 5)) & 15));
 
 			//Check if the current pet is the active pet of the team.
 			if (((pixels[pixelCounter].B & 16) != 0))
-				petStage->GetTeam(i)->SetActivePet(j);
+				this->petStage->GetTeam(i)->SetActivePet(j);
 
 			pixelCounter += 2;			//Increment pixel counter.
 
@@ -450,7 +452,7 @@ void Interpreter::UpdateAuras()
 
 		quint16 auraId = (pixels[i].G << 4) + (pixels[i].B >> 4);
 		if (auraId != 0)
-			petStage->GetTeam((pixels[i].R >> 6))->GetPet(((pixels[i].R >> 4) & 3))->AddAura(auraId, (pixels[i].R & 15), false);
+			this->petStage->GetTeam((pixels[i].R >> 6))->GetPet(((pixels[i].R >> 4) & 3))->AddAura(auraId, (pixels[i].R & 15), false);
 		else
 			break;
 	}

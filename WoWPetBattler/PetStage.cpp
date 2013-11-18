@@ -54,8 +54,9 @@ PetStage::PetStage(const PetStage& other)
 //Recreates the basic setup for the stage.
 void PetStage::Reinitialize()
 {
-	//Delete all teams
-	qDeleteAll(this->petTeams);
+	//Delete all teams.
+	while (!this->petTeams.isEmpty())
+		delete (this->petTeams.takeFirst());
 	this->petTeams.clear();
 
 	this->queueState = 0;
@@ -86,7 +87,7 @@ void PetStage::RoundUpdate()
 //Return whether or not the match is over.
 bool PetStage::IsMatchOver()
 {
-	if (petTeams.at(1)->IsTeamDead() || petTeams.at(2)->IsTeamDead())
+	if (this->petTeams.at(1)->IsTeamDead() || this->petTeams.at(2)->IsTeamDead())
 		return true;
 	return false;
 }

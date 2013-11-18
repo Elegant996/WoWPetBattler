@@ -133,8 +133,18 @@ function events:PET_BATTLE_PET_ROUND_PLAYBACK_COMPLETE(...)
 			end
 		end
 
+		--Used to cancel out problems with the last pet auto-entering.
+		local petsAlive = 0;
+		for i=1, teamSize[1] do
+			if (petsCurrentHP[1][i] ~= 0) then
+				petsAlive = petsAlive + 1;
+			end
+		end
+		
+		selectPet = C_PetBattles.ShouldShowPetSelect();
 		roundLockoutCount = roundLockoutCount - 1;	--Used to determine if we can actually make a move.
-		selectAbility, selectPet = (roundLockoutCount <= 0) and true or false, C_PetBattles.ShouldShowPetSelect();
+		if (selectPet and roundLockoutCount > 0) then roundLockoutCount = 0; end
+		selectAbility = (roundLockoutCount <= 0) and true or false;
 	else		
 		for i=0, teams do
 			teamSize[i], teamsActivePet[i] = C_PetBattles.GetNumPets(i), C_PetBattles.GetActivePet(i);
@@ -546,6 +556,11 @@ function UpdateEvent(self, elapsed)
 	uiBg1:SetVertexColor(mBorderR1, mBorderG1, mBorderB1);
 	uiBg2:SetVertexColor(mBorderR2, mBorderG2, mBorderB2);
 
+	--Constantly check this.
+	teamIsAlive = (C_PetJournal.GetPetStats(C_PetJournal.GetPetLoadOutInfo(1))) > 0 and
+			(C_PetJournal.GetPetStats(C_PetJournal.GetPetLoadOutInfo(2))) > 0 and
+			(C_PetJournal.GetPetStats(C_PetJournal.GetPetLoadOutInfo(3))) > 0 and true or false;
+	
 	encodeInitial();
 	encodeStates();
 	encodePetInfo();

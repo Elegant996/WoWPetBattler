@@ -39,6 +39,8 @@ protected:
 private:
 	void LoadPreferences();
 
+	void UpdateStates();
+
 	bool Locate();
 	void SetupPetTeams();
 	void UpdateHealthPools();
@@ -63,7 +65,6 @@ private:
 
 	bool readSuccess, oneTimeNotifier;
 	quint8 timeoutCount;
-
 };
 
 #endif
