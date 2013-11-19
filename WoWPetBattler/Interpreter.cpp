@@ -19,7 +19,7 @@ Interpreter::Interpreter(PetStage* petStage, AI* ai, Robot::Window *window) :
 //Destructor
 Interpreter::~Interpreter(void)
 {
-	delete[] pixels;
+	delete[] this->pixels;
 	delete[] points;
 	delete image;
 }
@@ -92,18 +92,18 @@ void Interpreter::run()
 		//Addon location already known, grab pixels.	
 		Robot::Screen::GrabScreen(*window, image, addonBar1);
 		for (quint8 i=0; i < 20; i+=1)
-			pixels[i] = image->GetPixel(points[i]);
+			this->pixels[i] = image->GetPixel(points[i]);
 
 		Robot::Screen::GrabScreen(*window, image, addonBar2);
 		for (quint8 i=20; i < 40; i+=1)
-			pixels[i] = image->GetPixel(points[i]);
+			this->pixels[i] = image->GetPixel(points[i]);
 
 		//Run checksums again to be sure it didn't move.
-		if (pixels[0].B != build || pixels[11].R != pixels[9].B || pixels[11].G != pixels[2].R || pixels[11].B != pixels[6].G
-				|| pixels[19].R != pixels[16].G || pixels[19].G != pixels[12].B || pixels[19].B != pixels[14].R
-				|| pixels[22].R != build || pixels[22].G != pixels[20].R || pixels[22].B != pixels[21].G
-				|| pixels[28].R != pixels[3].G || pixels[28].G != build || pixels[28].B != pixels[12].R
-				|| pixels[36].R != build || pixels[36].G != pixels[0].R || pixels[36].B != pixels[9].G)
+		if (this->pixels[0].B != build || this->pixels[11].R != this->pixels[9].B || this->pixels[11].G != this->pixels[2].R || this->pixels[11].B != this->pixels[6].G
+				|| this->pixels[19].R != this->pixels[16].G || this->pixels[19].G != this->pixels[12].B || this->pixels[19].B != this->pixels[14].R
+				|| this->pixels[22].R != build || this->pixels[22].G != this->pixels[20].R || this->pixels[22].B != this->pixels[21].G
+				|| this->pixels[28].R != this->pixels[3].G || this->pixels[28].G != build || this->pixels[28].B != this->pixels[12].R
+				|| this->pixels[36].R != build || this->pixels[36].G != this->pixels[0].R || this->pixels[36].B != this->pixels[9].G)
 		{
 			readSuccess = false;
 			oneTimeNotifier = false;
@@ -114,7 +114,7 @@ void Interpreter::run()
 		mutex.lock();
 
 		//Setup pet teams if we are now initialized and inform the user of the opponent's pets.
-		if ((!this->petStage->Initialized() && (pixels[0].G & 64) != 0))
+		if ((!this->petStage->Initialized() && (this->pixels[0].G & 64) != 0))
 		{
 			//Setup up teams.
 			this->SetupPetTeams();
@@ -132,7 +132,7 @@ void Interpreter::run()
 		}
 
 		//Update the stage info if we need to make a move.
-		if ((!this->petStage->SelectAbility() && (pixels[0].G & 16) != 0) || (!this->petStage->SelectPet() && (pixels[0].G & 32) != 0))
+		if ((!this->petStage->SelectAbility() && (this->pixels[0].G & 16) != 0) || (!this->petStage->SelectPet() && (this->pixels[0].G & 32) != 0))
 		{
 			//Update health pools.
 			this->UpdateHealthPools();
@@ -147,14 +147,14 @@ void Interpreter::run()
 			if ((this->petStage->GetTeam(1)->GetDeathToll() != this->petStage->GetTeam(1)->GetNumPets()-1
 					|| !this->petStage->GetTeam(1)->GetActivePet()->IsDead()) || (this->petStage->GetTeam(2)->GetDeathToll()
 					!= this->petStage->GetTeam(2)->GetNumPets()-1|| !this->petStage->GetTeam(2)->GetActivePet()->IsDead()))
-				this->ai->Run(this->petStage->Initialized() || (pixels[0].G & 64) != 0);
+				this->ai->Run(this->petStage->Initialized() || (this->pixels[0].G & 64) != 0);
 
 			//Delete all auras.
 			for (quint8 i=0; i < 3; i+=1)
 				for (quint8 j=0; j < this->petStage->GetTeam(i)->GetNumPets()+1; j+=1)
 					this->petStage->GetTeam(i)->GetPet(j)->RemoveAuras();
 		}
-		else if (this->petStage->InPetBattle() && ((pixels[0].R & 128) == 0))
+		else if (this->petStage->InPetBattle() && ((this->pixels[0].R & 128) == 0))
 		{
 			//Inform us of who won.
 			if (this->petStage->WonLastBattle())
@@ -165,15 +165,17 @@ void Interpreter::run()
 			//Record data.
 			emit OutputToGUI("Recording data...");
 			QString outputRecord = Recorder::RecordBattle(this->petStage);
+			if (petStage->IsPvPBattle())
+				Recorder::RecordPets(this->petStage);
 			emit OutputToGUI(outputRecord);
 			//TODO: Record pet info.
 			emit OutputToGUI("Recording complete.");
 
 			this->petStage->Reinitialize();			//We've just left a pet battle so let's reset the stage.
 		}
-		else if (queueEnabled && this->petStage->QueueState() != 3 && (pixels[0].R & 3) == 3)
+		else if (queueEnabled && this->petStage->QueueState() != 3 && (this->pixels[0].R & 3) == 3)
 			this->ai->AcceptQueue();
-		else if (queueEnabled && !this->petStage->InPetBattle() && this->petStage->QueueState() == 0 && (pixels[0].R & 3) == 0)
+		else if (queueEnabled && !this->petStage->InPetBattle() && this->petStage->QueueState() == 0 && (this->pixels[0].R & 3) == 0)
 			this->ai->QueueUp();
 
 		//Update petStage.
@@ -343,49 +345,52 @@ bool Interpreter::Locate()
 //Sets up pet teams after initializing.
 void Interpreter::SetupPetTeams()
 {
-	bool isWildBattle = ((pixels[0].G & 4) != 0);					//Opponent is a wild pet.
-	bool isPlayerNPC = ((pixels[0].G & 2) != 0);					//Opponent is NPC trainer.
-	this->petStage->IsPvPBattle(!isWildBattle && !isPlayerNPC);		//Set PvP flag.
+	bool isWildBattle = ((this->pixels[0].G & 4) != 0);					//Opponent is a wild pet.
+	bool isPlayerNPC = ((this->pixels[0].G & 2) != 0);					//Opponent is NPC trainer.
+	this->petStage->IsPvPBattle(!isWildBattle && !isPlayerNPC);			//Set PvP flag.
 
 	quint8 pixelCounter = 1;								//Used to determine what pixel block to look at.
 	for (quint8 i=1; i < 3; i+=1)
 		for (quint8 j=1; j < 6; j+=2)
 		{
 			//Get the species id and continue if it is valid.
-			quint16 species = ((((pixels[pixelCounter].R << 3) + (pixels[pixelCounter].G >> 5))) & 2047);
+			quint16 species = ((((this->pixels[pixelCounter].R << 3) + (this->pixels[pixelCounter].G >> 5))) & 2047);
 			if (species != 0)
 			{
 				//Add the pet to the team.
-				this->petStage->GetTeam(i)->AddPet(species, (pixels[pixelCounter].G & 31), ((pixels[pixelCounter].B >> 5) & 7),
-												((((pixels[pixelCounter].B & 31) << 1) + ((pixels[pixelCounter+1].R >> 7) & 1)) & 63));
+				this->petStage->GetTeam(i)->AddPet(species, (this->pixels[pixelCounter].G & 31), ((this->pixels[pixelCounter].B >> 5) & 7),
+												((((this->pixels[pixelCounter].B & 31) << 1) + ((this->pixels[pixelCounter+1].R >> 7) & 1)) & 63));
 
 				//Every pet has at least one ability.
-				this->petStage->GetTeam(i)->GetPet(((j-1)/2)+1)->AddAbility(((pixels[pixelCounter+1].R & 1) != 0),
-																		(((pixels[pixelCounter+1].R >> 5) & 1) + 1),
-																		((pixels[pixelCounter+1].R >> 1) & 15));
+				this->petStage->GetTeam(i)->GetPet(((j-1)/2)+1)->AddAbility(((this->pixels[pixelCounter+1].R & 1) != 0),
+																		this->petStage->IsPvPBattle(),
+																		(((this->pixels[pixelCounter+1].R >> 5) & 1) + 1),
+																		((this->pixels[pixelCounter+1].R >> 1) & 15));
 
 				//Check if the pet is able to have a second ability.
 				if (this->petStage->GetTeam(i)->GetPet(((j-1)/2)+1)->GetLevel() >= 2 || (isPlayerNPC && i==2))
-					this->petStage->GetTeam(i)->GetPet(((j-1)/2)+1)->AddAbility(((pixels[pixelCounter+1].R & 64) != 0),
-																			(((pixels[pixelCounter+1].G >> 7) & 1) + 1),
-																			((pixels[pixelCounter+1].G >> 3) & 15));
+					this->petStage->GetTeam(i)->GetPet(((j-1)/2)+1)->AddAbility(((this->pixels[pixelCounter+1].R & 64) != 0),
+																			this->petStage->IsPvPBattle(),
+																			(((this->pixels[pixelCounter+1].G >> 7) & 1) + 1),
+																			((this->pixels[pixelCounter+1].G >> 3) & 15));
 
 				//Check if the pet is able to have a third ability.
 				if (this->petStage->GetTeam(i)->GetPet(((j-1)/2)+1)->GetLevel() >= 4 || (isPlayerNPC && i==2))
-					this->petStage->GetTeam(i)->GetPet(((j-1)/2)+1)->AddAbility(((pixels[pixelCounter+1].G & 4) != 0),
-																			(((pixels[pixelCounter+1].G >> 1) & 1) + 1),
-																			(((pixels[pixelCounter+1].G << 3) + (pixels[pixelCounter+1].B >> 5)) & 15));
+					this->petStage->GetTeam(i)->GetPet(((j-1)/2)+1)->AddAbility(((this->pixels[pixelCounter+1].G & 4) != 0),
+																			this->petStage->IsPvPBattle(),
+																			(((this->pixels[pixelCounter+1].G >> 1) & 1) + 1),
+																			(((this->pixels[pixelCounter+1].G << 3) + (this->pixels[pixelCounter+1].B >> 5)) & 15));
 
 				//Check if the current pet is the active pet of the team.
-				if (((pixels[pixelCounter+1].B & 16) != 0))
+				if (((this->pixels[pixelCounter+1].B & 16) != 0))
 				{
 					this->petStage->GetTeam(i)->SetActivePet(((j-1)/2)+1);
 
 					//Get current action and rounds remaining on it.
 					if (i == 2)
 					{
-						this->petStage->GetTeam(i)->GetActivePet()->GetCurrentAction()->SetAction((PetAction::Action)((pixels[pixelCounter+1].B >> 2) & 3));
-						this->petStage->GetTeam(i)->GetActivePet()->GetCurrentAction()->SetRoundsRemaining((pixels[pixelCounter+1].B & 3));
+						this->petStage->GetTeam(i)->GetActivePet()->GetCurrentAction()->SetAction((PetAction::Action)((this->pixels[pixelCounter+1].B >> 2) & 3));
+						this->petStage->GetTeam(i)->GetActivePet()->GetCurrentAction()->SetRoundsRemaining((this->pixels[pixelCounter+1].B & 3));
 					}
 				}
 			}
@@ -401,9 +406,9 @@ void Interpreter::SetupPetTeams()
 //Updates the health pools of all pets.
 void Interpreter::UpdateHealthPools()
 {
-	quint32 healthBlock[] = {(pixels[14].R << 16) + (pixels[14].G << 8) + pixels[14].B,
-							(pixels[15].R << 16) + (pixels[15].G << 8) + pixels[15].B,
-							(pixels[16].R << 16) + (pixels[16].G << 8) + pixels[16].B};
+	quint32 healthBlock[] = {(this->pixels[14].R << 16) + (this->pixels[14].G << 8) + this->pixels[14].B,
+							(this->pixels[15].R << 16) + (this->pixels[15].G << 8) + this->pixels[15].B,
+							(this->pixels[16].R << 16) + (this->pixels[16].G << 8) + this->pixels[16].B};
 
 	quint16 currentHealth[2][3] = {{((healthBlock[0] >> 12) & 4095), (healthBlock[0] & 4095), ((healthBlock[1] >> 12) & 4095)},
 									{(healthBlock[1] & 4095), ((healthBlock[2] >> 12) & 4095), (healthBlock[2] & 4095)}};
@@ -420,22 +425,22 @@ void Interpreter::UpdateAbilities()
 	for (quint8 i=1; i < 3; i+=1)
 		for (quint8 j=1; j < this->petStage->GetTeam(i)->GetNumPets()+1; j+=1)
 		{
-			this->petStage->GetTeam(i)->GetPet(j)->GetAbility(1)->SetCooldown(((pixels[pixelCounter].R >> 1) & 15));
+			this->petStage->GetTeam(i)->GetPet(j)->GetAbility(1)->SetCooldown(((this->pixels[pixelCounter].R >> 1) & 15));
 			if (this->petStage->GetTeam(i)->GetPet(j)->GetNumAbilities() >= 2)
-				this->petStage->GetTeam(i)->GetPet(j)->GetAbility(2)->SetCooldown(((pixels[pixelCounter].G >> 3) & 15));
+				this->petStage->GetTeam(i)->GetPet(j)->GetAbility(2)->SetCooldown(((this->pixels[pixelCounter].G >> 3) & 15));
 			if (this->petStage->GetTeam(i)->GetPet(j)->GetNumAbilities() == 3)
-				this->petStage->GetTeam(i)->GetPet(j)->GetAbility(3)->SetCooldown((((pixels[pixelCounter].G << 3) + (pixels[pixelCounter].B >> 5)) & 15));
+				this->petStage->GetTeam(i)->GetPet(j)->GetAbility(3)->SetCooldown((((this->pixels[pixelCounter].G << 3) + (this->pixels[pixelCounter].B >> 5)) & 15));
 
 			//Check if the current pet is the active pet of the team.
-			if (((pixels[pixelCounter].B & 16) != 0))
+			if (((this->pixels[pixelCounter].B & 16) != 0))
 			{
 				this->petStage->GetTeam(i)->SetActivePet(j);
 
 				//Get current action and rounds remaining on it.
 				if (i == 2)
 				{
-					this->petStage->GetTeam(i)->GetActivePet()->GetCurrentAction()->SetAction((PetAction::Action)((pixels[pixelCounter].B >> 2) & 3));
-					this->petStage->GetTeam(i)->GetActivePet()->GetCurrentAction()->SetRoundsRemaining((pixels[pixelCounter].B & 3));
+					this->petStage->GetTeam(i)->GetActivePet()->GetCurrentAction()->SetAction((PetAction::Action)((this->pixels[pixelCounter].B >> 2) & 3));
+					this->petStage->GetTeam(i)->GetActivePet()->GetCurrentAction()->SetRoundsRemaining((this->pixels[pixelCounter].B & 3));
 				}
 			}
 
@@ -456,9 +461,9 @@ void Interpreter::UpdateAuras()
 		if (i == 19 || i == 22 || i == 28 || i == 36)
 			continue;
 
-		quint16 auraId = (pixels[i].G << 4) + (pixels[i].B >> 4);
+		quint16 auraId = (this->pixels[i].G << 4) + (this->pixels[i].B >> 4);
 		if (auraId != 0)
-			this->petStage->GetTeam((pixels[i].R >> 6))->GetPet(((pixels[i].R >> 4) & 3))->AddAura(auraId, (pixels[i].R & 15), false);
+			this->petStage->GetTeam((this->pixels[i].R >> 6))->GetPet(((this->pixels[i].R >> 4) & 3))->AddAura(auraId, (this->pixels[i].R & 15), false);
 		else
 			break;
 	}
@@ -467,21 +472,21 @@ void Interpreter::UpdateAuras()
 //Update the states of petStage.
 void Interpreter::UpdateStates()
 {
-	this->petStage->InPetBattle((pixels[0].R & 128) != 0);
-	this->petStage->TeamIsAlive((pixels[0].R & 64) != 0);
-	this->petStage->PlayerIsGhost((pixels[0].R & 32) != 0);
-	this->petStage->PlayerIsDead((pixels[0].R & 16) != 0);
-	this->petStage->PlayerAffectingCombat((pixels[0].R & 8) != 0);
-	this->petStage->QueueEnabled((pixels[0].R & 4) != 0);
-	this->petStage->QueueState((pixels[0].R & 3) != 0);
-	this->petStage->CanAccept((pixels[0].G & 128) != 0);
-	this->petStage->Initialized((pixels[0].G & 64) != 0);
-	this->petStage->SelectPet((pixels[0].G & 32) != 0);
+	this->petStage->InPetBattle((this->pixels[0].R & 128) != 0);
+	this->petStage->TeamIsAlive((this->pixels[0].R & 64) != 0);
+	this->petStage->PlayerIsGhost((this->pixels[0].R & 32) != 0);
+	this->petStage->PlayerIsDead((this->pixels[0].R & 16) != 0);
+	this->petStage->PlayerAffectingCombat((this->pixels[0].R & 8) != 0);
+	this->petStage->QueueEnabled((this->pixels[0].R & 4) != 0);
+	this->petStage->QueueState((this->pixels[0].R & 3) != 0);
+	this->petStage->CanAccept((this->pixels[0].G & 128) != 0);
+	this->petStage->Initialized((this->pixels[0].G & 64) != 0);
+	this->petStage->SelectPet((this->pixels[0].G & 32) != 0);
 	if ((this->petStage->GetTeam(1)->GetDeathToll() == this->petStage->GetTeam(1)->GetNumPets()-1
 			&& this->petStage->GetTeam(1)->GetActivePet()->IsDead()) || (this->petStage->GetTeam(2)->GetDeathToll()
 			== this->petStage->GetTeam(2)->GetNumPets()-1 && this->petStage->GetTeam(2)->GetActivePet()->IsDead()))
 		this->petStage->SelectAbility(false);
 	else
-		this->petStage->SelectAbility((pixels[0].G & 16) != 0);
-	this->petStage->WonLastBattle((pixels[0].G & 8) != 0);
+		this->petStage->SelectAbility((this->pixels[0].G & 16) != 0);
+	this->petStage->WonLastBattle((this->pixels[0].G & 8) != 0);
 }

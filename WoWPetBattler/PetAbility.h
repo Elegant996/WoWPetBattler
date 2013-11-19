@@ -14,7 +14,7 @@ class PetAbility : public QObject
 	Q_PROPERTY(quint16 AbilityId READ GetAbilityId)
 
 public:
-	PetAbility(quint16, qint8, bool);
+	PetAbility(quint16, quint8, qint8, bool);
 	~PetAbility(void);
 	PetAbility(const PetAbility&);
 
@@ -26,6 +26,7 @@ public:
 	void IsVerified(bool);
 
 	quint16 GetAbilityId();
+	quint8 GetTier();
 	qint8 GetCooldown();
 	qint8 GetRounds();
 	bool IsVerified();
@@ -33,6 +34,7 @@ public:
 private:
 	QString name;
 	quint16 abilityId;
+	quint8 tier;
 	qint8 cooldown, currentCooldown, rounds;
 	PetType::Type petTypeId;
 	bool isPassive, isVerified, usedThisTurn;

@@ -1,7 +1,7 @@
 #include "PetAbility.h"
 
 //Constructor
-PetAbility::PetAbility(quint16 abilityId, qint8 cooldown, bool isVerified)
+PetAbility::PetAbility(quint16 abilityId, quint8 tier, qint8 cooldown, bool isVerified)
 	: QObject(NULL)
 {
 	QFile abilityJson;
@@ -15,6 +15,7 @@ PetAbility::PetAbility(quint16 abilityId, qint8 cooldown, bool isVerified)
 
 	this->abilityId = abilityId;
 	this->name = ability.value(QString("name")).toString();
+	this->tier = tier;
 	this->cooldown = ability.value(QString("cooldown")).toDouble();
 	this->currentCooldown = cooldown;
 	this->rounds = ability.value(QString("rounds")).toDouble();
@@ -35,6 +36,7 @@ PetAbility::PetAbility(const PetAbility& other)
 {
 	this->abilityId = other.abilityId;
 	this->name = other.name;
+	this->tier = other.tier;
 	this->cooldown = other.cooldown;
 	this->currentCooldown = other.currentCooldown;
 	this->rounds = other.rounds;
@@ -75,6 +77,11 @@ void PetAbility::IsVerified(bool verification)
 quint16 PetAbility::GetAbilityId()
 {
 	return this->abilityId;
+}
+
+quint8 PetAbility::GetTier()
+{
+	return this->tier;
 }
 
 //Return cooldown status.

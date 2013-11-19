@@ -204,15 +204,48 @@ Pet::PetStatus Pet::GetStatus(quint8 index)
 }*/
 
 //Add an ability to the current pet.
-void Pet::AddAbility(bool verification, quint8 tier, qint8 cooldown)
+void Pet::AddAbility(bool verified, bool isPvPBattle, quint8 tier, qint8 cooldown)
 {
-	this->petAbilities.append(new PetAbility(abilityList[(this->petAbilities.size()+1)+((tier-1)*3)-1].toObject().value(QString("id")).toDouble(), cooldown, verification));
+	//If it's not a PvP battle or it is a PvP battle and the record is is not available.
+	if (!isPvPBattle || !QFile::exists("PetRecords/" + QString::number(this->speciesId) + ".json"))
+		this->petAbilities.append(new PetAbility(abilityList[(this->petAbilities.size()+1)+((tier-1)*3)-1].toObject().value(QString("id")).toDouble(), tier, cooldown, verified));
+	//It is a PvP battle and the record is available.
+	else
+	{
+		//No point in checking anything else if it's verified.
+		if (verified)
+			this->petAbilities.append(new PetAbility(abilityList[(this->petAbilities.size()+1)+((tier-1)*3)-1].toObject().value(QString("id")).toDouble(), tier, cooldown, verified));
+		else
+		{
+			QFile petRecord("PetRecords/" + QString::number(speciesId) + ".json");
+			petRecord.open(QIODevice::ReadOnly | QIODevice::Text);
+
+			//Create a parser and read the document.
+			QJsonParseError parser;
+			QJsonDocument petRecordDocument = QJsonDocument::fromJson(petRecord.readAll(), &parser);
+
+			//Reduces a bit of clutter to have an object.
+			QJsonObject petRecordObject = petRecordDocument.object();
+
+			//Get each tier's frequency.
+			quint32 tier1Count = petRecordObject.value(QString("abilities")).toArray().at(petAbilities.size()).toObject().value("ability" + QString::number(petAbilities.size()+1)).toArray().at(0).toObject().value(QString("count")).toDouble();
+			quint32 tier2Count = petRecordObject.value(QString("abilities")).toArray().at(petAbilities.size()).toObject().value("ability" + QString::number(petAbilities.size()+1)).toArray().at(1).toObject().value(QString("count")).toDouble();
+
+			//Use the tier with the greatest frequency.
+			if (tier1Count > tier2Count)
+				this->petAbilities.append(new PetAbility(abilityList[(this->petAbilities.size()+1)-1].toObject().value(QString("id")).toDouble(), tier, cooldown, verified));
+			else
+				this->petAbilities.append(new PetAbility(abilityList[(this->petAbilities.size()+1)+2].toObject().value(QString("id")).toDouble(), tier, cooldown, verified));
+
+			petRecord.close();	//Close the record.
+		}
+	}
 }
 
 //Replace the ability of the current pet at specified index.
-void Pet::ReplaceAbility(quint8 index, bool verification, quint8 tier, qint8 cooldown)
+void Pet::ReplaceAbility(quint8 index, bool verified, quint8 tier, qint8 cooldown)
 {
-	this->petAbilities.replace(index-1, new PetAbility(abilityList[(index+1)+((tier-1)*3)-1].toObject().value(QString("id")).toDouble(), cooldown, verification));
+	this->petAbilities.replace(index-1, new PetAbility(abilityList[(index+1)+((tier-1)*3)-1].toObject().value(QString("id")).toDouble(), tier, cooldown, verified));
 }
 
 //Return the number of abilities known by the pet.

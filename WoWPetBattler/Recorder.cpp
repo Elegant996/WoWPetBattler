@@ -1,6 +1,6 @@
 #include "Recorder.h"
 
-//Records the battle info to the appropriate *.json file.
+//Records the battle info to the appropriate record.
 QString Recorder::RecordBattle(PetStage *petStage)
 {
 	//Get both team's id.
@@ -13,7 +13,7 @@ QString Recorder::RecordBattle(PetStage *petStage)
 	//Create player's team id directory if it does not exist.
 	if (!QDir("BattleRecords/" + playerTeamId).exists())
 	{
-		//Create the new directory and add default json file for the team.
+		//Create the new directory and add default record for the team.
 		QDir().mkdir("BattleRecords/" + playerTeamId);
 		QDir::setCurrent("BattleRecords/" + playerTeamId);
 		CreateBattleRecord(petStage, 1, QString("%1").arg(QString::number(0), 15, '0'));
@@ -23,7 +23,7 @@ QString Recorder::RecordBattle(PetStage *petStage)
 	//Set folder to that of the player's team id.
 	QDir::setCurrent("BattleRecords/" + playerTeamId);
 
-	//Creat the record if it doesn't exist.
+	//Create the record if it doesn't exist.
 	if (!QFile::exists(opponentTeamId + ".json"))
 	{
 		output = CreateBattleRecord(petStage, 2, opponentTeamId);	//Create a new json for the opponent's team.
@@ -40,6 +40,21 @@ QString Recorder::RecordBattle(PetStage *petStage)
 
 	//Return the output.
 	return output;
+}
+
+//Records the pet info to the appropriate record.
+void Recorder::RecordPets(PetStage *petStage)
+{
+	//Record each pet.
+	for (quint8 i=1; i < petStage->GetTeam(2)->GetNumPets()+1; i+=1)
+	{
+		//Create the record if it doesn't exist.
+		if (!QFile::exists("PetRecords/" + QString::number(petStage->GetTeam(2)->GetPet(i)->GetSpeciesId()) + ".json"))
+			CreatePetRecord(petStage, i);
+		
+		//Update the record.
+		UpdatePetRecord(petStage, i);
+	}
 }
 
 //Makes the team's id.
@@ -143,4 +158,111 @@ QString Recorder::UpdateBattleRecord(PetStage *petStage, quint8 teamIndex, QStri
 
 	//Return the output.
 	return QString("This team has %1 wins and %2 losses.").arg(QString::number(wins), QString::number(losses));
+}
+
+//Creates a pet record.
+void Recorder::CreatePetRecord(PetStage *petStage, quint8 petIndex)
+{
+	//Get the pet species.
+	quint16 petSpecies = petStage->GetTeam(2)->GetPet(petIndex)->GetSpeciesId();
+
+	//Object that holds all info.
+	QJsonObject currentPet;
+
+	//Insert the team id into the object.
+	currentPet.insert("id", QJsonValue(petSpecies));
+
+	QJsonArray abilities;
+	//Process each ability of the pet.
+	for (quint8 i=1; i < petStage->GetTeam(2)->GetPet(petIndex)->GetNumAbilities()+1; i+=1)
+	{
+		QJsonObject currentAbility;
+		QJsonArray currentTiers;
+
+		//For each tier of an ability set it's count to 0.
+		for (quint8 j=1; j < 3; j+=1)
+		{
+			QJsonObject currentTier;
+			currentTier.insert("tier", QJsonValue(j));
+			currentTier.insert("count", QJsonValue(0));
+			currentTiers.append(currentTier);
+		}
+
+		//Add the current tier to the ability.
+		currentAbility.insert("ability" + QString::number(i), currentTiers);
+		abilities.append(currentAbility);
+	}
+
+	//Insert the pet array into the object.
+	currentPet.insert("abilities", abilities);
+
+	//Add object to document.
+	QJsonDocument petRecordDocument;
+	petRecordDocument.setObject(currentPet);
+
+	//Write info to file.
+	QFile petRecord("PetRecords/" + QString::number(petSpecies) + ".json");		//Load the record.
+	petRecord.open(QIODevice::WriteOnly | QIODevice::Text);						//Open the battle record for reading and writing; create if it doesn't exist.
+	petRecord.write(petRecordDocument.toJson());								//Write the battle record.
+	petRecord.close();															//Close the record.
+}
+
+//Updates a pet record.
+void Recorder::UpdatePetRecord(PetStage *petStage, quint8 petIndex)
+{
+	//Get the pet species.
+	quint16 petSpecies = petStage->GetTeam(2)->GetPet(petIndex)->GetSpeciesId();
+
+	//Open the pet record to read and write.
+	QFile petRecord("PetRecords/" + QString::number(petSpecies) + ".json");
+	petRecord.open(QIODevice::ReadWrite | QIODevice::Text);
+
+	//Create a parser and read the document.
+	QJsonParseError parser;
+	QJsonDocument petRecordDocument = QJsonDocument::fromJson(petRecord.readAll(), &parser);
+
+	//Convert document to object.
+	QJsonObject petRecordObject, newPetRecordObject;
+	petRecordObject = petRecordDocument.object();	
+
+	//Go through each ability.
+	QJsonArray abilities, newAbilities;
+	abilities = petRecordObject.value(QString("abilities")).toArray();
+	for (quint8 i=0; i < abilities.size(); i+=1)
+	{
+		QJsonObject currentAbility, newCurrentAbility;
+		currentAbility = abilities.at(i).toObject();
+
+		QJsonArray currentTiers, newCurrentTiers;
+		currentTiers = currentAbility.value(QString("ability" + QString::number(i+1))).toArray();
+
+		//Go through each tier the ability can have.
+		for (quint8 j=0; j < currentTiers.size(); j+=1)
+		{
+			QJsonObject currentTier, newCurrentTier;
+			currentTier = currentTiers.at(j).toObject();
+
+			//Get the frequency of the ability and increase it if it was used this battle.
+			int count = currentTier.value(QString("count")).toDouble();
+			count += (!petStage->GetTeam(2)->GetPet(petIndex)->GetAbility(i+1)->IsVerified()
+				&& petStage->GetTeam(2)->GetPet(petIndex)->GetAbility(i+1)->GetTier() == j+1) ? 1 : 0;
+
+			//Insert it into the new variable.
+			newCurrentTier.insert(QString("tier"), QJsonValue(j+1));
+			newCurrentTier.insert(QString("count"), QJsonValue(count));
+			newCurrentTiers.append(newCurrentTier);
+		}
+
+		//Replace current ability with updated version.
+		newCurrentAbility.insert((QString("ability" + QString::number(i+1))), newCurrentTiers);
+		newAbilities.append(newCurrentAbility);
+	}
+
+	//Replace abilities with updated version.
+	newPetRecordObject.insert(QString("abilities"), newAbilities);
+
+	petRecordDocument.setObject(newPetRecordObject);		//Add object to document.
+	petRecord.resize(0);									//Empty the record.
+	petRecord.write(petRecordDocument.toJson());			//Write the update battle record.
+	petRecord.close();										//Close the record.
 }

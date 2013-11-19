@@ -67,7 +67,7 @@ public:
 	Q_INVOKABLE PetStatus GetStatus(quint8);
 	//QList<int> GetStatuses();
 
-	void AddAbility(bool, quint8, qint8);
+	void AddAbility(bool, bool, quint8, qint8);
 	void ReplaceAbility(quint8, bool, quint8, qint8);
 	int GetNumAbilities();
 	Q_INVOKABLE PetAbility* GetAbility(quint8);

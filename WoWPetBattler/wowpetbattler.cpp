@@ -7,10 +7,6 @@ WoWPetBattler::WoWPetBattler(QWidget *parent)
 	//Set up the UI.
 	this->ui.setupUi(this);
 
-	//(OLD) Set position of main GUI.
-	//if (this->taskbar.Synchronize())
-		//this->move(taskbar.GetBounds().W - size().width() - 15, taskbar.GetBounds().Y - size().height() - 35);
-
 	//Load preferences.
 	this->LoadPreferences();
 
@@ -44,36 +40,44 @@ WoWPetBattler::WoWPetBattler(QWidget *parent)
 	connect(this->interpreter, SIGNAL(OutputToGUI(QString)), this, SLOT(Output(QString)));
 	connect(this->interpreter, SIGNAL(Stop(QString)), this, SLOT(Stop(QString)));
 
-	//Testing data
+	//Create BattleRecords folder if it does not exist.
+	if (!QDir("BattleRecords").exists())
+		QDir().mkdir("BattleRecords");
+
+	//Create PetRecords folder if it does not exist.
+	if (!QDir("PetRecords").exists())
+		QDir().mkdir("PetRecords");
+
+	//Testing data.
 	/*petStage->GetTeam(1)->AddPet(1229, 5, 4, 25);
-	petStage->GetTeam(1)->GetPet(1)->AddAbility(true, 1, 0);
-	petStage->GetTeam(1)->GetPet(1)->AddAbility(true, 1, 0);
-	petStage->GetTeam(1)->GetPet(1)->AddAbility(true, 2, 0);
+	petStage->GetTeam(1)->GetPet(1)->AddAbility(true, true, 1, 0);
+	petStage->GetTeam(1)->GetPet(1)->AddAbility(true, true, 1, 0);
+	petStage->GetTeam(1)->GetPet(1)->AddAbility(true, true, 2, 0);
 
 	petStage->GetTeam(1)->AddPet(439, 9, 4, 25);
-	petStage->GetTeam(1)->GetPet(2)->AddAbility(true, 1, 0);
-	petStage->GetTeam(1)->GetPet(2)->AddAbility(true, 1, 0);
-	petStage->GetTeam(1)->GetPet(2)->AddAbility(true, 2, 0);
+	petStage->GetTeam(1)->GetPet(2)->AddAbility(true, true, 1, 0);
+	petStage->GetTeam(1)->GetPet(2)->AddAbility(true, true, 1, 0);
+	petStage->GetTeam(1)->GetPet(2)->AddAbility(true, true, 2, 0);
 
 	petStage->GetTeam(1)->AddPet(519, 7, 4, 25);
-	petStage->GetTeam(1)->GetPet(3)->AddAbility(true, 2, 0);
-	petStage->GetTeam(1)->GetPet(3)->AddAbility(true, 2, 0);
-	petStage->GetTeam(1)->GetPet(3)->AddAbility(true, 1, 0);
+	petStage->GetTeam(1)->GetPet(3)->AddAbility(true, true, 2, 0);
+	petStage->GetTeam(1)->GetPet(3)->AddAbility(true, true, 2, 0);
+	petStage->GetTeam(1)->GetPet(3)->AddAbility(true, true, 1, 0);
 
 	petStage->GetTeam(2)->AddPet(1012, 5, 6, 25);
-	petStage->GetTeam(2)->GetPet(1)->AddAbility(true, 1, 0);
-	petStage->GetTeam(2)->GetPet(1)->AddAbility(true, 1, 0);
-	petStage->GetTeam(2)->GetPet(1)->AddAbility(true, 1, 0);
+	petStage->GetTeam(2)->GetPet(1)->AddAbility(false, true, 1, 0);
+	petStage->GetTeam(2)->GetPet(1)->AddAbility(false, true, 1, 0);
+	petStage->GetTeam(2)->GetPet(1)->AddAbility(false, true, 1, 0);
 
 	petStage->GetTeam(2)->AddPet(1011, 7, 6, 25);
-	petStage->GetTeam(2)->GetPet(2)->AddAbility(true, 1, 0);
-	petStage->GetTeam(2)->GetPet(2)->AddAbility(true, 1, 0);
-	petStage->GetTeam(2)->GetPet(2)->AddAbility(true, 1, 0);
+	petStage->GetTeam(2)->GetPet(2)->AddAbility(false, true, 1, 0);
+	petStage->GetTeam(2)->GetPet(2)->AddAbility(false, true, 1, 0);
+	petStage->GetTeam(2)->GetPet(2)->AddAbility(false, true, 1, 0);
 
 	petStage->GetTeam(2)->AddPet(1010, 8, 6, 25);
-	petStage->GetTeam(2)->GetPet(3)->AddAbility(true, 1, 0);
-	petStage->GetTeam(2)->GetPet(3)->AddAbility(true, 1, 0);
-	petStage->GetTeam(2)->GetPet(3)->AddAbility(true, 1, 0);
+	petStage->GetTeam(2)->GetPet(3)->AddAbility(false, true, 1, 0);
+	petStage->GetTeam(2)->GetPet(3)->AddAbility(false, true, 1, 0);
+	petStage->GetTeam(2)->GetPet(3)->AddAbility(false, true, 1, 0);
 
 	petStage->GetTeam(1)->SetActivePet(1);
 	petStage->GetTeam(2)->SetActivePet(1);*/
@@ -221,6 +225,7 @@ void WoWPetBattler::on_playButton_clicked()
 
 	delete objectContext;*/
 
+	//Recorder::RecordPets(petStage);
 		
 	if (ui.playButton->isChecked())
 	{

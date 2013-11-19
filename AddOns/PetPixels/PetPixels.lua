@@ -38,9 +38,9 @@ for i=0, teams do petsNumAuras[i], petsAuras[i], petsAurasDuration[i] = {}, {}, 
 
 function events:SPELL_UPDATE_COOLDOWN(...)
 	--print("SPELL_UPDATE_COOLDOWN");
-	teamIsAlive = (C_PetJournal.GetPetStats(C_PetJournal.GetPetLoadOutInfo(1))) > 0 and
+	teamIsAlive = ((C_PetJournal.GetPetStats(C_PetJournal.GetPetLoadOutInfo(1))) > 0 and
 			(C_PetJournal.GetPetStats(C_PetJournal.GetPetLoadOutInfo(2))) > 0 and
-			(C_PetJournal.GetPetStats(C_PetJournal.GetPetLoadOutInfo(3))) > 0;
+			(C_PetJournal.GetPetStats(C_PetJournal.GetPetLoadOutInfo(3))) > 0 and true or false);
 end
 
 function events:CHAT_MSG_PET_BATTLE_COMBAT_LOG(...)
@@ -261,9 +261,9 @@ end
 function events:PET_BATTLE_QUEUE_STATUS(...)
 	--print("PET_BATTLE_QUEUE_STATUS");
 	wonLastBattle = false;
-	teamIsAlive = queueEnabled and (C_PetJournal.GetPetStats(C_PetJournal.GetPetLoadOutInfo(1))) > 0 and
+	teamIsAlive = (queueEnabled and (C_PetJournal.GetPetStats(C_PetJournal.GetPetLoadOutInfo(1))) > 0 and
 			(C_PetJournal.GetPetStats(C_PetJournal.GetPetLoadOutInfo(2))) > 0 and
-			(C_PetJournal.GetPetStats(C_PetJournal.GetPetLoadOutInfo(3))) > 0;
+			(C_PetJournal.GetPetStats(C_PetJournal.GetPetLoadOutInfo(3))) > 0 and true or false);
 	queueEnabled = C_PetJournal.IsFindBattleEnabled();
 	queueState = (C_PetBattles.GetPVPMatchmakingInfo());
 	canAccept = C_PetBattles.CanAcceptQueuedPVPMatch();
@@ -439,18 +439,21 @@ function encodePetInfo()
 			--Hardcode Ability 1
 			if (petsAbilitiesVerified[i][((j-1)/2)+1][1]) then r[i][j+1] = r[i][j+1] + 64; end
 			if (petsAbilities[i][((j-1)/2)+1][1] == 2) then r[i][j+1] = r[i][j+1] + 32; end
+			petsAbilitiesCD[1] = (petsAbilitiesCD[1] > 15 and 15 or petsAbilitiesCD[1]);
 			petsAbilitiesCD[1] = bit.lshift(petsAbilitiesCD[1], 1);
 			r[i][j+1] = r[i][j+1] + bit.band(petsAbilitiesCD[1], 255);
 
 			--Hardcode Ability 2
 			if (petsAbilitiesVerified[i][((j-1)/2)+1][2]) then r[i][j+1] = r[i][j+1] + 1; end
 			if (petsAbilities[i][((j-1)/2)+1][2] == 2) then g[i][j+1] = g[i][j+1] + 128; end
+			petsAbilitiesCD[2] = (petsAbilitiesCD[2] > 15 and 15 or petsAbilitiesCD[2]);
 			petsAbilitiesCD[2] = bit.lshift(petsAbilitiesCD[2], 7);
 			g[i][j+1] = g[i][j+1] + bit.band(petsAbilitiesCD[2], 255);
 
 			--Hardcode Ability 3
 			if (petsAbilitiesVerified[i][((j-1)/2)+1][3]) then g[i][j+1] = g[i][j+1] + 4; end
 			if (petsAbilities[i][((j-1)/2)+1][3] == 2) then g[i][j+1] = g[i][j+1] + 2; end
+			petsAbilitiesCD[3] = (petsAbilitiesCD[3] > 15 and 15 or petsAbilitiesCD[3]);
 			petsAbilitiesCD[3] = bit.lshift(petsAbilitiesCD[3], 5);
 			b[i][j+1] = b[i][j+1] + bit.band(petsAbilitiesCD[3], 255);
 			petsAbilitiesCD[3] = bit.rshift(petsAbilitiesCD[3], 8);
@@ -463,7 +466,7 @@ function encodePetInfo()
 				--Encode opponent's current move.
 				if (i == enemyTeam) then
 					b[i][j+1] = b[i][j+1] + bit.lshift(enemyCurrentMove, 2);
-					b[i][j+1] = b[i][j+1] + roundLockoutCount[i];
+					b[i][j+1] = b[i][j+1] + ((roundLockoutCount[i] > 3) and 3 or roundLockoutCount[i]);
 				end
 			end
 
