@@ -32,7 +32,7 @@ QString Recorder::RecordBattle(PetStage *petStage)
 	}
 
 	//Update the battle record for the teams.
-	UpdateBattleRecord(petStage, 1, QString("%1").arg(QString::number(0), 15, '0'));
+	output = UpdateBattleRecord(petStage, 1, QString("%1").arg(QString::number(0), 15, '0'));
 	UpdateBattleRecord(petStage, 2, opponentTeamId);
 	
 	//Reset directory path.

@@ -27,7 +27,10 @@ WoWPetBattler::WoWPetBattler(QWidget *parent)
 	this->interpreter = new Interpreter(petStage, ai, &WoWWindow);
 
 	//Move AI to Interpreter thread.
-	//this->ai->moveToThread(interpreter);
+	this->ai->moveToThread(interpreter);
+
+	//Setup Debug connection.
+	connect(Debug::Instance(), SIGNAL(OutputToGUI(QString)), this, SLOT(Output(QString)));
 
 	//Setup Preferences connections.
 	connect(this->preferences, SIGNAL(LoadPreferences()), this, SLOT(LoadPreferences()));
@@ -79,12 +82,12 @@ WoWPetBattler::WoWPetBattler(QWidget *parent)
 //Destructor
 WoWPetBattler::~WoWPetBattler()
 {
+	//Save preferences.
+	this->SavePreferences();
+
 	//Stop the interpreter if it's running.
 	if (this->interpreter->isRunning())
 		this->interpreter->Exit();
-
-	//Save preferences.
-	this->SavePreferences();
 
 	//Clean up.
 	delete interpreter;
@@ -263,12 +266,6 @@ void WoWPetBattler::on_playButton_clicked()
 		if (this->disableAero)
 			Robot::Screen::EnableAero(true);
 	}
-}
-
-//When the user clicks the X button on the QMenuBar we don't delete anything, so let's override that.
-void WoWPetBattler::closeEvent(QCloseEvent *event)
-{
-	delete this;
 }
 
 void WoWPetBattler::SavePreferences()

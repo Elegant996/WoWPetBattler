@@ -23,6 +23,7 @@ public:
 	void RoundUpdate();
 
 	bool IsTeamDead();
+	quint8 GetDeathToll();
 
 	void AddPet();
 	void AddPet(quint16, quint8, quint8, quint8);

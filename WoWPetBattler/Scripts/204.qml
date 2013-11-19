@@ -133,7 +133,7 @@ Item
             petStage.GetTeam(0).GetPet(0).RemoveAura(1);
         }
 
-        petStage.GetTeam(0).GetPet(0).AddAura(203, 5, true, petStage.GetTeam(teamIndex).ActivePet.Power);
+        petStage.GetTeam(0).GetPet(0).AddAura(203, 5, true, teamIndex, petStage.GetTeam(teamIndex).ActivePetIndex, petStage.GetTeam(teamIndex).ActivePet.Power);
 
         return numHits;
     }

@@ -37,15 +37,14 @@ protected:
 	void run();
 
 private:
-	void LoadPreferences();
-
-	void UpdateStates();
+	void LoadPreferences();	
 
 	bool Locate();
 	void SetupPetTeams();
 	void UpdateHealthPools();
 	void UpdateAbilities();
 	void UpdateAuras();
+	void UpdateStates();
 
 	volatile bool running, queueEnabled;
 	const quint8 build;

@@ -135,6 +135,8 @@ App_Data/*.ldf
 
 #Qt generated files
 WoWPetBattler/GeneratedFiles*/
+WoWPetBattler/BattleRecords*/
+WoWPetBattler/PetRecords*/
 
 #Ignore settings
 *.ini

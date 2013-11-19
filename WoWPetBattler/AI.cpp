@@ -18,7 +18,7 @@ AI::~AI(void)
 	{
 		delete component;
 		delete objectContext;
-		delete engine;
+		engine->deleteLater();
 	}
 }
 
@@ -101,20 +101,6 @@ void AI::AcceptQueue()
 void AI::Run(bool initialized)
 {
 	Move nextMove;		//Holds next ability.
-
-	//Get number of dead pets on the player's team.
-	quint8 deathCount = 0;
-	for (quint8 i=1; i < this->petStage->GetTeam(1)->GetNumPets()+1; i+=1)
-		if (this->petStage->GetTeam(1)->GetPet(i)->IsDead())
-			deathCount += 1;
-
-	//Use deathCount to block certain issues regarding utilization of final pet.
-	if (deathCount > 0 && deathCount == this->petStage->GetTeam(1)->GetNumPets()-1
-			&& this->petStage->GetTeam(1)->GetActivePet()->IsDead())
-		//Resolve who the active pet is now.
-		for (quint8 i=1; i < this->petStage->GetTeam(1)->GetNumPets()+1; i+=1)
-			if (!this->petStage->GetTeam(1)->GetPet(i)->IsDead())
-				this->petStage->GetTeam(1)->SetActivePet(i);
 
 	//Run Expectiminimax if select ability or select pet is present.
 	if (initialized)

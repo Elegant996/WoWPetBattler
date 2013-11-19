@@ -144,7 +144,10 @@ void Interpreter::run()
 			this->UpdateAuras();
 
 			//Call AI and have it determine our next move.
-			this->ai->Run(this->petStage->Initialized() || (pixels[0].G & 64) != 0);
+			if ((this->petStage->GetTeam(1)->GetDeathToll() != this->petStage->GetTeam(1)->GetNumPets()-1
+					|| !this->petStage->GetTeam(1)->GetActivePet()->IsDead()) || (this->petStage->GetTeam(2)->GetDeathToll()
+					!= this->petStage->GetTeam(2)->GetNumPets()-1|| !this->petStage->GetTeam(2)->GetActivePet()->IsDead()))
+				this->ai->Run(this->petStage->Initialized() || (pixels[0].G & 64) != 0);
 
 			//Delete all auras.
 			for (quint8 i=0; i < 3; i+=1)
@@ -209,23 +212,6 @@ void Interpreter::LoadPreferences()
 
 	//Close Options group.
 	setting.endGroup();
-}
-
-//Update the states of petStage.
-void Interpreter::UpdateStates()
-{
-	this->petStage->InPetBattle((pixels[0].R & 128) != 0);
-	this->petStage->TeamIsAlive((pixels[0].R & 64) != 0);
-	this->petStage->PlayerIsGhost((pixels[0].R & 32) != 0);
-	this->petStage->PlayerIsDead((pixels[0].R & 16) != 0);
-	this->petStage->PlayerAffectingCombat((pixels[0].R & 8) != 0);
-	this->petStage->QueueEnabled((pixels[0].R & 4) != 0);
-	this->petStage->QueueState((pixels[0].R & 3) != 0);
-	this->petStage->CanAccept((pixels[0].G & 128) != 0);
-	this->petStage->Initialized((pixels[0].G & 64) != 0);
-	this->petStage->SelectPet((pixels[0].G & 32) != 0);
-	this->petStage->SelectAbility((pixels[0].G & 16) != 0);
-	this->petStage->WonLastBattle((pixels[0].G & 8) != 0);
 }
 
 //Locates the addon in the game.
@@ -392,7 +378,16 @@ void Interpreter::SetupPetTeams()
 
 				//Check if the current pet is the active pet of the team.
 				if (((pixels[pixelCounter+1].B & 16) != 0))
+				{
 					this->petStage->GetTeam(i)->SetActivePet(((j-1)/2)+1);
+
+					//Get current action and rounds remaining on it.
+					if (i == 2)
+					{
+						this->petStage->GetTeam(i)->GetActivePet()->GetCurrentAction()->SetAction((PetAction::Action)((pixels[pixelCounter+1].B >> 2) & 3));
+						this->petStage->GetTeam(i)->GetActivePet()->GetCurrentAction()->SetRoundsRemaining((pixels[pixelCounter+1].B & 3));
+					}
+				}
 			}
 
 			pixelCounter += 2;			//Increment pixel counter.
@@ -433,7 +428,16 @@ void Interpreter::UpdateAbilities()
 
 			//Check if the current pet is the active pet of the team.
 			if (((pixels[pixelCounter].B & 16) != 0))
+			{
 				this->petStage->GetTeam(i)->SetActivePet(j);
+
+				//Get current action and rounds remaining on it.
+				if (i == 2)
+				{
+					this->petStage->GetTeam(i)->GetActivePet()->GetCurrentAction()->SetAction((PetAction::Action)((pixels[pixelCounter].B >> 2) & 3));
+					this->petStage->GetTeam(i)->GetActivePet()->GetCurrentAction()->SetRoundsRemaining((pixels[pixelCounter].B & 3));
+				}
+			}
 
 			pixelCounter += 2;			//Increment pixel counter.
 
@@ -458,4 +462,26 @@ void Interpreter::UpdateAuras()
 		else
 			break;
 	}
+}
+
+//Update the states of petStage.
+void Interpreter::UpdateStates()
+{
+	this->petStage->InPetBattle((pixels[0].R & 128) != 0);
+	this->petStage->TeamIsAlive((pixels[0].R & 64) != 0);
+	this->petStage->PlayerIsGhost((pixels[0].R & 32) != 0);
+	this->petStage->PlayerIsDead((pixels[0].R & 16) != 0);
+	this->petStage->PlayerAffectingCombat((pixels[0].R & 8) != 0);
+	this->petStage->QueueEnabled((pixels[0].R & 4) != 0);
+	this->petStage->QueueState((pixels[0].R & 3) != 0);
+	this->petStage->CanAccept((pixels[0].G & 128) != 0);
+	this->petStage->Initialized((pixels[0].G & 64) != 0);
+	this->petStage->SelectPet((pixels[0].G & 32) != 0);
+	if ((this->petStage->GetTeam(1)->GetDeathToll() == this->petStage->GetTeam(1)->GetNumPets()-1
+			&& this->petStage->GetTeam(1)->GetActivePet()->IsDead()) || (this->petStage->GetTeam(2)->GetDeathToll()
+			== this->petStage->GetTeam(2)->GetNumPets()-1 && this->petStage->GetTeam(2)->GetActivePet()->IsDead()))
+		this->petStage->SelectAbility(false);
+	else
+		this->petStage->SelectAbility((pixels[0].G & 16) != 0);
+	this->petStage->WonLastBattle((pixels[0].G & 8) != 0);
 }

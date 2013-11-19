@@ -138,7 +138,7 @@ Item
             for (var j=1; j < petStage.GetTeam(teamIndex).NumPets+1; j++)
                 petStage.GetTeam(i).GetPet(j).AddStatus(PetStatus.Burning);
 
-        petStage.GetTeam(0).GetPet(0).AddAura(171, 9, true, petStage.GetTeam(teamIndex).ActivePet.Power);
+        petStage.GetTeam(0).GetPet(0).AddAura(171, 9, true, teamIndex, petStage.GetTeam(teamIndex).ActivePetIndex, petStage.GetTeam(teamIndex).ActivePet.Power);
 
         return numHits;
     }

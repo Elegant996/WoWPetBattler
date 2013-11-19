@@ -44,6 +44,17 @@ bool PetTeam::IsTeamDead()
 	return true;
 }
 
+//Returns the number of dead pets.
+quint8 PetTeam::GetDeathToll()
+{
+	quint8 deathToll = 0;
+	for (quint8 i=1; i < this->pets.size(); i+=1)
+		if (pets.at(i)->IsDead())
+			deathToll += 1;
+
+	return deathToll;
+}
+
 //Adds a dummy pet, used for weather.
 void PetTeam::AddPet()
 {

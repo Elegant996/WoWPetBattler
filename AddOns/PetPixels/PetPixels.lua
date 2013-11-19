@@ -23,7 +23,7 @@ local inPetBattle, wonLastBattle, teamIsAlive, playerIsGhost, playerIsDead, play
 local queueEnabled, queueState, canAccept, initialized, selectPet, selectAbility = false, nil, false, false, false, false;
 local isWildBattle, isPlayerNPC = false, false;
 
-local roundLockoutCount = 0;
+local roundLockoutCount, enemyCurrentMove = {0, 0}, 0;
 
 local teamSize, teamsActivePet, petsSpecies, petsBreed = {0, 0}, {0, 0}, {{}, {}}, {{}, {}};
 		teamSize[0], teamsActivePet[0] = 0, 4;
@@ -36,6 +36,13 @@ for i=0, teams do petsNumAuras[i], petsAuras[i], petsAurasDuration[i] = {}, {}, 
 -- Events
 ----------------------------------------------
 
+function events:SPELL_UPDATE_COOLDOWN(...)
+	--print("SPELL_UPDATE_COOLDOWN");
+	teamIsAlive = (C_PetJournal.GetPetStats(C_PetJournal.GetPetLoadOutInfo(1))) > 0 and
+			(C_PetJournal.GetPetStats(C_PetJournal.GetPetLoadOutInfo(2))) > 0 and
+			(C_PetJournal.GetPetStats(C_PetJournal.GetPetLoadOutInfo(3))) > 0;
+end
+
 function events:CHAT_MSG_PET_BATTLE_COMBAT_LOG(...)
 	--print("CHAT_MSG_PET_BATTLE_COMBAT_LOG");
 	if (not initialized--[[or not isPVPBattle()]]) then
@@ -47,18 +54,33 @@ function events:CHAT_MSG_PET_BATTLE_COMBAT_LOG(...)
 
 	abilityID, power, speed = tonumber(abilityID), tonumber(power), tonumber(speed);
 
-	--Get how many rounds it takes for our selected ability to complete.
-	if (power == C_PetBattles.GetPower(myTeam, teamsActivePet[myTeam]) and speed == C_PetBattles.GetSpeed(myTeam, teamsActivePet[myTeam])) then
+	--Get how many rounds it takes for myTeam's selected ability to complete.
+	if (roundLockoutCount[myTeam] == 0 and power == C_PetBattles.GetPower(myTeam, teamsActivePet[myTeam]) and speed == C_PetBattles.GetSpeed(myTeam, teamsActivePet[myTeam])) then
 		local idTable, _ = C_PetJournal.GetPetAbilityList(C_PetBattles.GetPetSpeciesID(myTeam, teamsActivePet[myTeam]));
 
-		for i=1, 6 do
-			if (idTable[i] == abilityID) then
-				roundLockoutCount = (select(6, C_PetBattles.GetAbilityInfoByID(abilityID)));
+		for i=0, 5 do
+			if (idTable[i+1] == abilityID) then
+				roundLockoutCount[myTeam] = (select(6, C_PetBattles.GetAbilityInfoByID(abilityID)));
 				break;
 			end
 		end
+	end
+
+	--Get how many rounds it takes for enemyTeam's selected ability to complete.
+	if (roundLockoutCount[enemyTeam] == 0 and power == C_PetBattles.GetPower(enemyTeam, teamsActivePet[enemyTeam]) and speed == C_PetBattles.GetSpeed(enemyTeam, teamsActivePet[enemyTeam])) then
+		local idTable, _ = C_PetJournal.GetPetAbilityList(C_PetBattles.GetPetSpeciesID(enemyTeam, teamsActivePet[enemyTeam]));
+
+		for i=0, 5 do
+			if (idTable[i+1] == abilityID) then
+				roundLockoutCount[enemyTeam] = (select(6, C_PetBattles.GetAbilityInfoByID(abilityID)));
+				enemyCurrentMove = math.ceil(i%3+1);
+				break;
+			end
+		end
+	end
+	
 	--Determine what ability our opponent (PvP only) just used and verify it against what we know.
-	elseif (isPVPBattle() and power == C_PetBattles.GetPower(enemyTeam, teamsActivePet[enemyTeam]) and speed == C_PetBattles.GetSpeed(enemyTeam, teamsActivePet[enemyTeam])) then
+	if (isPVPBattle() and power == C_PetBattles.GetPower(enemyTeam, teamsActivePet[enemyTeam]) and speed == C_PetBattles.GetSpeed(enemyTeam, teamsActivePet[enemyTeam])) then
 		local idTable, _ = C_PetJournal.GetPetAbilityList(C_PetBattles.GetPetSpeciesID(enemyTeam, teamsActivePet[enemyTeam]));
 
 		for i=0, 5 do
@@ -141,10 +163,15 @@ function events:PET_BATTLE_PET_ROUND_PLAYBACK_COMPLETE(...)
 			end
 		end
 		
+		--Handle round lockouts and the enemy's current move.
+		if (selectPet and roundLockoutCount[myTeam] > 0) then roundLockoutCount[myTeam] = 0; end
+		for i=1, teams do
+			if (roundLockoutCount[i] > 0) then roundLockoutCount[i] = roundLockoutCount[i] - 1; end
+		end
+		if (roundLockoutCount[enemyTeam] == 0) then enemyCurrentMove = 0; end
+
 		selectPet = C_PetBattles.ShouldShowPetSelect();
-		roundLockoutCount = roundLockoutCount - 1;	--Used to determine if we can actually make a move.
-		if (selectPet and roundLockoutCount > 0) then roundLockoutCount = 0; end
-		selectAbility = (roundLockoutCount <= 0) and true or false;
+		selectAbility = (roundLockoutCount[myTeam] <= 0) and true or false;
 	else		
 		for i=0, teams do
 			teamSize[i], teamsActivePet[i] = C_PetBattles.GetNumPets(i), C_PetBattles.GetActivePet(i);
@@ -202,14 +229,20 @@ end
 
 function events:PET_BATTLE_PET_CHANGED(...)
 	--print("PET_BATTLE_PET_CHANGED")
-	for i=1, teams do teamsActivePet[i] = C_PetBattles.GetActivePet(i); end
+	for i=1, teams do
+		if (teamsActivePet[i] ~= C_PetBattles.GetActivePet(i)) then
+			teamsActivePet[i] = C_PetBattles.GetActivePet(i);
+			if (i == enemyTeam) then enemyCurrentMove = 0; end
+			roundLockoutCount[i] = 0;
+		end
+	end
 end
 
 function events:PET_BATTLE_OPENING_START(...)
 	--print("PET_BATTLE_OPENING_START");
 	inPetBattle = C_PetBattles.IsInBattle();
 
-	roundLockoutCount = 0;
+	roundLockoutCount, enemyCurrentMove = {0, 0}, 0;
 
 	teamSize, teamsActivePet, petsSpecies, petsBreed = {0, 0}, {0, 0}, {{}, {}}, {{}, {}};
 		teamSize[0], teamsActivePet[0] = 0, 4;
@@ -286,7 +319,7 @@ function events:PET_BATTLE_CLOSE(...)
 	playerAffectingCombat = UnitAffectingCombat("player");
 	isWildBattle, isPlayerNPC = false, false;
 
-	roundLockoutCount = 0;
+	roundLockoutCount, enemyCurrentMove = {0, 0}, 0;
 
 	for i=0, teams do
 		for j=0, teamSize[i] do
@@ -423,8 +456,16 @@ function encodePetInfo()
 			petsAbilitiesCD[3] = bit.rshift(petsAbilitiesCD[3], 8);
 			g[i][j+1] = g[i][j+1] + bit.band(petsAbilitiesCD[3], 255);
 
-			--Active Pet
-			if (teamsActivePet[i] == ((j-1)/2)+1) then b[i][j+1] = b[i][j+1] + 16; end
+			--Active Pet.
+			if (teamsActivePet[i] == ((j-1)/2)+1) then
+				b[i][j+1] = b[i][j+1] + 16;
+
+				--Encode opponent's current move.
+				if (i == enemyTeam) then
+					b[i][j+1] = b[i][j+1] + bit.lshift(enemyCurrentMove, 2);
+					b[i][j+1] = b[i][j+1] + roundLockoutCount[i];
+				end
+			end
 
 			local index = i==1 and i+j or i==2 and 4*i+j-1;
 			if (index == 12) then index = index + 1; end
@@ -555,15 +596,6 @@ function UpdateEvent(self, elapsed)
 
 	uiBg1:SetVertexColor(mBorderR1, mBorderG1, mBorderB1);
 	uiBg2:SetVertexColor(mBorderR2, mBorderG2, mBorderB2);
-
-	--Constantly check this to see if the team is alive.			
-	if ((C_PetJournal.GetPetStats(C_PetJournal.GetPetLoadOutInfo(1))) > 0 and
-			(C_PetJournal.GetPetStats(C_PetJournal.GetPetLoadOutInfo(2))) > 0 and
-			(C_PetJournal.GetPetStats(C_PetJournal.GetPetLoadOutInfo(3))) > 0) then
-		teamIsAlive = true;
-	else
-		teamIsAlive = false;
-	end
 	
 	encodeInitial();
 	encodeStates();
@@ -583,6 +615,7 @@ end)
 
 PetPixels:RegisterEvent("PLAYER_LOGIN")
 --PetPixels:RegisterEvent("PLAYER_ENTERING_WORLD")
+PetPixels:RegisterEvent("SPELL_UPDATE_COOLDOWN")
 --PetPixels:RegisterEvent("PET_BATTLE_ABILITY_CHANGED")
 PetPixels:RegisterEvent("PET_BATTLE_ACTION_SELECTED")
 PetPixels:RegisterEvent("PET_BATTLE_AURA_APPLIED")
