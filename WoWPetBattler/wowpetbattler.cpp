@@ -40,6 +40,18 @@ WoWPetBattler::WoWPetBattler(QWidget *parent)
 	connect(this->interpreter, SIGNAL(OutputToGUI(QString)), this, SLOT(Output(QString)));
 	connect(this->interpreter, SIGNAL(Stop(QString)), this, SLOT(Stop(QString)));
 
+	//Create Ability folder if it does not exist.
+	if (!QDir("Ability").exists())
+		QDir().mkdir("Ability");
+
+	//Create Species folder if it does not exist.
+	if (!QDir("Species").exists())
+		QDir().mkdir("Scripts");
+
+	//Create Scripts folder if it does not exist.
+	if (!QDir("Scripts").exists())
+		QDir().mkdir("Scripts");
+
 	//Create BattleRecords folder if it does not exist.
 	if (!QDir("BattleRecords").exists())
 		QDir().mkdir("BattleRecords");

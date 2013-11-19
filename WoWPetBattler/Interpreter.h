@@ -46,7 +46,7 @@ private:
 	void UpdateAuras();
 	void UpdateStates();
 
-	volatile bool running, queueEnabled;
+	volatile bool running, aeroDisabled, queueEnabled;
 	const quint8 build;
 
 	PetStage *petStage;
@@ -63,7 +63,7 @@ private:
 	Robot::Bounds addonBar1, addonBar2;
 
 	bool readSuccess, oneTimeNotifier;
-	quint8 timeoutCount;
+	quint16 timeoutCount;
 };
 
 #endif

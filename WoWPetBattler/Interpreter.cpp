@@ -28,8 +28,10 @@ Interpreter::~Interpreter(void)
 void Interpreter::Exit()
 {
 	//Unlock the thread.
-	mutex.unlock();
-	running = false;
+	if (this->readSuccess)
+		this->mutex.unlock();
+	this->running = false;
+	this->timeoutCount = 0;
 	if (!wait(2000))
 		terminate();
 
@@ -49,44 +51,43 @@ void Interpreter::run()
 	ai->LoadQMLResources();
 
 	//Update bools in case we run it again.
-	running = true;
-	readSuccess = false;
-	oneTimeNotifier = false;
+	this->running = true;
+	this->readSuccess = false;
+	this->oneTimeNotifier = false;
 
-	while (running)
+	while (this->running)
 	{
 		//Start the timer to limit number of updaters per second.
-		timer.start();
+		this->timer.start();
 
-		if (!readSuccess)
+		if (!this->readSuccess)
 		{
 			//Emit message once!
-			if (!oneTimeNotifier)
+			if (!this->oneTimeNotifier)
 			{
 				emit OutputToGUI("Locating Addon", "Locating addon...");
-				oneTimeNotifier = true;
+				this->oneTimeNotifier = true;
 			}
 
-			if (!Locate())
+			if (!this->Locate())
 			{
-				timeoutCount += 1;
-				//TODO: Account for Aero.
-				if (timeoutCount >= 450)
+				this->timeoutCount += 1;
+				if (this->timeoutCount >= 450)
 					emit Stop("Addon could not be located. Stopping...");
 			
-				mutex.lock();
+				this->mutex.lock();
 				int elapsed = timer.elapsed();
 				if (33 - elapsed > 0)
-					msleep(33 - elapsed);
-				timer.restart();
-				mutex.unlock();
+					this->msleep(33 - elapsed);
+				this->timer.restart();
+				this->mutex.unlock();
 
 				continue;
 			}
 
 			emit OutputToGUI("Running", "Addon located.");
-			readSuccess = true;
-			timeoutCount = 0;
+			this->readSuccess = true;
+			this->timeoutCount = 0;
 		}
 
 		//Addon location already known, grab pixels.	
@@ -208,6 +209,9 @@ void Interpreter::LoadPreferences()
 
 	//Open Options group.
 	setting.beginGroup("Options");
+
+	//Fetch Aero preferences.
+	this->aeroDisabled = !setting.value("DisableAero", true).toBool();
 
 	//Fetch Queue preferences.
 	this->queueEnabled = setting.value("PvPEnabled", true).toBool();
