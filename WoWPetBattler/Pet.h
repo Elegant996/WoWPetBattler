@@ -78,6 +78,7 @@ public:
 	Q_INVOKABLE void RemoveAura(quint8);
 	Q_INVOKABLE void RemoveAuraId(quint16);
 	void RemoveAuras();
+	Q_INVOKABLE bool HasAura(quint16);
 	Q_INVOKABLE quint8 GetNumAuras();
 	Q_INVOKABLE PetAura* GetAura(quint8);
 	Q_INVOKABLE PetAura* GetLastAura();

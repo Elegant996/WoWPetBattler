@@ -1,4 +1,4 @@
-// Immolation - Aura
+// Confusing Sting - Aura
 import QtQuick 2.0
 
 import PetAction 1.0
@@ -36,9 +36,9 @@ Item
     function applyAuraStart(teamIndex, petIndex, auraIndex, duration)
     {
         if (petStage.GetTeam(teamIndex).GetPet(petIndex).GetAura(auraIndex).Power == 0)
-            petHelper.CheckAuraPower(petStage, petStage.GetTeam(teamIndex).GetPet(petIndex).GetAura(auraIndex), teamIndex, 409);
+            petHelper.CheckAuraPower(petStage, petStage.GetTeam(teamIndex).GetPet(petIndex).GetAura(auraIndex), (teamIndex%2)+1, 632);
 
-        petStage.GetTeam(teamIndex).GetPet(petIndex).AttackedThisRound = true;
+        petStage.GetTeam(teamIndex).GetPet(petIndex).AddStatus(PetStatus.Poisoned);
     }
 
     //Applies the aura effect to the active pet.
@@ -53,15 +53,15 @@ Item
         if (Math.random() < petStage.GetTeam(teamIndex).GetPet(petIndex).AvoidanceRating)
             return;
 
-        var scaleFactor = 0.25;
-        var baseDamage = 5;
-        var attackType = PetType.Elemental;
+        var scaleFactor = 0.15;
+        var baseDamage = 3;
+        var attackType = PetType.Flying;
         var normalDamage = Math.round(baseDamage + petStage.GetTeam(teamIndex).GetPet(petIndex).GetAura(auraIndex).Power * scaleFactor);
-        var damage = Math.round((normalDamage - petStage.GetTeam((teamIndex%2)+1).ActivePet.DamageOffset)
-                        * petType.GetEffectiveness(attackType, petStage.GetTeam((teamIndex%2)+1).ActivePet.Type)
-                        * petStage.GetTeam((teamIndex%2)+1).ActivePet.DefenseModifier);
+        var damage = Math.round((normalDamage - petStage.GetTeam(teamIndex).ActivePet.DamageOffset)
+                        * petType.GetEffectiveness(attackType, petStage.GetTeam(teamIndex).ActivePet.Type)
+                        * petStage.GetTeam(teamIndex).ActivePet.DefenseModifier);
 
-        petHelper.CheckDamage(petStage, (teamIndex%2)+1, petStage.GetTeam((teamIndex%2)+1).ActivePetIndex, 2*damage, false, false);
+        petHelper.CheckDamage(petStage, teamIndex, petIndex, 2*damage, false, false);
     }
 
     //Grants the pet any special statuses the ability has.

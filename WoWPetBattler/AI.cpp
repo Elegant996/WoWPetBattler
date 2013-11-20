@@ -104,7 +104,7 @@ void AI::Run(bool initialized)
 
 	//Run Expectiminimax if select ability or select pet is present.
 	if (initialized)
-		nextMove = this->Expectiminimax(petStage, 4, -4500, 4500, 1);
+		nextMove = this->Expectiminimax(petStage, 3, -4500, 4500, 1);
 	//If we are not initialized select the first pet.
 	else
 	{
@@ -184,9 +184,9 @@ Move AI::Expectiminimax(PetStage* petStage, quint8 depth, float alpha, float bet
 		The full equation is similar to how pet health is actually calculated: petHealthPercent * 52 * Level + 100*/
 		for (quint8 i=1; i < 3; i+=1)
 			for (quint8 j=1; j < stageNode->GetTeam(1)->GetNumPets()+1; j+=1)
-				//score += ((i==1)?1:-1) * stageNode->GetTeam(i)->GetPet(j)->GetHealth();
-				score += ((i==1)?1:-1) * (stageNode->GetTeam(i)->GetPet(j)->GetHealthPercentage()
-							* (52 * stageNode->GetTeam(i)->GetPet(j)->GetLevel() + 100));
+				score += ((i==1)?1:-1) * stageNode->GetTeam(i)->GetPet(j)->GetHealth();
+				/*score += ((i==1)?1:-1) * (stageNode->GetTeam(i)->GetPet(j)->GetHealthPercentage()
+							* (52 * stageNode->GetTeam(i)->GetPet(j)->GetLevel() + 100));*/
 
 		
 		desiredMove.SetHeuristic(score);	//Pass it the score.

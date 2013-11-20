@@ -324,6 +324,15 @@ void Pet::RemoveAuras()
 		delete (petAuras.takeAt(auraIndex));
 }
 
+//Returns whether or not the pet has the aura id specified.
+bool Pet::HasAura(quint16 auraId)
+{
+	for (quint8 i=0; i < petAuras.size(); i+=1)
+		if (this->petAuras.at(i)->GetAuraId() == auraId)
+			return true;
+	return false;
+}
+
 //Return number of auras on the pet.
 quint8 Pet::GetNumAuras()
 {

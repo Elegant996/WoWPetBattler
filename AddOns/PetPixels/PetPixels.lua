@@ -142,6 +142,11 @@ function events:PET_BATTLE_PET_ROUND_PLAYBACK_COMPLETE(...)
 	--print("PET_BATTLE_PET_ROUND_PLAYBACK_COMPLETE");
 	if (initialized) then
 		for i=1, teams do
+			if (teamsActivePet[i] ~= C_PetBattles.GetActivePet(i)) then
+				teamsActivePet[i] = C_PetBattles.GetActivePet(i);
+			if (i == enemyTeam) then enemyCurrentMove = 0; end
+				roundLockoutCount[i] = 0;
+			end
 			for j=1, teamSize[i] do
 				for k=1, numAbilities do
 					if (C_PetBattles.GetAbilityState(i, j, k) ~= nil and (select(2, C_PetBattles.GetAbilityState(i, j, k))) >= (select(3, C_PetBattles.GetAbilityState(i, j, k)))) then

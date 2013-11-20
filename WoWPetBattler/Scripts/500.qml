@@ -50,7 +50,7 @@ Item
     //Apply the aura's effect at the end of the turn.
     function applyAuraEnd(teamIndex, petIndex, auraIndex, duration)
     {
-        if(Math.random() < petStage.GetTeam((teamIndex%2)+1).ActivePet.AvoidanceRating)
+        if (Math.random() < petStage.GetTeam(teamIndex).GetPet(petIndex).AvoidanceRating)
             return;
 
         var scaleFactor = 0.20;

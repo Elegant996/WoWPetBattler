@@ -144,11 +144,18 @@ void Interpreter::run()
 			//Update auras on pets.
 			this->UpdateAuras();
 
-			//Prevent an issue from arising where we make a move based ourselves having a dead pet or our opponent having a dead pet.
-			while ((this->petStage->GetTeam(1)->GetDeathToll() == this->petStage->GetTeam(1)->GetNumPets()-1
+			//Prevent an issue from arising where we make a move based on having a dead pet out.
+			if (this->petStage->GetTeam(1)->GetDeathToll() == this->petStage->GetTeam(1)->GetNumPets()-1
 					&& this->petStage->GetTeam(1)->GetActivePet()->IsDead())
-					|| (this->petStage->GetTeam(2)->GetActivePet()->IsDead()
-					&& !this->petStage->GetTeam(2)->GetActivePet()->IsDead()))
+				for (quint8 i=1; i < this->petStage->GetTeam(1)->GetNumPets()+1; i+=1)
+					if (!this->petStage->GetTeam(1)->GetPet(i)->IsDead())
+					{
+						this->petStage->GetTeam(1)->SetActivePet(i);
+						break;
+					}
+
+			//Constantly update if the opponent's pet is dead.
+			while (this->petStage->GetTeam(2)->GetActivePet()->IsDead()	&& !this->petStage->GetTeam(1)->GetActivePet()->IsDead())
 				this->UpdateAbilities();
 
 			//Call AI and have it determine our next move.
@@ -161,8 +168,11 @@ void Interpreter::run()
 		}
 		else if (this->petStage->InPetBattle() && ((this->pixels[0].R & 128) == 0))
 		{
+			//Update states to get ensure smooth process.
+			this->UpdateStates();
+
 			//Inform us of who won.
-			if ((this->pixels[0].G & 8) != 0)
+			if (this->petStage->WonLastBattle())
 				emit OutputToGUI("Victory!");
 			else
 				emit OutputToGUI("You lose.");
