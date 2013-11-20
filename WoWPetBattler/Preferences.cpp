@@ -199,19 +199,19 @@ void Preferences::Load()
 
 	//Fetch avoidance rating.
 	this->ui.minAvoidanceSlider->setValue(setting.value("minAvoidanceThreshold", 0).toInt());
-	this->ui.maxAvoidanceSlider->setValue(setting.value("maxAvoidanceThreshold", 0).toInt());
+	this->ui.maxAvoidanceSlider->setValue(setting.value("maxAvoidanceThreshold", 20).toInt());
 
 	//Fetch hit rating.
 	this->ui.minHitSlider->setValue(setting.value("minHitThreshold", 0).toInt());
-	this->ui.maxHitSlider->setValue(setting.value("maxHitThreshold", 0).toInt());
+	this->ui.maxHitSlider->setValue(setting.value("maxHitThreshold", 20).toInt());
 
 	//Fetch crit rating.
 	this->ui.minCritSlider->setValue(setting.value("minCritThreshold", 1).toInt());
-	this->ui.maxCritSlider->setValue(setting.value("maxCritThreshold", 1).toInt());
+	this->ui.maxCritSlider->setValue(setting.value("maxCritThreshold", 20).toInt());
 
 	//Fetch chance on hit rating.
 	this->ui.minChanceOnHitSlider->setValue(setting.value("minChanceOnHitThreshold", 0).toInt());
-	this->ui.maxChanceOnHitSlider->setValue(setting.value("maxChanceOnHitThreshold", 0).toInt());
+	this->ui.maxChanceOnHitSlider->setValue(setting.value("maxChanceOnHitThreshold", 20).toInt());
 
 	//Close Thresholds group.
 	setting.endGroup();
