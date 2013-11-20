@@ -16,7 +16,7 @@ public:
 	static void CheckRacials(Pet*);
 	Q_INVOKABLE static void CheckAuraPower(PetStage*, PetAura*, quint8, quint16);
 	Q_INVOKABLE static void CheckCleansingRain(PetStage*, quint8, quint8, quint16, qint8, bool, quint16);
-	Q_INVOKABLE static float CheckWeatherBonus(PetStage*, PetType::Type);
+	Q_INVOKABLE static float CheckWeatherBonus(PetStage*, quint8);
 
 private:
 	static quint16 Round(float);

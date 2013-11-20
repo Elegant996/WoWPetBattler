@@ -144,11 +144,15 @@ void Interpreter::run()
 			//Update auras on pets.
 			this->UpdateAuras();
 
+			//Prevent an issue from arising where we make a move based ourselves having a dead pet or our opponent having a dead pet.
+			while ((this->petStage->GetTeam(1)->GetDeathToll() == this->petStage->GetTeam(1)->GetNumPets()-1
+					&& this->petStage->GetTeam(1)->GetActivePet()->IsDead())
+					|| (this->petStage->GetTeam(2)->GetActivePet()->IsDead()
+					&& !this->petStage->GetTeam(2)->GetActivePet()->IsDead()))
+				this->UpdateAbilities();
+
 			//Call AI and have it determine our next move.
-			if ((this->petStage->GetTeam(1)->GetDeathToll() != this->petStage->GetTeam(1)->GetNumPets()-1
-					|| !this->petStage->GetTeam(1)->GetActivePet()->IsDead()) || (this->petStage->GetTeam(2)->GetDeathToll()
-					!= this->petStage->GetTeam(2)->GetNumPets()-1|| !this->petStage->GetTeam(2)->GetActivePet()->IsDead()))
-				this->ai->Run(this->petStage->Initialized() || (this->pixels[0].G & 64) != 0);
+			this->ai->Run(this->petStage->Initialized() || (this->pixels[0].G & 64) != 0);
 
 			//Delete all auras.
 			for (quint8 i=0; i < 3; i+=1)
@@ -158,7 +162,7 @@ void Interpreter::run()
 		else if (this->petStage->InPetBattle() && ((this->pixels[0].R & 128) == 0))
 		{
 			//Inform us of who won.
-			if (this->petStage->WonLastBattle())
+			if ((this->pixels[0].G & 8) != 0)
 				emit OutputToGUI("Victory!");
 			else
 				emit OutputToGUI("You lose.");
@@ -486,11 +490,6 @@ void Interpreter::UpdateStates()
 	this->petStage->CanAccept((this->pixels[0].G & 128) != 0);
 	this->petStage->Initialized((this->pixels[0].G & 64) != 0);
 	this->petStage->SelectPet((this->pixels[0].G & 32) != 0);
-	if ((this->petStage->GetTeam(1)->GetDeathToll() == this->petStage->GetTeam(1)->GetNumPets()-1
-			&& this->petStage->GetTeam(1)->GetActivePet()->IsDead()) || (this->petStage->GetTeam(2)->GetDeathToll()
-			== this->petStage->GetTeam(2)->GetNumPets()-1 && this->petStage->GetTeam(2)->GetActivePet()->IsDead()))
-		this->petStage->SelectAbility(false);
-	else
-		this->petStage->SelectAbility((this->pixels[0].G & 16) != 0);
+	this->petStage->SelectAbility((this->pixels[0].G & 16) != 0);
 	this->petStage->WonLastBattle((this->pixels[0].G & 8) != 0);
 }

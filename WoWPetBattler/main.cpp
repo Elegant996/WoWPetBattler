@@ -8,7 +8,7 @@ int main(int argc, char *argv[])
 {
 	QApplication app(argc, argv);
 	WoWPetBattler mainWindow;
-	qInstallMessageHandler(Debug::messageHandler);
+	//qInstallMessageHandler(Debug::messageHandler);
 	mainWindow.show();
 	mainWindow.activateWindow();
 	if (mainWindow.isMinimized())

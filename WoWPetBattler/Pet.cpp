@@ -169,7 +169,7 @@ void Pet::RoundUpdate()
 //Adds the status to the list.
 void Pet::AddStatus(Pet::PetStatus status)
 {
-	if (!petStatuses.contains(status))
+	//if (!petStatuses.contains(status))
 		petStatuses.append(status);
 }
 

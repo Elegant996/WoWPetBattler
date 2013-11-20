@@ -37,6 +37,8 @@ Item
     {
         if (petStage.GetTeam(teamIndex).GetPet(petIndex).GetAura(auraIndex).Power == 0)
             petHelper.CheckAuraPower(petStage, petStage.GetTeam(teamIndex).GetPet(petIndex).GetAura(auraIndex), (teamIndex%2)+1, 501);
+
+        petStage.GetTeam(teamIndex).GetPet(petIndex).AddStatus(PetStatus.Burning);
     }
 
     //Applies the aura effect to the active pet.

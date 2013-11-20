@@ -79,10 +79,13 @@ Item
                                 * petStage.GetTeam(teamIndex).ActivePet.DamageModifier);
 
                 numHits += 1;
-                if (isCritting && i == randomPetIndex)
-                    petHelper.CheckDamage(petStage, (teamIndex%2)+1, i, 2*damage, true, false);
-                else
-                    petHelper.CheckDamage(petStage, (teamIndex%2)+1, i, damage, true, false);
+                if (petStage.GetTeam((teamIndex%2)+1).GetPet(i).Type != PetType.Elemental)
+                {
+                    if (isCritting && i == randomPetIndex)
+                        petHelper.CheckDamage(petStage, (teamIndex%2)+1, i, 2*damage, true, false);
+                    else
+                        petHelper.CheckDamage(petStage, (teamIndex%2)+1, i, damage, true, false);
+                }
             }
         else
             for (var i=2; i < petStage.GetTeam((teamIndex%2)+1).NumPets+1; i++)
@@ -93,10 +96,13 @@ Item
                                 * petStage.GetTeam(teamIndex).ActivePet.DamageModifier);
 
                 numHits += 1;
-                if (isCritting && i == randomPetIndex)
-                    petHelper.CheckDamage(petStage, (teamIndex%2)+1, i, 2*damage, true, false);
-                else
-                    petHelper.CheckDamage(petStage, (teamIndex%2)+1, i, damage, true, false);
+                if (petStage.GetTeam((teamIndex%2)+1).GetPet(i).Type != PetType.Elemental)
+                {
+                    if (isCritting && i == randomPetIndex)
+                        petHelper.CheckDamage(petStage, (teamIndex%2)+1, i, 2*damage, true, false);
+                    else
+                        petHelper.CheckDamage(petStage, (teamIndex%2)+1, i, damage, true, false);
+                }
             }
 
         //Remove any other weather effects.

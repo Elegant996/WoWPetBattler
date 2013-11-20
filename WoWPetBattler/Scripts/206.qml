@@ -70,8 +70,8 @@ Item
                         * petStage.GetTeam((teamIndex%2)+1).ActivePet.DefenseModifier
                         * petStage.GetTeam(teamIndex).ActivePet.DamageModifier);
 
-        //Check whether it is avoid/crit/hit/proc.
-        if (!isAvoiding && isHitting)
+        //Check whether it is avoid/crit/hit/proc and opponent is not of the Elemental type.
+        if (!isAvoiding && isHitting && petStage.GetTeam((teamIndex%2)+1).ActivePet.Type != PetType.Elemental)
         {
             numHits += 1;
             if (isCritting)

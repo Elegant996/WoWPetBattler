@@ -1,6 +1,6 @@
 {
     "id": "000000000000000",
-    "losses": 0,
+    "losses": 1,
     "pets": [
         {
             "id": 1229,
@@ -15,5 +15,5 @@
             "name": "Fel Flame"
         }
     ],
-    "wins": 2
+    "wins": 6
 }

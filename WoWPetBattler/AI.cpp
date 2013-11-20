@@ -104,7 +104,7 @@ void AI::Run(bool initialized)
 
 	//Run Expectiminimax if select ability or select pet is present.
 	if (initialized)
-		nextMove = this->Expectiminimax(petStage, 3, -4500, 4500, 1);
+		nextMove = this->Expectiminimax(petStage, 4, -4500, 4500, 1);
 	//If we are not initialized select the first pet.
 	else
 	{
@@ -990,6 +990,10 @@ QList<PetStage*> AI::IsPetDead(PetStage *stageNode, quint8 teamIndex)
 							break;																						//There should not be more than 1.
 						}
 					possibleStages.append(outcomeStage);																//Append the substitute stage to the QList.
+
+					//If it's not a PvP Battle, the opponent simply moves on to the next available pet.
+					if (!outcomeStage->IsPvPBattle())
+						break;
 				}
 		}
 	}

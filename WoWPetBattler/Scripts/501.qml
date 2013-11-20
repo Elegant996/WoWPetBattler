@@ -68,7 +68,8 @@ Item
         var damage = Math.round((normalDamage - petStage.GetTeam((teamIndex%2)+1).ActivePet.DamageOffset)
                         * petType.GetEffectiveness(attackType, petStage.GetTeam((teamIndex%2)+1).ActivePet.Type)
                         * petStage.GetTeam((teamIndex%2)+1).ActivePet.DefenseModifier
-                        * petStage.GetTeam(teamIndex).ActivePet.DamageModifier);
+                        * (petStage.GetTeam(teamIndex).ActivePet.DamageModifier
+							+ petHelper.CheckWeatherBonus(petStage, attackType)));
 
         //Check whether it is avoid/crit/hit/proc.
         if (!isAvoiding && isHitting)
@@ -80,6 +81,7 @@ Item
                 petHelper.CheckDamage(petStage, (teamIndex%2)+1, petStage.GetTeam((teamIndex%2)+1).ActivePetIndex, damage, true, true);
 
             petStage.GetTeam((teamIndex%2)+1).ActivePet.AddAura(500, 4, true, teamIndex, petStage.GetTeam(teamIndex).ActivePetIndex, petStage.GetTeam(teamIndex).ActivePet.Power);
+            petStage.GetTeam((teamIndex%2)+1).ActivePet.AddStatus(PetStatus.Burning);
         }
 
         return numHits;

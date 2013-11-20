@@ -66,8 +66,8 @@ Item
         var attackType = PetType.Magic;
         var normalDamage = Math.round(baseDamage + petStage.GetTeam(teamIndex).ActivePet.Power * scaleFactor);
 
-        //Check whether it is avoid/crit/hit/proc.
-        if (!isAvoiding && isHitting)
+        //Check whether it is avoid/crit/hit/proc and opponent is not of the Elemental type.
+        if (!isAvoiding && isHitting && petStage.GetTeam((teamIndex%2)+1).ActivePet.Type != PetType.Elemental)
             for (var i=1; i < petStage.GetTeam((teamIndex%2)+1).NumPets+1; i++)
             {
                 var damage = Math.round((normalDamage - petStage.GetTeam((teamIndex%2)+1).GetPet(i).DamageOffset)

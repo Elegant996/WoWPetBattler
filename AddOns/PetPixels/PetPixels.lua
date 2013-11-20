@@ -292,12 +292,14 @@ function events:PET_BATTLE_OVER(...)
 		end
 	end
 
-	if (petsCurrentHP[1][1] == petsCurrentHP[1][2] == petsCurrentHP[1][3]
-		== petsCurrentHP[2][1] == petsCurrentHP[2][2] == petsCurrentHP[2][3] == 0) then
+	if (petsCurrentHP[1][1] == 0 and petsCurrentHP[1][2] == 0 and petsCurrentHP[1][3] == 0
+		and petsCurrentHP[2][1] == 0 and petsCurrentHP[2][2] == 0 and petsCurrentHP[2][3] == 0) then
 		wonLastBattle = false;
-	elseif (petsCurrentHP[1][1] == petsCurrentHP[1][2] == petsCurrentHP[1][3] == 0) then
+	elseif (petsCurrentHP[1][1] == 0 and petsCurrentHP[1][2] == 0 and petsCurrentHP[1][3] == 0) then
 		wonLastBattle = false;
-	elseif (petsCurrentHP[2][1] == petsCurrentHP[2][2] == petsCurrentHP[2][3] == 0) then
+	elseif (petsCurrentHP[2][1] ~= 0 and petsCurrentHP[2][2] ~= 0 and petsCurrentHP[2][3] ~= 0) then
+		wonLastBattle = false;
+	elseif (petsCurrentHP[2][1] == 0 and petsCurrentHP[2][2] == 0 and petsCurrentHP[2][3] == 0) then
 		wonLastBattle = true;
 	else
 		wonLastBattle = true;
