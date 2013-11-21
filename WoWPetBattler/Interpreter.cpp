@@ -28,7 +28,7 @@ Interpreter::~Interpreter(void)
 void Interpreter::Exit()
 {
 	//Unlock the thread.
-	if (this->readSuccess)
+	if (this->readSuccess && !this->oneTimeNotifier)
 		this->mutex.unlock();
 	this->running = false;
 	this->timeoutCount = 0;

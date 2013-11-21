@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>600</width>
-    <height>477</height>
+    <height>539</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -31,7 +31,7 @@
      <x>10</x>
      <y>10</y>
      <width>581</width>
-     <height>460</height>
+     <height>521</height>
     </rect>
    </property>
    <layout class="QGridLayout" name="gridLayout">
@@ -83,74 +83,11 @@
       </property>
      </widget>
     </item>
-    <item row="4" column="1">
+    <item row="9" column="1">
      <widget class="QDialogButtonBox" name="buttonBox">
       <property name="standardButtons">
        <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
       </property>
-     </widget>
-    </item>
-    <item row="3" column="0">
-     <widget class="QSplitter" name="checkBoxSplitter">
-      <property name="orientation">
-       <enum>Qt::Vertical</enum>
-      </property>
-      <widget class="QCheckBox" name="aeroCheckBox">
-       <property name="font">
-        <font>
-         <family>MS Shell Dlg 2</family>
-         <pointsize>10</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>Disables Aero (Increases Performance)</string>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-      </widget>
-      <widget class="QCheckBox" name="tieCheckBox">
-       <property name="font">
-        <font>
-         <family>MS Shell Dlg 2</family>
-         <pointsize>10</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>Random When Speeds Are Equal</string>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-      </widget>
-      <widget class="QCheckBox" name="passCheckBox">
-       <property name="font">
-        <font>
-         <family>MS Shell Dlg 2</family>
-         <pointsize>10</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>Consider Passing As A Move</string>
-       </property>
-       <property name="checked">
-        <bool>false</bool>
-       </property>
-      </widget>
-      <widget class="QCheckBox" name="PvPCheckBox">
-       <property name="font">
-        <font>
-         <family>MS Shell Dlg 2</family>
-         <pointsize>10</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>Enable PvP Queuing</string>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-      </widget>
      </widget>
     </item>
     <item row="1" column="0" colspan="2">
@@ -164,59 +101,6 @@
       <property name="spacing">
        <number>20</number>
       </property>
-      <item row="3" column="1">
-       <widget class="QSplitter" name="maxChanceOnHitSplitter">
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
-        </property>
-        <widget class="QLabel" name="maxChanceOnHitLabel">
-         <property name="contextMenuPolicy">
-          <enum>Qt::NoContextMenu</enum>
-         </property>
-         <property name="layoutDirection">
-          <enum>Qt::LeftToRight</enum>
-         </property>
-         <property name="text">
-          <string>Maximum Chance On Hit %</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignCenter</set>
-         </property>
-         <property name="buddy">
-          <cstring>maxChanceOnHitSlider</cstring>
-         </property>
-        </widget>
-        <widget class="QSlider" name="maxChanceOnHitSlider">
-         <property name="minimum">
-          <number>0</number>
-         </property>
-         <property name="maximum">
-          <number>20</number>
-         </property>
-         <property name="singleStep">
-          <number>1</number>
-         </property>
-         <property name="pageStep">
-          <number>2</number>
-         </property>
-         <property name="value">
-          <number>0</number>
-         </property>
-         <property name="sliderPosition">
-          <number>0</number>
-         </property>
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="tickPosition">
-          <enum>QSlider::TicksBelow</enum>
-         </property>
-         <property name="tickInterval">
-          <number>10</number>
-         </property>
-        </widget>
-       </widget>
-      </item>
       <item row="3" column="0">
        <widget class="QSplitter" name="minChanceOnHitSplitter">
         <property name="orientation">
@@ -270,12 +154,12 @@
         </widget>
        </widget>
       </item>
-      <item row="2" column="1">
-       <widget class="QSplitter" name="maxCritSplitter">
+      <item row="3" column="1">
+       <widget class="QSplitter" name="maxChanceOnHitSplitter">
         <property name="orientation">
          <enum>Qt::Vertical</enum>
         </property>
-        <widget class="QLabel" name="maxCritLabel">
+        <widget class="QLabel" name="maxChanceOnHitLabel">
          <property name="contextMenuPolicy">
           <enum>Qt::NoContextMenu</enum>
          </property>
@@ -283,16 +167,16 @@
           <enum>Qt::LeftToRight</enum>
          </property>
          <property name="text">
-          <string>Maximum Critical Strike %</string>
+          <string>Maximum Chance On Hit %</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>
          </property>
          <property name="buddy">
-          <cstring>maxCritSlider</cstring>
+          <cstring>maxChanceOnHitSlider</cstring>
          </property>
         </widget>
-        <widget class="QSlider" name="maxCritSlider">
+        <widget class="QSlider" name="maxChanceOnHitSlider">
          <property name="minimum">
           <number>0</number>
          </property>
@@ -306,10 +190,10 @@
           <number>2</number>
          </property>
          <property name="value">
-          <number>1</number>
+          <number>0</number>
          </property>
          <property name="sliderPosition">
-          <number>1</number>
+          <number>0</number>
          </property>
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
@@ -585,7 +469,209 @@
         </widget>
        </widget>
       </item>
+      <item row="2" column="1">
+       <widget class="QSplitter" name="maxCritSplitter">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <widget class="QLabel" name="maxCritLabel">
+         <property name="contextMenuPolicy">
+          <enum>Qt::NoContextMenu</enum>
+         </property>
+         <property name="layoutDirection">
+          <enum>Qt::LeftToRight</enum>
+         </property>
+         <property name="text">
+          <string>Maximum Critical Strike %</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+         <property name="buddy">
+          <cstring>maxCritSlider</cstring>
+         </property>
+        </widget>
+        <widget class="QSlider" name="maxCritSlider">
+         <property name="minimum">
+          <number>0</number>
+         </property>
+         <property name="maximum">
+          <number>20</number>
+         </property>
+         <property name="singleStep">
+          <number>1</number>
+         </property>
+         <property name="pageStep">
+          <number>2</number>
+         </property>
+         <property name="value">
+          <number>1</number>
+         </property>
+         <property name="sliderPosition">
+          <number>1</number>
+         </property>
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="tickPosition">
+          <enum>QSlider::TicksBelow</enum>
+         </property>
+         <property name="tickInterval">
+          <number>10</number>
+         </property>
+        </widget>
+       </widget>
+      </item>
      </layout>
+    </item>
+    <item row="3" column="0">
+     <widget class="QSplitter" name="depthSplitter">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+      <widget class="QLabel" name="depthLabel">
+       <property name="contextMenuPolicy">
+        <enum>Qt::NoContextMenu</enum>
+       </property>
+       <property name="layoutDirection">
+        <enum>Qt::LeftToRight</enum>
+       </property>
+       <property name="text">
+        <string>Turns To Look Ahead (1-5)</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+       <property name="buddy">
+        <cstring>maxCritSlider</cstring>
+       </property>
+      </widget>
+      <widget class="QSlider" name="depthSlider">
+       <property name="minimum">
+        <number>1</number>
+       </property>
+       <property name="maximum">
+        <number>5</number>
+       </property>
+       <property name="singleStep">
+        <number>1</number>
+       </property>
+       <property name="pageStep">
+        <number>2</number>
+       </property>
+       <property name="value">
+        <number>3</number>
+       </property>
+       <property name="sliderPosition">
+        <number>3</number>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="tickPosition">
+        <enum>QSlider::TicksBelow</enum>
+       </property>
+       <property name="tickInterval">
+        <number>1</number>
+       </property>
+      </widget>
+      <widget class="QGroupBox" name="groupBox">
+       <property name="font">
+        <font>
+         <pointsize>10</pointsize>
+        </font>
+       </property>
+       <property name="title">
+        <string>Heuristics</string>
+       </property>
+       <layout class="QGridLayout" name="heuristicGridLayout">
+        <item row="0" column="0">
+         <layout class="QVBoxLayout" name="verticalLayout">
+          <item>
+           <widget class="QRadioButton" name="currentHealthRadioButton">
+            <property name="text">
+             <string>Use Current Health</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="fixedHealthRadioButton">
+            <property name="text">
+             <string>Use Fixed Health</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+    <item row="3" column="1">
+     <widget class="QSplitter" name="checkBoxSplitter">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+      <widget class="QCheckBox" name="aeroCheckBox">
+       <property name="font">
+        <font>
+         <family>MS Shell Dlg 2</family>
+         <pointsize>10</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>Disables Aero (Increases Performance)</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="tieCheckBox">
+       <property name="font">
+        <font>
+         <family>MS Shell Dlg 2</family>
+         <pointsize>10</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>Random When Speeds Are Equal</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="passCheckBox">
+       <property name="font">
+        <font>
+         <family>MS Shell Dlg 2</family>
+         <pointsize>10</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>Consider Passing As A Move</string>
+       </property>
+       <property name="checked">
+        <bool>false</bool>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="PvPCheckBox">
+       <property name="font">
+        <font>
+         <family>MS Shell Dlg 2</family>
+         <pointsize>10</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>Enable PvP Queuing</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </widget>
     </item>
    </layout>
   </widget>

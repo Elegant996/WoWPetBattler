@@ -174,6 +174,14 @@ void Preferences::Save()
 	setting.setValue("CanPass", this->ui.passCheckBox->isChecked());			//Set whether a pet can pass.
 	setting.setValue("PvPEnabled", this->ui.PvPCheckBox->isChecked());			//Set whether PvP is enabled.
 
+	setting.setValue("TurnDepth", this->ui.depthSlider->value());				//Store turn depth.
+
+	//Set heuristic for radio buttons.
+	if (this->ui.currentHealthRadioButton->isChecked())
+		setting.setValue("Heuristic", AI::CurrentHealth);
+	else if (this->ui.fixedHealthRadioButton->isChecked())
+		setting.setValue("Heuristic", AI::FixedHealth);
+
 	//Close Options group.
 	setting.endGroup();
 }
@@ -223,6 +231,14 @@ void Preferences::Load()
 	this->ui.tieCheckBox->setChecked(setting.value("AutoDecideTies", true).toBool());	//Fetch whether to auto decide ties.
 	this->ui.passCheckBox->setChecked(setting.value("CanPass", false).toBool());		//Fetch whether a pet can pass.
 	this->ui.PvPCheckBox->setChecked(setting.value("PvPEnabled", true).toBool());		//Fetch whether PvP is enabled.
+
+	this->ui.depthSlider->setValue(setting.value("TurnDepth", 3).toInt());				//Store turn depth.
+	
+	//Fetch heuristic from radio buttons.
+	if (setting.value("Heuristic", AI::FixedHealth).toInt() == AI::CurrentHealth)
+		this->ui.currentHealthRadioButton->setChecked(true);
+	else if (setting.value("Heuristic", AI::FixedHealth).toInt() == AI::FixedHealth)
+		this->ui.fixedHealthRadioButton->setChecked(true);
 
 	//Close Options group.
 	setting.endGroup();

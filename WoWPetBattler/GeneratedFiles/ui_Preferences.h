@@ -17,10 +17,13 @@
 #include <QtWidgets/QDialog>
 #include <QtWidgets/QDialogButtonBox>
 #include <QtWidgets/QGridLayout>
+#include <QtWidgets/QGroupBox>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
+#include <QtWidgets/QRadioButton>
 #include <QtWidgets/QSlider>
 #include <QtWidgets/QSplitter>
+#include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
 
 QT_BEGIN_NAMESPACE
@@ -33,21 +36,13 @@ public:
     QLabel *thresholdLabel;
     QLabel *optionsLabel;
     QDialogButtonBox *buttonBox;
-    QSplitter *checkBoxSplitter;
-    QCheckBox *aeroCheckBox;
-    QCheckBox *tieCheckBox;
-    QCheckBox *passCheckBox;
-    QCheckBox *PvPCheckBox;
     QGridLayout *thresholdsGridLayout;
-    QSplitter *maxChanceOnHitSplitter;
-    QLabel *maxChanceOnHitLabel;
-    QSlider *maxChanceOnHitSlider;
     QSplitter *minChanceOnHitSplitter;
     QLabel *minChanceOnHitLabel;
     QSlider *minChanceOnHitSlider;
-    QSplitter *maxCritSplitter;
-    QLabel *maxCritLabel;
-    QSlider *maxCritSlider;
+    QSplitter *maxChanceOnHitSplitter;
+    QLabel *maxChanceOnHitLabel;
+    QSlider *maxChanceOnHitSlider;
     QSplitter *minCritSplitter;
     QLabel *minCritLabel;
     QSlider *minCritSlider;
@@ -63,17 +58,33 @@ public:
     QSplitter *minHitSplitter;
     QLabel *minHitLabel;
     QSlider *minHitSlider;
+    QSplitter *maxCritSplitter;
+    QLabel *maxCritLabel;
+    QSlider *maxCritSlider;
+    QSplitter *depthSplitter;
+    QLabel *depthLabel;
+    QSlider *depthSlider;
+    QGroupBox *groupBox;
+    QGridLayout *heuristicGridLayout;
+    QVBoxLayout *verticalLayout;
+    QRadioButton *currentHealthRadioButton;
+    QRadioButton *fixedHealthRadioButton;
+    QSplitter *checkBoxSplitter;
+    QCheckBox *aeroCheckBox;
+    QCheckBox *tieCheckBox;
+    QCheckBox *passCheckBox;
+    QCheckBox *PvPCheckBox;
 
     void setupUi(QDialog *PreferencesDialog)
     {
         if (PreferencesDialog->objectName().isEmpty())
             PreferencesDialog->setObjectName(QStringLiteral("PreferencesDialog"));
-        PreferencesDialog->resize(600, 477);
+        PreferencesDialog->resize(600, 539);
         PreferencesDialog->setMinimumSize(QSize(430, 440));
         PreferencesDialog->setBaseSize(QSize(430, 440));
         layoutWidget = new QWidget(PreferencesDialog);
         layoutWidget->setObjectName(QStringLiteral("layoutWidget"));
-        layoutWidget->setGeometry(QRect(10, 10, 581, 460));
+        layoutWidget->setGeometry(QRect(10, 10, 581, 521));
         gridLayout = new QGridLayout(layoutWidget);
         gridLayout->setObjectName(QStringLiteral("gridLayout"));
         gridLayout->setContentsMargins(10, 10, 10, 10);
@@ -105,65 +116,12 @@ public:
         buttonBox->setObjectName(QStringLiteral("buttonBox"));
         buttonBox->setStandardButtons(QDialogButtonBox::Cancel|QDialogButtonBox::Ok);
 
-        gridLayout->addWidget(buttonBox, 4, 1, 1, 1);
-
-        checkBoxSplitter = new QSplitter(layoutWidget);
-        checkBoxSplitter->setObjectName(QStringLiteral("checkBoxSplitter"));
-        checkBoxSplitter->setOrientation(Qt::Vertical);
-        aeroCheckBox = new QCheckBox(checkBoxSplitter);
-        aeroCheckBox->setObjectName(QStringLiteral("aeroCheckBox"));
-        QFont font2;
-        font2.setFamily(QStringLiteral("MS Shell Dlg 2"));
-        font2.setPointSize(10);
-        aeroCheckBox->setFont(font2);
-        aeroCheckBox->setChecked(true);
-        checkBoxSplitter->addWidget(aeroCheckBox);
-        tieCheckBox = new QCheckBox(checkBoxSplitter);
-        tieCheckBox->setObjectName(QStringLiteral("tieCheckBox"));
-        tieCheckBox->setFont(font2);
-        tieCheckBox->setChecked(true);
-        checkBoxSplitter->addWidget(tieCheckBox);
-        passCheckBox = new QCheckBox(checkBoxSplitter);
-        passCheckBox->setObjectName(QStringLiteral("passCheckBox"));
-        passCheckBox->setFont(font2);
-        passCheckBox->setChecked(false);
-        checkBoxSplitter->addWidget(passCheckBox);
-        PvPCheckBox = new QCheckBox(checkBoxSplitter);
-        PvPCheckBox->setObjectName(QStringLiteral("PvPCheckBox"));
-        PvPCheckBox->setFont(font2);
-        PvPCheckBox->setChecked(true);
-        checkBoxSplitter->addWidget(PvPCheckBox);
-
-        gridLayout->addWidget(checkBoxSplitter, 3, 0, 1, 1);
+        gridLayout->addWidget(buttonBox, 9, 1, 1, 1);
 
         thresholdsGridLayout = new QGridLayout();
         thresholdsGridLayout->setSpacing(20);
         thresholdsGridLayout->setObjectName(QStringLiteral("thresholdsGridLayout"));
         thresholdsGridLayout->setContentsMargins(10, -1, 10, -1);
-        maxChanceOnHitSplitter = new QSplitter(layoutWidget);
-        maxChanceOnHitSplitter->setObjectName(QStringLiteral("maxChanceOnHitSplitter"));
-        maxChanceOnHitSplitter->setOrientation(Qt::Vertical);
-        maxChanceOnHitLabel = new QLabel(maxChanceOnHitSplitter);
-        maxChanceOnHitLabel->setObjectName(QStringLiteral("maxChanceOnHitLabel"));
-        maxChanceOnHitLabel->setContextMenuPolicy(Qt::NoContextMenu);
-        maxChanceOnHitLabel->setLayoutDirection(Qt::LeftToRight);
-        maxChanceOnHitLabel->setAlignment(Qt::AlignCenter);
-        maxChanceOnHitSplitter->addWidget(maxChanceOnHitLabel);
-        maxChanceOnHitSlider = new QSlider(maxChanceOnHitSplitter);
-        maxChanceOnHitSlider->setObjectName(QStringLiteral("maxChanceOnHitSlider"));
-        maxChanceOnHitSlider->setMinimum(0);
-        maxChanceOnHitSlider->setMaximum(20);
-        maxChanceOnHitSlider->setSingleStep(1);
-        maxChanceOnHitSlider->setPageStep(2);
-        maxChanceOnHitSlider->setValue(0);
-        maxChanceOnHitSlider->setSliderPosition(0);
-        maxChanceOnHitSlider->setOrientation(Qt::Horizontal);
-        maxChanceOnHitSlider->setTickPosition(QSlider::TicksBelow);
-        maxChanceOnHitSlider->setTickInterval(10);
-        maxChanceOnHitSplitter->addWidget(maxChanceOnHitSlider);
-
-        thresholdsGridLayout->addWidget(maxChanceOnHitSplitter, 3, 1, 1, 1);
-
         minChanceOnHitSplitter = new QSplitter(layoutWidget);
         minChanceOnHitSplitter->setObjectName(QStringLiteral("minChanceOnHitSplitter"));
         minChanceOnHitSplitter->setOrientation(Qt::Vertical);
@@ -188,29 +146,29 @@ public:
 
         thresholdsGridLayout->addWidget(minChanceOnHitSplitter, 3, 0, 1, 1);
 
-        maxCritSplitter = new QSplitter(layoutWidget);
-        maxCritSplitter->setObjectName(QStringLiteral("maxCritSplitter"));
-        maxCritSplitter->setOrientation(Qt::Vertical);
-        maxCritLabel = new QLabel(maxCritSplitter);
-        maxCritLabel->setObjectName(QStringLiteral("maxCritLabel"));
-        maxCritLabel->setContextMenuPolicy(Qt::NoContextMenu);
-        maxCritLabel->setLayoutDirection(Qt::LeftToRight);
-        maxCritLabel->setAlignment(Qt::AlignCenter);
-        maxCritSplitter->addWidget(maxCritLabel);
-        maxCritSlider = new QSlider(maxCritSplitter);
-        maxCritSlider->setObjectName(QStringLiteral("maxCritSlider"));
-        maxCritSlider->setMinimum(0);
-        maxCritSlider->setMaximum(20);
-        maxCritSlider->setSingleStep(1);
-        maxCritSlider->setPageStep(2);
-        maxCritSlider->setValue(1);
-        maxCritSlider->setSliderPosition(1);
-        maxCritSlider->setOrientation(Qt::Horizontal);
-        maxCritSlider->setTickPosition(QSlider::TicksBelow);
-        maxCritSlider->setTickInterval(10);
-        maxCritSplitter->addWidget(maxCritSlider);
+        maxChanceOnHitSplitter = new QSplitter(layoutWidget);
+        maxChanceOnHitSplitter->setObjectName(QStringLiteral("maxChanceOnHitSplitter"));
+        maxChanceOnHitSplitter->setOrientation(Qt::Vertical);
+        maxChanceOnHitLabel = new QLabel(maxChanceOnHitSplitter);
+        maxChanceOnHitLabel->setObjectName(QStringLiteral("maxChanceOnHitLabel"));
+        maxChanceOnHitLabel->setContextMenuPolicy(Qt::NoContextMenu);
+        maxChanceOnHitLabel->setLayoutDirection(Qt::LeftToRight);
+        maxChanceOnHitLabel->setAlignment(Qt::AlignCenter);
+        maxChanceOnHitSplitter->addWidget(maxChanceOnHitLabel);
+        maxChanceOnHitSlider = new QSlider(maxChanceOnHitSplitter);
+        maxChanceOnHitSlider->setObjectName(QStringLiteral("maxChanceOnHitSlider"));
+        maxChanceOnHitSlider->setMinimum(0);
+        maxChanceOnHitSlider->setMaximum(20);
+        maxChanceOnHitSlider->setSingleStep(1);
+        maxChanceOnHitSlider->setPageStep(2);
+        maxChanceOnHitSlider->setValue(0);
+        maxChanceOnHitSlider->setSliderPosition(0);
+        maxChanceOnHitSlider->setOrientation(Qt::Horizontal);
+        maxChanceOnHitSlider->setTickPosition(QSlider::TicksBelow);
+        maxChanceOnHitSlider->setTickInterval(10);
+        maxChanceOnHitSplitter->addWidget(maxChanceOnHitSlider);
 
-        thresholdsGridLayout->addWidget(maxCritSplitter, 2, 1, 1, 1);
+        thresholdsGridLayout->addWidget(maxChanceOnHitSplitter, 3, 1, 1, 1);
 
         minCritSplitter = new QSplitter(layoutWidget);
         minCritSplitter->setObjectName(QStringLiteral("minCritSplitter"));
@@ -331,18 +289,120 @@ public:
 
         thresholdsGridLayout->addWidget(minHitSplitter, 1, 0, 1, 1);
 
+        maxCritSplitter = new QSplitter(layoutWidget);
+        maxCritSplitter->setObjectName(QStringLiteral("maxCritSplitter"));
+        maxCritSplitter->setOrientation(Qt::Vertical);
+        maxCritLabel = new QLabel(maxCritSplitter);
+        maxCritLabel->setObjectName(QStringLiteral("maxCritLabel"));
+        maxCritLabel->setContextMenuPolicy(Qt::NoContextMenu);
+        maxCritLabel->setLayoutDirection(Qt::LeftToRight);
+        maxCritLabel->setAlignment(Qt::AlignCenter);
+        maxCritSplitter->addWidget(maxCritLabel);
+        maxCritSlider = new QSlider(maxCritSplitter);
+        maxCritSlider->setObjectName(QStringLiteral("maxCritSlider"));
+        maxCritSlider->setMinimum(0);
+        maxCritSlider->setMaximum(20);
+        maxCritSlider->setSingleStep(1);
+        maxCritSlider->setPageStep(2);
+        maxCritSlider->setValue(1);
+        maxCritSlider->setSliderPosition(1);
+        maxCritSlider->setOrientation(Qt::Horizontal);
+        maxCritSlider->setTickPosition(QSlider::TicksBelow);
+        maxCritSlider->setTickInterval(10);
+        maxCritSplitter->addWidget(maxCritSlider);
+
+        thresholdsGridLayout->addWidget(maxCritSplitter, 2, 1, 1, 1);
+
 
         gridLayout->addLayout(thresholdsGridLayout, 1, 0, 1, 2);
 
+        depthSplitter = new QSplitter(layoutWidget);
+        depthSplitter->setObjectName(QStringLiteral("depthSplitter"));
+        depthSplitter->setOrientation(Qt::Vertical);
+        depthLabel = new QLabel(depthSplitter);
+        depthLabel->setObjectName(QStringLiteral("depthLabel"));
+        depthLabel->setContextMenuPolicy(Qt::NoContextMenu);
+        depthLabel->setLayoutDirection(Qt::LeftToRight);
+        depthLabel->setAlignment(Qt::AlignCenter);
+        depthSplitter->addWidget(depthLabel);
+        depthSlider = new QSlider(depthSplitter);
+        depthSlider->setObjectName(QStringLiteral("depthSlider"));
+        depthSlider->setMinimum(1);
+        depthSlider->setMaximum(5);
+        depthSlider->setSingleStep(1);
+        depthSlider->setPageStep(2);
+        depthSlider->setValue(3);
+        depthSlider->setSliderPosition(3);
+        depthSlider->setOrientation(Qt::Horizontal);
+        depthSlider->setTickPosition(QSlider::TicksBelow);
+        depthSlider->setTickInterval(1);
+        depthSplitter->addWidget(depthSlider);
+        groupBox = new QGroupBox(depthSplitter);
+        groupBox->setObjectName(QStringLiteral("groupBox"));
+        QFont font2;
+        font2.setPointSize(10);
+        groupBox->setFont(font2);
+        heuristicGridLayout = new QGridLayout(groupBox);
+        heuristicGridLayout->setObjectName(QStringLiteral("heuristicGridLayout"));
+        verticalLayout = new QVBoxLayout();
+        verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
+        currentHealthRadioButton = new QRadioButton(groupBox);
+        currentHealthRadioButton->setObjectName(QStringLiteral("currentHealthRadioButton"));
+        currentHealthRadioButton->setChecked(true);
+
+        verticalLayout->addWidget(currentHealthRadioButton);
+
+        fixedHealthRadioButton = new QRadioButton(groupBox);
+        fixedHealthRadioButton->setObjectName(QStringLiteral("fixedHealthRadioButton"));
+
+        verticalLayout->addWidget(fixedHealthRadioButton);
+
+
+        heuristicGridLayout->addLayout(verticalLayout, 0, 0, 1, 1);
+
+        depthSplitter->addWidget(groupBox);
+
+        gridLayout->addWidget(depthSplitter, 3, 0, 1, 1);
+
+        checkBoxSplitter = new QSplitter(layoutWidget);
+        checkBoxSplitter->setObjectName(QStringLiteral("checkBoxSplitter"));
+        checkBoxSplitter->setOrientation(Qt::Vertical);
+        aeroCheckBox = new QCheckBox(checkBoxSplitter);
+        aeroCheckBox->setObjectName(QStringLiteral("aeroCheckBox"));
+        QFont font3;
+        font3.setFamily(QStringLiteral("MS Shell Dlg 2"));
+        font3.setPointSize(10);
+        aeroCheckBox->setFont(font3);
+        aeroCheckBox->setChecked(true);
+        checkBoxSplitter->addWidget(aeroCheckBox);
+        tieCheckBox = new QCheckBox(checkBoxSplitter);
+        tieCheckBox->setObjectName(QStringLiteral("tieCheckBox"));
+        tieCheckBox->setFont(font3);
+        tieCheckBox->setChecked(true);
+        checkBoxSplitter->addWidget(tieCheckBox);
+        passCheckBox = new QCheckBox(checkBoxSplitter);
+        passCheckBox->setObjectName(QStringLiteral("passCheckBox"));
+        passCheckBox->setFont(font3);
+        passCheckBox->setChecked(false);
+        checkBoxSplitter->addWidget(passCheckBox);
+        PvPCheckBox = new QCheckBox(checkBoxSplitter);
+        PvPCheckBox->setObjectName(QStringLiteral("PvPCheckBox"));
+        PvPCheckBox->setFont(font3);
+        PvPCheckBox->setChecked(true);
+        checkBoxSplitter->addWidget(PvPCheckBox);
+
+        gridLayout->addWidget(checkBoxSplitter, 3, 1, 1, 1);
+
 #ifndef QT_NO_SHORTCUT
-        maxChanceOnHitLabel->setBuddy(maxChanceOnHitSlider);
         minChanceOnHitLabel->setBuddy(minChanceOnHitSlider);
-        maxCritLabel->setBuddy(maxCritSlider);
+        maxChanceOnHitLabel->setBuddy(maxChanceOnHitSlider);
         minCritLabel->setBuddy(minCritSlider);
         maxHitLabel->setBuddy(maxHitSlider);
         maxAvoidanceLabel->setBuddy(maxAvoidanceSlider);
         minAvoidanceLabel->setBuddy(minAvoidanceSlider);
         minHitLabel->setBuddy(minHitSlider);
+        maxCritLabel->setBuddy(maxCritSlider);
+        depthLabel->setBuddy(maxCritSlider);
 #endif // QT_NO_SHORTCUT
         QWidget::setTabOrder(minAvoidanceSlider, maxAvoidanceSlider);
         QWidget::setTabOrder(maxAvoidanceSlider, minHitSlider);
@@ -368,18 +428,22 @@ public:
         PreferencesDialog->setWindowTitle(QApplication::translate("PreferencesDialog", "Preferences", 0));
         thresholdLabel->setText(QApplication::translate("PreferencesDialog", "Thresholds", 0));
         optionsLabel->setText(QApplication::translate("PreferencesDialog", "Options", 0));
-        aeroCheckBox->setText(QApplication::translate("PreferencesDialog", "Disables Aero (Increases Performance)", 0));
-        tieCheckBox->setText(QApplication::translate("PreferencesDialog", "Random When Speeds Are Equal", 0));
-        passCheckBox->setText(QApplication::translate("PreferencesDialog", "Consider Passing As A Move", 0));
-        PvPCheckBox->setText(QApplication::translate("PreferencesDialog", "Enable PvP Queuing", 0));
-        maxChanceOnHitLabel->setText(QApplication::translate("PreferencesDialog", "Maximum Chance On Hit %", 0));
         minChanceOnHitLabel->setText(QApplication::translate("PreferencesDialog", "Minimum Chance On Hit %", 0));
-        maxCritLabel->setText(QApplication::translate("PreferencesDialog", "Maximum Critical Strike %", 0));
+        maxChanceOnHitLabel->setText(QApplication::translate("PreferencesDialog", "Maximum Chance On Hit %", 0));
         minCritLabel->setText(QApplication::translate("PreferencesDialog", "Minimum Critical Strike %", 0));
         maxHitLabel->setText(QApplication::translate("PreferencesDialog", "Maximum Hit %", 0));
         maxAvoidanceLabel->setText(QApplication::translate("PreferencesDialog", "Maximum Avoidance %", 0));
         minAvoidanceLabel->setText(QApplication::translate("PreferencesDialog", "Minimum Avoidance %", 0));
         minHitLabel->setText(QApplication::translate("PreferencesDialog", "Minimum Hit %", 0));
+        maxCritLabel->setText(QApplication::translate("PreferencesDialog", "Maximum Critical Strike %", 0));
+        depthLabel->setText(QApplication::translate("PreferencesDialog", "Turns To Look Ahead (1-5)", 0));
+        groupBox->setTitle(QApplication::translate("PreferencesDialog", "Heuristics", 0));
+        currentHealthRadioButton->setText(QApplication::translate("PreferencesDialog", "Use Current Health", 0));
+        fixedHealthRadioButton->setText(QApplication::translate("PreferencesDialog", "Use Fixed Health", 0));
+        aeroCheckBox->setText(QApplication::translate("PreferencesDialog", "Disables Aero (Increases Performance)", 0));
+        tieCheckBox->setText(QApplication::translate("PreferencesDialog", "Random When Speeds Are Equal", 0));
+        passCheckBox->setText(QApplication::translate("PreferencesDialog", "Consider Passing As A Move", 0));
+        PvPCheckBox->setText(QApplication::translate("PreferencesDialog", "Enable PvP Queuing", 0));
     } // retranslateUi
 
 };

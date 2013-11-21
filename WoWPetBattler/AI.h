@@ -25,6 +25,8 @@ public:
 	AI(PetStage*, Robot::Window*);
 	~AI(void);
 
+	enum HeuristicType { CurrentHealth, FixedHealth };
+
 	void LoadPreferences();
 	void LoadQMLResources();
 
@@ -64,6 +66,10 @@ private:
 	float maxAvoidanceThreshold, maxHitThreshold, maxCritThreshold, maxChanceOnHitThreshold;
 
 	bool qmlResourcesLoaded, canPass, tieBreaker;
+
+	quint8 depth;
+
+	HeuristicType heuristicType;
 };
 
 #endif

@@ -53,8 +53,15 @@ void AI::LoadPreferences()
 	//Open Options group.
 	setting.beginGroup("Options");
 
+	//Define limitations.
 	this->tieBreaker = setting.value("AutoDecideTies", true).toBool();
 	this->canPass = setting.value("CanPass", false).toBool();
+
+	//Set depth of the search.
+	this->depth = setting.value("TurnDepth", 3).toInt();
+
+	//Fetch heuristic from radio buttons.
+	this->heuristicType = (HeuristicType)setting.value("Heuristic", AI::FixedHealth).toInt();
 
 	//Close Options group.
 	setting.endGroup();
@@ -104,7 +111,7 @@ void AI::Run(bool initialized)
 
 	//Run Expectiminimax if select ability or select pet is present.
 	if (initialized)
-		nextMove = this->Expectiminimax(petStage, 3, -4500, 4500, 1);
+		nextMove = this->Expectiminimax(this->petStage, this->depth, -4500, 4500, 1);
 	//If we are not initialized select the first pet.
 	else
 	{
@@ -184,9 +191,14 @@ Move AI::Expectiminimax(PetStage* petStage, quint8 depth, float alpha, float bet
 		The full equation is similar to how pet health is actually calculated: petHealthPercent * 52 * Level + 100*/
 		for (quint8 i=1; i < 3; i+=1)
 			for (quint8 j=1; j < stageNode->GetTeam(1)->GetNumPets()+1; j+=1)
-				score += ((i==1)?1:-1) * stageNode->GetTeam(i)->GetPet(j)->GetHealth();
-				/*score += ((i==1)?1:-1) * (stageNode->GetTeam(i)->GetPet(j)->GetHealthPercentage()
-							* (52 * stageNode->GetTeam(i)->GetPet(j)->GetLevel() + 100));*/
+			{
+				//Used the specified heuristic.
+				if (this->heuristicType == CurrentHealth)
+					score += ((i==1)?1:-1) * stageNode->GetTeam(i)->GetPet(j)->GetHealth();
+				else if (this->heuristicType == FixedHealth)
+					score += ((i==1)?1:-1) * (stageNode->GetTeam(i)->GetPet(j)->GetHealthPercentage()
+							* (52 * stageNode->GetTeam(i)->GetPet(j)->GetLevel() + 100));
+			}
 
 		
 		desiredMove.SetHeuristic(score);	//Pass it the score.
@@ -362,7 +374,7 @@ Move AI::SelectAction(PetStage *stageNode, quint8 depth, float alpha, float beta
 				}
 
 		//If passing is enabled, add it to the list of possible moves.
-		if (this->canPass)
+		if (this->canPass || (stageMoves.isEmpty() && nextMoves.isEmpty()))
 		{
 			PetStage *actionNode = new PetStage(*stageNode);
 			actionNode->GetTeam(turnIndex)->GetActivePet()->GetCurrentAction()->SetAction(PetAction::Pass);

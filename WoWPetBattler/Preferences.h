@@ -7,6 +7,8 @@
 
 #include "UI_Preferences.h"
 
+#include "AI.h"
+
 class Preferences :	public QDialog
 {
 	Q_OBJECT
