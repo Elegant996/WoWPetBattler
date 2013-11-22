@@ -59,40 +59,6 @@ WoWPetBattler::WoWPetBattler(QWidget *parent)
 	//Create PetRecords folder if it does not exist.
 	if (!QDir("PetRecords").exists())
 		QDir().mkdir("PetRecords");
-
-	//Testing data.
-	/*petStage->GetTeam(1)->AddPet(1229, 5, 4, 25);
-	petStage->GetTeam(1)->GetPet(1)->AddAbility(true, true, 1, 0);
-	petStage->GetTeam(1)->GetPet(1)->AddAbility(true, true, 1, 0);
-	petStage->GetTeam(1)->GetPet(1)->AddAbility(true, true, 2, 0);
-
-	petStage->GetTeam(1)->AddPet(439, 9, 4, 25);
-	petStage->GetTeam(1)->GetPet(2)->AddAbility(true, true, 1, 0);
-	petStage->GetTeam(1)->GetPet(2)->AddAbility(true, true, 1, 0);
-	petStage->GetTeam(1)->GetPet(2)->AddAbility(true, true, 2, 0);
-
-	petStage->GetTeam(1)->AddPet(519, 7, 4, 25);
-	petStage->GetTeam(1)->GetPet(3)->AddAbility(true, true, 2, 0);
-	petStage->GetTeam(1)->GetPet(3)->AddAbility(true, true, 2, 0);
-	petStage->GetTeam(1)->GetPet(3)->AddAbility(true, true, 1, 0);
-
-	petStage->GetTeam(2)->AddPet(1012, 5, 6, 25);
-	petStage->GetTeam(2)->GetPet(1)->AddAbility(false, true, 1, 0);
-	petStage->GetTeam(2)->GetPet(1)->AddAbility(false, true, 1, 0);
-	petStage->GetTeam(2)->GetPet(1)->AddAbility(false, true, 1, 0);
-
-	petStage->GetTeam(2)->AddPet(1011, 7, 6, 25);
-	petStage->GetTeam(2)->GetPet(2)->AddAbility(false, true, 1, 0);
-	petStage->GetTeam(2)->GetPet(2)->AddAbility(false, true, 1, 0);
-	petStage->GetTeam(2)->GetPet(2)->AddAbility(false, true, 1, 0);
-
-	petStage->GetTeam(2)->AddPet(1010, 8, 6, 25);
-	petStage->GetTeam(2)->GetPet(3)->AddAbility(false, true, 1, 0);
-	petStage->GetTeam(2)->GetPet(3)->AddAbility(false, true, 1, 0);
-	petStage->GetTeam(2)->GetPet(3)->AddAbility(false, true, 1, 0);
-
-	petStage->GetTeam(1)->SetActivePet(1);
-	petStage->GetTeam(2)->SetActivePet(1);*/
 }
 
 //Destructor
@@ -184,61 +150,7 @@ void WoWPetBattler::on_actionPreferences_triggered()
 
 //Handler for play button.
 void WoWPetBattler::on_playButton_clicked()
-{
-	/*qmlRegisterType<PetStage>();
-	qmlRegisterType<PetTeam>();
-	qmlRegisterType<PetType>("PetType", 1, 0, "PetType");
-	qmlRegisterType<Pet>("PetStatus", 1, 0, "PetStatus");
-	qmlRegisterType<PetAction>("PetAction", 1, 0, "PetAction");
-	qmlRegisterType<PetAbility>();
-	qmlRegisterType<PetAura>();
-	qmlRegisterType<PetHelper>("PetHelper", 1, 0, "PetHelper");
-
-	//petStage->WonLastBattle(true);
-	//Recorder::RecordBattle(petStage);
-
-	ai->LoadQMLResources();
-
-	Move testMove;
-	testMove = ai->Expectiminimax(petStage, 4, -4500, 4500, 1);
-	qDebug() << "Move: " + QString::number(testMove.GetAction());
-	qDebug() << "Heuristic: " + QString::number(testMove.GetHeuristic());
-
-	qDebug() << "Processing move.";
-	petStage->GetTeam(1)->GetActivePet()->SetHealth(petStage->GetTeam(1)->GetActivePet()->GetHealth() - 144);
-	petStage->GetTeam(1)->GetActivePet()->AddAura(542, 2, true);
-	petStage->GetTeam(1)->GetActivePet()->SetDefenseModifier(petStage->GetTeam(1)->GetActivePet()->GetDefenseModifier() + 1);
-	petStage->GetTeam(1)->GetActivePet()->GetAbility(3)->SetCooldown(5);
-	petStage->GetTeam(2)->GetActivePet()->SetHealth(petStage->GetTeam(2)->GetActivePet()->GetHealth() - 280);
-	petStage->GetTeam(2)->SetActivePet(2);
-
-	testMove = ai->Expectiminimax(petStage, 4, -4500, 4500, 1);
-	qDebug() << "Move: " + QString::number(testMove.GetAction());
-	qDebug() << "Heuristic: " + QString::number(testMove.GetHeuristic());*/
-
-	/*QQmlContext *objectContext = new QQmlContext(engine.rootContext());
-	objectContext->setContextProperty("petStage", petStage);	
-
-	QQmlComponent component(&engine, QUrl::fromLocalFile("Scripts/466.qml"));
-	QObject *object = component.create(objectContext);
-
-	if (component.status() == 3)
-		while (!component.errors().isEmpty())
-			qDebug() << component.errors().takeFirst().toString();
-
-	qDebug() << petStage->GetTeam(2)->GetPet(1)->GetHealth();
-
-	QMetaObject::invokeMethod(object, "useAbility", Q_ARG(QVariant, 1), Q_ARG(QVariant, 1), Q_ARG(QVariant, true), Q_ARG(QVariant, false),
-								Q_ARG(QVariant, true), Q_ARG(QVariant, false), Q_ARG(QVariant, false));
-
-	qDebug() << petStage->GetTeam(2)->GetPet(1)->GetHealth();
-
-	delete object;
-
-	delete objectContext;*/
-
-	//Recorder::RecordPets(petStage);
-		
+{		
 	if (ui.playButton->isChecked())
 	{
 		//Disable aero if setting demands it.

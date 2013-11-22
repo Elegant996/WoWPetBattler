@@ -143,7 +143,6 @@ void Pet::RoundUpdate()
 	foreach (PetAbility *petAbility, this->petAbilities)
 		petAbility->RoundUpdate();
 
-	//TODO: Test this!
 	//Update each aura and remove expired ones.
 	for (int i=0; i < petAuras.size(); i+=1)
 	{
