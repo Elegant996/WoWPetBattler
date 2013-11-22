@@ -63,7 +63,8 @@ Item
         //Check whether it is avoid/crit/hit/proc.
         if (!isAvoiding && isHitting)
         {
-            petStage.GetTeam((teamIndex%2)+1).ActivePet.AddAura(231, 5, true, teamIndex, petStage.GetTeam(teamIndex).ActivePetIndex, petStage.GetTeam(teamIndex).ActivePet.Power);
+            //petStage.GetTeam((teamIndex%2)+1).ActivePet.AddAura(231, 5, true, teamIndex, petStage.GetTeam(teamIndex).ActivePetIndex, petStage.GetTeam(teamIndex).ActivePet.Power);
+			petHelper.CheckCleansingRain(petStage, teamIndex, petStage.GetTeam(teamIndex).ActivePetIndex, 231, 5, true, petStage.GetTeam(teamIndex).ActivePet.Power);
         }
 
         return numHits;

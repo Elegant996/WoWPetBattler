@@ -5,6 +5,7 @@ void PetHelper::CheckDamage(PetStage *petStage, quint8 teamIndex, quint8 petInde
 {
 	Pet *currentPet = petStage->GetTeam(teamIndex)->GetPet(petIndex);
 	quint16 totalDamage = damage;
+	quint16 currentHealth = currentPet->GetHealth();
 
 	//Special exception is the use of Lightning Storm weather effect.
 	if (useLightning && petStage->GetTeam(0)->GetPet(0)->GetNumAuras() > 0
@@ -46,7 +47,7 @@ void PetHelper::CheckDamage(PetStage *petStage, quint8 teamIndex, quint8 petInde
 
 	//Scan over the auras for the current pet.
 	for (quint8 i=1; i < currentPet->GetNumAuras()+1; i+=1)
-		//Check for Plague Blood.
+		//Plague Blood.
 		if (currentPet->GetAura(i)->GetAuraId() == 658)
 		{
 			quint16 normalHealing = Round(4 + (float)currentPet->GetAura(i)->GetPower() * 0.2);			
@@ -63,6 +64,21 @@ void PetHelper::CheckDamage(PetStage *petStage, quint8 teamIndex, quint8 petInde
 				quint16 healing = Round(normalHealing * petStage->GetTeam(currentPet->GetAura(i)->GetOriginTeam())->GetPet(currentPet->GetAura(i)->GetOriginPet())->GetHealingModifier());
 				CheckHealing(petStage, currentPet->GetAura(i)->GetOriginTeam(), currentPet->GetAura(i)->GetOriginPet(), normalHealing, false);
 			}
+		}
+		//Asleep.
+		else if (currentPet->GetAura(i)->GetAuraId() == 498 || currentPet->GetAura(i)->GetAuraId() == 926)
+		{
+			currentPet->RemoveStatus(Pet::Asleep);
+			currentPet->RemoveAura(i);
+			i -= 1;
+		}
+		//Silk Cocoon.
+		else if (currentPet->GetAura(i)->GetAuraId() == 505)
+		{
+			currentPet->SetSpeed(currentPet->GetNormalSpeed());
+			currentPet->SetHealth(currentHealth);
+			currentPet->RemoveAura(i);
+			i -= 1;
 		}
 }
 
@@ -186,7 +202,7 @@ void PetHelper::CheckCleansingRain(PetStage* petStage, quint8 teamIndex, quint8 
 }
 
 //Checks to see if there is a bonus to be gained from weather and applies it.
-float PetHelper::CheckWeatherBonus(PetStage *petStage, quint8 petType)
+float PetHelper::CheckWeatherDamageBonus(PetStage *petStage, quint8 petType)
 {
 	if (petType == PetType::Magic && petStage->GetTeam(0)->GetPet(0)->GetNumAuras() > 0
 			&& petStage->GetTeam(0)->GetPet(0)->GetAura(1)->GetAuraId() == 596)

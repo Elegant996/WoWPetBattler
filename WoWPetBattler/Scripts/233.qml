@@ -1,4 +1,4 @@
-// Flame Breath - Ability
+// Frog Kiss - Ability
 import QtQuick 2.0
 
 import PetAction 1.0
@@ -29,7 +29,7 @@ Item
     //Returns the chance on hit rating if the move has any.
     function getChanceOnHitRating(teamIndex)
     {
-        return 0;
+        return 0.25;
     }
 
     //Apply the aura's effect at the start of the turn.
@@ -61,15 +61,14 @@ Item
                         isHitting, isCritting, isProcing)
     {
         var numHits = 0;
-        var scaleFactor = 0.80;
-        var baseDamage = 16;
-        var attackType = PetType.Dragonkin;
+        var scaleFactor = 0.5;
+        var baseDamage = 10;
+        var attackType = PetType.Aquatic;
         var normalDamage = Math.round(baseDamage + petStage.GetTeam(teamIndex).ActivePet.Power * scaleFactor);
         var damage = Math.round((normalDamage - petStage.GetTeam((teamIndex%2)+1).ActivePet.DamageOffset)
                         * petType.GetEffectiveness(attackType, petStage.GetTeam((teamIndex%2)+1).ActivePet.Type)
                         * petStage.GetTeam((teamIndex%2)+1).ActivePet.DefenseModifier
-                        * (petStage.GetTeam(teamIndex).ActivePet.DamageModifier
-							+ petHelper.CheckWeatherDamageBonus(petStage, attackType)));
+                        * petStage.GetTeam(teamIndex).ActivePet.DamageModifier);
 
         //Check whether it is avoid/crit/hit/proc.
         if (!isAvoiding && isHitting)
@@ -80,9 +79,12 @@ Item
             else
                 petHelper.CheckDamage(petStage, (teamIndex%2)+1, petStage.GetTeam((teamIndex%2)+1).ActivePetIndex, damage, true, true);
 
-            //petStage.GetTeam((teamIndex%2)+1).ActivePet.AddAura(500, 4, true, teamIndex, petStage.GetTeam(teamIndex).ActivePetIndex, petStage.GetTeam(teamIndex).ActivePet.Power);
-            petHelper.CheckCleansingRain(petStage, teamIndex, petStage.GetTeam(teamIndex).ActivePetIndex, 500, 4, true, petStage.GetTeam(teamIndex).ActivePet.Power);
-			petStage.GetTeam((teamIndex%2)+1).ActivePet.AddStatus(PetStatus.Burning);
+            if (isProcing)
+                if (petStage.GetTeam((teamIndex%2)+1).ActivePet.Type != PetType.Critter)
+                {
+                    petStage.GetTeam((teamIndex%2)+1).ActivePet.AddAura(822, 1, !isFirst);
+                    petStage.GetTeam((teamIndex%2)+1).ActivePet.AddStatus(PetStatus.Polymorphed);
+                }
         }
 
         return numHits;

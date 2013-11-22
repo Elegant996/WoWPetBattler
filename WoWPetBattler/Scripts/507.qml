@@ -1,4 +1,4 @@
-// Flame Breath - Ability
+// Moth Balls - Ability
 import QtQuick 2.0
 
 import PetAction 1.0
@@ -17,7 +17,7 @@ Item
     //Returns the accuracy of the pet given the move.
     function getAccuracyRating(teamIndex)
     {
-        return 1;
+        return 0.5;
     }
 
     //Returns the critical strike rating of the pet given the move.
@@ -61,28 +61,39 @@ Item
                         isHitting, isCritting, isProcing)
     {
         var numHits = 0;
-        var scaleFactor = 0.80;
-        var baseDamage = 16;
-        var attackType = PetType.Dragonkin;
+        var scaleFactor = 0.5;
+        var baseDamage = 10;
+        var attackType = PetType.Flying;
         var normalDamage = Math.round(baseDamage + petStage.GetTeam(teamIndex).ActivePet.Power * scaleFactor);
         var damage = Math.round((normalDamage - petStage.GetTeam((teamIndex%2)+1).ActivePet.DamageOffset)
                         * petType.GetEffectiveness(attackType, petStage.GetTeam((teamIndex%2)+1).ActivePet.Type)
                         * petStage.GetTeam((teamIndex%2)+1).ActivePet.DefenseModifier
-                        * (petStage.GetTeam(teamIndex).ActivePet.DamageModifier
-							+ petHelper.CheckWeatherDamageBonus(petStage, attackType)));
+                        * petStage.GetTeam(teamIndex).ActivePet.DamageModifier);
+
+        //Used below.
+        var critHit = Math.floor((Math.random()*4)+1);
+
+        var randomNumHits;
+        if (!isHitting)
+            randomNumHits = 0;
+        else
+            randomNumHits = 1;
+
+        for (var i=0; i < 4; i++)
+            if (Math.random() <= petStage.GetTeam(teamIndex).ActivePet.AccuracyOffset + 0.5)
+                randomNumHits++;
 
         //Check whether it is avoid/crit/hit/proc.
-        if (!isAvoiding && isHitting)
+        if (!isAvoiding)
         {
-            numHits += 1;
-            if (isCritting)
-                petHelper.CheckDamage(petStage, (teamIndex%2)+1, petStage.GetTeam((teamIndex%2)+1).ActivePetIndex, 2*damage, true, true);
-            else
-                petHelper.CheckDamage(petStage, (teamIndex%2)+1, petStage.GetTeam((teamIndex%2)+1).ActivePetIndex, damage, true, true);
-
-            //petStage.GetTeam((teamIndex%2)+1).ActivePet.AddAura(500, 4, true, teamIndex, petStage.GetTeam(teamIndex).ActivePetIndex, petStage.GetTeam(teamIndex).ActivePet.Power);
-            petHelper.CheckCleansingRain(petStage, teamIndex, petStage.GetTeam(teamIndex).ActivePetIndex, 500, 4, true, petStage.GetTeam(teamIndex).ActivePet.Power);
-			petStage.GetTeam((teamIndex%2)+1).ActivePet.AddStatus(PetStatus.Burning);
+            for (var i=0; i < randomNumHits; i++)
+            {
+                numHits += 1;
+                if (isCritting && critHit == i+1)
+                    petHelper.CheckDamage(petStage, (teamIndex%2)+1, petStage.GetTeam((teamIndex%2)+1).ActivePetIndex, 2*damage, true, true);
+                else
+                    petHelper.CheckDamage(petStage, (teamIndex%2)+1, petStage.GetTeam((teamIndex%2)+1).ActivePetIndex, damage, true, true);
+            }
         }
 
         return numHits;

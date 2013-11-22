@@ -1,4 +1,4 @@
-// Drowsy - Aura
+// Soothing Mists - Ability
 import QtQuick 2.0
 
 import PetAction 1.0
@@ -47,8 +47,7 @@ Item
     //Apply the aura's effect at the end of the turn.
     function applyAuraEnd(teamIndex, petIndex, auraIndex, duration)
     {
-        if (petStage.GetTeam(teamIndex).GetPet(petIndex).Type != PetType.Critter)
-            petStage.GetTeam(teamIndex).GetPet(petIndex).AddAura(498, 2, true);
+
     }
 
     //Grants the pet any special statuses the ability has.
@@ -61,6 +60,8 @@ Item
     function useAbility(teamIndex, curRound, isFirst, isAvoiding,
                         isHitting, isCritting, isProcing)
     {
+        petStage.GetTeam(teamIndex).GetPet(0).AddAura(395, 5, true, teamIndex, petStage.GetTeam(teamIndex).ActivePetIndex, petStage.GetTeam(teamIndex).ActivePet.Power);
+
         return 0;
     }
 }

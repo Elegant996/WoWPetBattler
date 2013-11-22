@@ -63,7 +63,8 @@ Item
         //Check whether it is avoid/crit/hit/proc.
         if (!isAvoiding && isHitting)
         {
-            petStage.GetTeam((teamIndex%2)+1).ActivePet.AddAura(496, 1, true);
+            if (petStage.GetTeam((teamIndex%2)+1).ActivePet.Type != PetType.Critter)
+                petStage.GetTeam((teamIndex%2)+1).ActivePet.AddAura(496, 1, true);
         }
 
         return 0;

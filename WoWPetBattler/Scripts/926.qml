@@ -1,4 +1,4 @@
-// Asleep - Ability
+// Asleep - Aura
 import QtQuick 2.0
 
 import PetAction 1.0
@@ -17,7 +17,7 @@ Item
     //Returns the accuracy of the pet given the move.
     function getAccuracyRating(teamIndex)
     {
-        return 1;
+        return 2;
     }
 
     //Returns the critical strike rating of the pet given the move.

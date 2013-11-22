@@ -1,4 +1,4 @@
-// Flame Breath - Ability
+// Alpha Strike - Ability
 import QtQuick 2.0
 
 import PetAction 1.0
@@ -17,7 +17,7 @@ Item
     //Returns the accuracy of the pet given the move.
     function getAccuracyRating(teamIndex)
     {
-        return 1;
+        return 0.95;
     }
 
     //Returns the critical strike rating of the pet given the move.
@@ -61,28 +61,41 @@ Item
                         isHitting, isCritting, isProcing)
     {
         var numHits = 0;
-        var scaleFactor = 0.80;
-        var baseDamage = 16;
-        var attackType = PetType.Dragonkin;
+        var scaleFactor = 0.75;
+        var baseDamage = 15;
+        var attackType = PetType.Flying;
         var normalDamage = Math.round(baseDamage + petStage.GetTeam(teamIndex).ActivePet.Power * scaleFactor);
         var damage = Math.round((normalDamage - petStage.GetTeam((teamIndex%2)+1).ActivePet.DamageOffset)
                         * petType.GetEffectiveness(attackType, petStage.GetTeam((teamIndex%2)+1).ActivePet.Type)
                         * petStage.GetTeam((teamIndex%2)+1).ActivePet.DefenseModifier
-                        * (petStage.GetTeam(teamIndex).ActivePet.DamageModifier
-							+ petHelper.CheckWeatherDamageBonus(petStage, attackType)));
+                        * petStage.GetTeam(teamIndex).ActivePet.DamageModifier);
 
         //Check whether it is avoid/crit/hit/proc.
-        if (!isAvoiding && isHitting)
+        if (!isAvoiding)
         {
-            numHits += 1;
-            if (isCritting)
-                petHelper.CheckDamage(petStage, (teamIndex%2)+1, petStage.GetTeam((teamIndex%2)+1).ActivePetIndex, 2*damage, true, true);
-            else
-                petHelper.CheckDamage(petStage, (teamIndex%2)+1, petStage.GetTeam((teamIndex%2)+1).ActivePetIndex, damage, true, true);
+            if (isHitting)
+            {
+                numHits += 1;
+                if (isCritting)
+                    petHelper.CheckDamage(petStage, (teamIndex%2)+1, petStage.GetTeam((teamIndex%2)+1).ActivePetIndex, 2*damage, true, true);
+                else
+                    petHelper.CheckDamage(petStage, (teamIndex%2)+1, petStage.GetTeam((teamIndex%2)+1).ActivePetIndex, damage, true, true);
+            }
 
-            //petStage.GetTeam((teamIndex%2)+1).ActivePet.AddAura(500, 4, true, teamIndex, petStage.GetTeam(teamIndex).ActivePetIndex, petStage.GetTeam(teamIndex).ActivePet.Power);
-            petHelper.CheckCleansingRain(petStage, teamIndex, petStage.GetTeam(teamIndex).ActivePetIndex, 500, 4, true, petStage.GetTeam(teamIndex).ActivePet.Power);
-			petStage.GetTeam((teamIndex%2)+1).ActivePet.AddStatus(PetStatus.Burning);
+            //If the other team's active pet is slower.
+            if (petStage.GetTeam(teamIndex).ActivePet.Speed > petStage.GetTeam((teamIndex%2)+1).ActivePet.Speed)
+            {
+                numHits += 1;
+                scaleFactor = 0.5;
+                baseDamage = 10;
+                normalDamage = Math.round(baseDamage + petStage.GetTeam(teamIndex).ActivePet.Power * scaleFactor);
+                damage = Math.round((normalDamage - petStage.GetTeam((teamIndex%2)+1).ActivePet.DamageOffset)
+                                * petType.GetEffectiveness(attackType, petStage.GetTeam((teamIndex%2)+1).ActivePet.Type)
+                                * petStage.GetTeam((teamIndex%2)+1).ActivePet.DefenseModifier
+                                * petStage.GetTeam(teamIndex).ActivePet.DamageModifier);
+
+                petHelper.CheckDamage(petStage, (teamIndex%2)+1, petStage.GetTeam((teamIndex%2)+1).ActivePetIndex, damage, true, true);
+            }
         }
 
         return numHits;

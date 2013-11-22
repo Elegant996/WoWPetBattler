@@ -1,4 +1,4 @@
-// Drowsy - Aura
+// Wind-Up - Aura
 import QtQuick 2.0
 
 import PetAction 1.0
@@ -35,7 +35,7 @@ Item
     //Apply the aura's effect at the start of the turn.
     function applyAuraStart(teamIndex, petIndex, auraIndex, duration)
     {
-
+        petStage.GetTeam(teamIndex).GetPet(petIndex).DamageModifier += 0.10;
     }
 
     //Applies the aura effect to the active pet.
@@ -47,8 +47,7 @@ Item
     //Apply the aura's effect at the end of the turn.
     function applyAuraEnd(teamIndex, petIndex, auraIndex, duration)
     {
-        if (petStage.GetTeam(teamIndex).GetPet(petIndex).Type != PetType.Critter)
-            petStage.GetTeam(teamIndex).GetPet(petIndex).AddAura(498, 2, true);
+
     }
 
     //Grants the pet any special statuses the ability has.

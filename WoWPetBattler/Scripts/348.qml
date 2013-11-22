@@ -1,4 +1,4 @@
-// Drowsy - Aura
+// Bash - Ability
 import QtQuick 2.0
 
 import PetAction 1.0
@@ -47,8 +47,7 @@ Item
     //Apply the aura's effect at the end of the turn.
     function applyAuraEnd(teamIndex, petIndex, auraIndex, duration)
     {
-        if (petStage.GetTeam(teamIndex).GetPet(petIndex).Type != PetType.Critter)
-            petStage.GetTeam(teamIndex).GetPet(petIndex).AddAura(498, 2, true);
+
     }
 
     //Grants the pet any special statuses the ability has.
@@ -61,6 +60,12 @@ Item
     function useAbility(teamIndex, curRound, isFirst, isAvoiding,
                         isHitting, isCritting, isProcing)
     {
+        if (!isAvoiding && isHitting)
+            if (petStage.GetTeam((teamIndex%2)+1).ActivePet.Type != PetType.Critter
+                    || (petStage.GetTeam(0).GetPet(0).NumAuras > 0
+                    && petStage.GetTeam(0).GetPet(0).GetAura(1).AuraId == 590))
+                petStage.GetTeam((teamIndex%2)+1).ActivePet.AddAura(174, 1, !isFirst);
+
         return 0;
     }
 }

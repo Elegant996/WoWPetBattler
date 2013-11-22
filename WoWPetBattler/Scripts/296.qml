@@ -17,7 +17,7 @@ Item
     //Returns the accuracy of the pet given the move.
     function getAccuracyRating(teamIndex)
     {
-        return 0.95;
+        return 1;
     }
 
     //Returns the critical strike rating of the pet given the move.

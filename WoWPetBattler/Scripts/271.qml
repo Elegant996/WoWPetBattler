@@ -1,4 +1,4 @@
-// Drowsy - Aura
+// Glowing Toxin - Aura
 import QtQuick 2.0
 
 import PetAction 1.0
@@ -47,8 +47,9 @@ Item
     //Apply the aura's effect at the end of the turn.
     function applyAuraEnd(teamIndex, petIndex, auraIndex, duration)
     {
-        if (petStage.GetTeam(teamIndex).GetPet(petIndex).Type != PetType.Critter)
-            petStage.GetTeam(teamIndex).GetPet(petIndex).AddAura(498, 2, true);
+        var damage = Math.round(petStage.GetTeam(teamIndex).GetPet(petIndex).MaxHealth * 0.06);
+
+        petHelper.CheckDamage(petStage, teamIndex, petIndex, damage, false, false);
     }
 
     //Grants the pet any special statuses the ability has.
