@@ -63,6 +63,6 @@ Item
         if (!isAvoiding && isHitting)
          petStage.GetTeam((teamIndex%2)+1).ActivePet.AddAura(542, 2, true);
 
-        return numHits;
+        return 0;
     }
 }
