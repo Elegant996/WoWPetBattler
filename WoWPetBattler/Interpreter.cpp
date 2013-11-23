@@ -231,10 +231,10 @@ void Interpreter::LoadPreferences()
 	setting.beginGroup("Options");
 
 	//Fetch Aero preferences.
-	this->aeroDisabled = !setting.value("DisableAero", true).toBool();
+	this->aeroDisabled = !setting.value("DisableAero", false).toBool();
 
 	//Fetch Queue preferences.
-	this->queueEnabled = setting.value("PvPEnabled", true).toBool();
+	this->queueEnabled = setting.value("PvPEnabled", false).toBool();
 
 	//Close Options group.
 	setting.endGroup();

@@ -227,10 +227,10 @@ void Preferences::Load()
 	//Open Options group.
 	setting.beginGroup("Options");
 
-	this->ui.aeroCheckBox->setChecked(setting.value("DisableAero", true).toBool());		//Fetch whether to disable Aero.
+	this->ui.aeroCheckBox->setChecked(setting.value("DisableAero", false).toBool());	//Fetch whether to disable Aero.
 	this->ui.tieCheckBox->setChecked(setting.value("AutoDecideTies", true).toBool());	//Fetch whether to auto decide ties.
 	this->ui.passCheckBox->setChecked(setting.value("CanPass", false).toBool());		//Fetch whether a pet can pass.
-	this->ui.PvPCheckBox->setChecked(setting.value("PvPEnabled", true).toBool());		//Fetch whether PvP is enabled.
+	this->ui.PvPCheckBox->setChecked(setting.value("PvPEnabled", false).toBool());		//Fetch whether PvP is enabled.
 
 	this->ui.depthSlider->setValue(setting.value("TurnDepth", 3).toInt());				//Store turn depth.
 	
