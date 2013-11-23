@@ -62,9 +62,8 @@ Item
 
         petHelper.CheckDamage(petStage, teamIndex, petIndex, 2*damage, false, false);
 
-        if (petStage.GetTeam((teamIndex%2)+1).ActivePet.Type != PetType.Critter
-                || (petStage.GetTeam(0).GetPet(0).NumAuras > 0
-                && petStage.GetTeam(0).GetPet(0).GetAura(1).AuraId == 590))
+        if (petStage.GetTeam(teamIndex).GetPet(petIndex).Type != PetType.Critter
+                && !petStage.GetTeam(0).GetPet(0).HasAura(590))
         {
             petStage.GetTeam(teamIndex).GetPet(petIndex).AddAura(248, 2, true);
             petStage.GetTeam(teamIndex).GetPet(petIndex).AddStatus(PetStatus.Rooted);

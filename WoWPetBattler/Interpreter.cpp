@@ -11,6 +11,7 @@ Interpreter::Interpreter(PetStage* petStage, AI* ai, Robot::Window *window) :
 	this->points = new Robot::Point[40];
 	this->pixels = new Robot::Color[40];
 	this->timeoutCount = 0;
+	this->threadLocked = false;
 
 	//Load preferences.
 	this->LoadPreferences();
@@ -20,8 +21,8 @@ Interpreter::Interpreter(PetStage* petStage, AI* ai, Robot::Window *window) :
 Interpreter::~Interpreter(void)
 {
 	delete[] this->pixels;
-	delete[] points;
-	delete image;
+	delete[] this->points;
+	delete this->image;
 }
 
 //Exits the loop.
@@ -33,7 +34,7 @@ void Interpreter::Exit()
 	this->running = false;
 	this->timeoutCount = 0;
 	if (!wait(2000))
-		terminate();
+		this->terminate();
 
 	this->petStage->Reinitialize();		//Thread activity has stopped; reinitialize the stage.
 }
@@ -45,10 +46,10 @@ void Interpreter::run()
 	this->LoadPreferences();
 
 	//Make AI reload its settings incase something changed.
-	ai->LoadPreferences();
+	this->ai->LoadPreferences();
 
 	//Have the AI load its QML resources.
-	ai->LoadQMLResources();
+	this->ai->LoadQMLResources();
 
 	//Update bools in case we run it again.
 	this->running = true;
@@ -106,13 +107,14 @@ void Interpreter::run()
 				|| this->pixels[28].R != this->pixels[3].G || this->pixels[28].G != build || this->pixels[28].B != this->pixels[12].R
 				|| this->pixels[36].R != build || this->pixels[36].G != this->pixels[0].R || this->pixels[36].B != this->pixels[9].G)
 		{
-			readSuccess = false;
-			oneTimeNotifier = false;
+			this->readSuccess = false;
+			this->oneTimeNotifier = false;
 			continue;
 		}
 
 		//Lock the access so only this thread can access petStage to update it.
-		mutex.lock();
+		this->mutex.lock();
+		this->threadLocked = true;
 
 		//Setup pet teams if we are now initialized and inform the user of the opponent's pets.
 		if ((!this->petStage->Initialized() && (this->pixels[0].G & 64) != 0))
@@ -155,7 +157,8 @@ void Interpreter::run()
 					}
 
 			//Constantly update if the opponent's pet is dead.
-			while (this->petStage->GetTeam(2)->GetActivePet()->IsDead()	&& !this->petStage->GetTeam(1)->GetActivePet()->IsDead())
+			while (this->petStage->GetTeam(2)->GetActivePet()->IsDead()	&& !this->petStage->GetTeam(2)->IsTeamDead()
+					&& !this->petStage->GetTeam(1)->GetActivePet()->IsDead())
 				this->UpdateAbilities();
 
 			//Call AI and have it determine our next move.
@@ -211,7 +214,8 @@ void Interpreter::run()
 		if (33 - elapsed > 0)
 			msleep(33 - elapsed);
 		timer.restart();
-		mutex.unlock();
+		this->mutex.unlock();
+		this->threadLocked = false;
 	}
 }
 

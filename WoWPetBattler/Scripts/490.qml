@@ -1,4 +1,4 @@
-// Scratch - Ability
+// Deflection - Ability
 import QtQuick 2.0
 
 import PetAction 1.0
@@ -17,7 +17,7 @@ Item
     //Returns the accuracy of the pet given the move.
     function getAccuracyRating(teamIndex)
     {
-        return 0.95;
+        return 0;
     }
 
     //Returns the critical strike rating of the pet given the move.
@@ -60,27 +60,9 @@ Item
     function useAbility(teamIndex, curRound, isFirst, isAvoiding,
                         isHitting, isCritting, isProcing)
     {
-        var numHits = 0;
-        var scaleFactor = 1.1;
-        var baseDamage = 22;
-        var attackType = PetType.Critter;
-        var normalDamage = Math.round(baseDamage + petStage.GetTeam(teamIndex).ActivePet.Power * scaleFactor);
-        var damage = Math.round((normalDamage - petStage.GetTeam((teamIndex%2)+1).ActivePet.DamageOffset)
-                        * petType.GetEffectiveness(attackType, petStage.GetTeam((teamIndex%2)+1).ActivePet.Type)
-                        * petStage.GetTeam((teamIndex%2)+1).ActivePet.DefenseModifier
-                        * (petStage.GetTeam(teamIndex).ActivePet.DamageModifier
-                           + CheckWeatherDamageBonus(petStage, attackType)));
+        //Grants 100% avoidance.
+        petStage.GetTeam(teamIndex).ActivePet.AvoidanceRating += 1;
 
-        //Check whether it is avoid/crit/hit/proc.
-        if (!isAvoiding && isHitting)
-        {
-            numHits += 1;
-            if (isCritting)
-                petHelper.CheckDamage(petStage, (teamIndex%2)+1, petStage.GetTeam((teamIndex%2)+1).ActivePetIndex, 2*damage, true, true);
-            else
-                petHelper.CheckDamage(petStage, (teamIndex%2)+1, petStage.GetTeam((teamIndex%2)+1).ActivePetIndex, damage, true, true);
-        }
-
-        return numHits;
+        return 0;
     }
 }

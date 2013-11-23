@@ -47,7 +47,9 @@ Item
     //Apply the aura's effect at the end of the turn.
     function applyAuraEnd(teamIndex, petIndex, auraIndex, duration)
     {
-
+        if (!petStage.GetTeam(teamIndex).GetPet(petIndex).GetAura(auraIndex).IsFresh
+                && duration == 1)
+            petStage.GetTeam(teamIndex).GetPet(petIndex).AddAura(924, 2, true);
     }
 
     //Grants the pet any special statuses the ability has.

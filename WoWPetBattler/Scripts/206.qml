@@ -68,7 +68,8 @@ Item
         var damage = Math.round((normalDamage - petStage.GetTeam((teamIndex%2)+1).ActivePet.DamageOffset)
                         * petType.GetEffectiveness(attackType, petStage.GetTeam((teamIndex%2)+1).ActivePet.Type)
                         * petStage.GetTeam((teamIndex%2)+1).ActivePet.DefenseModifier
-                        * petStage.GetTeam(teamIndex).ActivePet.DamageModifier);
+                        * (petStage.GetTeam(teamIndex).ActivePet.DamageModifier
+                           + CheckWeatherDamageBonus(petStage, attackType)));
 
         //Check whether it is avoid/crit/hit/proc and opponent is not of the Elemental type.
         if (!isAvoiding && isHitting && petStage.GetTeam((teamIndex%2)+1).ActivePet.Type != PetType.Elemental)

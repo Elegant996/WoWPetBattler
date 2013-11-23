@@ -1,4 +1,4 @@
-// Scratch - Ability
+// Rupture - Ability
 import QtQuick 2.0
 
 import PetAction 1.0
@@ -29,7 +29,7 @@ Item
     //Returns the chance on hit rating if the move has any.
     function getChanceOnHitRating(teamIndex)
     {
-        return 0;
+        return 0.25;
     }
 
     //Apply the aura's effect at the start of the turn.
@@ -61,9 +61,9 @@ Item
                         isHitting, isCritting, isProcing)
     {
         var numHits = 0;
-        var scaleFactor = 1.1;
-        var baseDamage = 22;
-        var attackType = PetType.Critter;
+        var scaleFactor = 1.5;
+        var baseDamage = 30;
+        var attackType = PetType.Elemental;
         var normalDamage = Math.round(baseDamage + petStage.GetTeam(teamIndex).ActivePet.Power * scaleFactor);
         var damage = Math.round((normalDamage - petStage.GetTeam((teamIndex%2)+1).ActivePet.DamageOffset)
                         * petType.GetEffectiveness(attackType, petStage.GetTeam((teamIndex%2)+1).ActivePet.Type)
@@ -79,6 +79,15 @@ Item
                 petHelper.CheckDamage(petStage, (teamIndex%2)+1, petStage.GetTeam((teamIndex%2)+1).ActivePetIndex, 2*damage, true, true);
             else
                 petHelper.CheckDamage(petStage, (teamIndex%2)+1, petStage.GetTeam((teamIndex%2)+1).ActivePetIndex, damage, true, true);
+
+            if (isProcing)
+                if (petStage.GetTeam((teamIndex%2)+1).ActivePet.Type != PetType.Critter
+					&& !petStage.GetTeam((teamIndex%2)+1).ActivePet.HasAura(924)
+                    && !petStage.GetTeam(0).GetPet(0).HasAura(590))
+                {
+                    petStage.GetTeam((teamIndex%2)+1).ActivePet.AddAura(174, 1, !isFirst);
+                    petStage.GetTeam((teamIndex%2)+1).ActivePet.AddStatus(PetStatus.Stunned);
+                }
         }
 
         return numHits;

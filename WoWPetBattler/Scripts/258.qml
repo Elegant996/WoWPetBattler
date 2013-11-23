@@ -78,7 +78,8 @@ Item
                 var damage = Math.round((normalDamage - petStage.GetTeam((teamIndex%2)+1).GetPet(i).DamageOffset)
                                 * petType.GetEffectiveness(attackType, petStage.GetTeam((teamIndex%2)+1).ActivePet.Type)
                                 * petStage.GetTeam((teamIndex%2)+1).GetPet(i).DefenseModifier
-                                * petStage.GetTeam(teamIndex).ActivePet.DamageModifier);
+                                * (petStage.GetTeam(teamIndex).ActivePet.DamageModifier
+									+ CheckWeatherDamageBonus(petStage, attackType)));
 
                 numHits += 1;
                 if (petStage.GetTeam((teamIndex%2)+1).GetPet(i).Type != PetType.Elemental)
@@ -95,7 +96,8 @@ Item
                 var damage = Math.round((normalDamage - petStage.GetTeam((teamIndex%2)+1).GetPet(i).DamageOffset)
                                 * petType.GetEffectiveness(attackType, petStage.GetTeam((teamIndex%2)+1).ActivePet.Type)
                                 * petStage.GetTeam((teamIndex%2)+1).GetPet(i).DefenseModifier
-                                * petStage.GetTeam(teamIndex).ActivePet.DamageModifier);
+                                * (petStage.GetTeam(teamIndex).ActivePet.DamageModifier
+									+ CheckWeatherDamageBonus(petStage, attackType)));
 
                 numHits += 1;
                 if (petStage.GetTeam((teamIndex%2)+1).GetPet(i).Type != PetType.Elemental)
