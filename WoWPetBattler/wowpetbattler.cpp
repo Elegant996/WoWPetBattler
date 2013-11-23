@@ -46,7 +46,7 @@ WoWPetBattler::WoWPetBattler(QWidget *parent)
 
 	//Create Species folder if it does not exist.
 	if (!QDir("Species").exists())
-		QDir().mkdir("Scripts");
+		QDir().mkdir("Species");
 
 	//Create Scripts folder if it does not exist.
 	if (!QDir("Scripts").exists())

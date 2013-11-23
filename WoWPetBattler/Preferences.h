@@ -2,7 +2,6 @@
 #define PREFERENCES_H
 
 #include <QDialog>
-#include <QDebug>
 #include <QSettings>
 
 #include "UI_Preferences.h"

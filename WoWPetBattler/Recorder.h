@@ -1,8 +1,6 @@
 #ifndef RECORDER_H
 #define RECORDER_H
 
-#include <QDebug>
-
 #include <QDir>
 #include <QFile>
 #include <QJsonArray>
