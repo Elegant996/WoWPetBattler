@@ -16,7 +16,7 @@ public:
 	static void CheckRacialsProc(PetStage*, quint8);
 	static void CheckRacials(Pet*);
 	Q_INVOKABLE static void CheckAuraPower(PetStage*, PetAura*, quint8, quint16);
-	Q_INVOKABLE static void CheckCleansingRain(PetStage*, quint8, quint8, quint16, qint8, bool, quint16);
+	Q_INVOKABLE static void CheckCleansingRain(PetStage*, quint8, quint8, quint16, qint8, bool, quint8, quint8, quint16);
 	Q_INVOKABLE static float CheckWeatherDamageBonus(PetStage*, quint8);
 
 private:

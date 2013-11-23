@@ -219,6 +219,9 @@ void Interpreter::run()
 		this->mutex.unlock();
 		this->threadLocked = false;
 	}
+
+	if (!this->running)
+		emit OutputToGUI("Not Running", "");
 }
 
 //Load preferences for main window.

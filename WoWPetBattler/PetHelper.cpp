@@ -193,12 +193,13 @@ void PetHelper::CheckAuraPower(PetStage* petStage, PetAura *curAura, quint8 team
 }
 
 //Checks if a weather effect can decrease the duration of a harmful effect.
-void PetHelper::CheckCleansingRain(PetStage* petStage, quint8 teamIndex, quint8 petIndex, quint16 auraId, qint8 duration, bool isFresh, quint16 power)
+void PetHelper::CheckCleansingRain(PetStage* petStage, quint8 teamIndex, quint8 petIndex, quint16 auraId, qint8 duration, bool isFresh,
+								   quint8 casterTeamIndex, quint8 casterPetIndex, quint16 power)
 {
-	if (petStage->GetTeam(0)->GetPet(0)->GetNumAuras() > 0 && petStage->GetTeam(0)->GetPet(0)->GetAura(1)->GetAuraId() == 229)
-		petStage->GetTeam(teamIndex)->GetPet(petIndex)->AddAura(auraId, duration-1, isFresh, 0, 0, power);
+	if (petStage->GetTeam(0)->GetPet(0)->HasAura(229))
+		petStage->GetTeam(teamIndex)->GetPet(petIndex)->AddAura(auraId, duration-1, isFresh, casterTeamIndex, casterPetIndex, power);
 	else
-		petStage->GetTeam(teamIndex)->GetPet(petIndex)->AddAura(auraId, duration, isFresh, 0, 0, power);
+		petStage->GetTeam(teamIndex)->GetPet(petIndex)->AddAura(auraId, duration, isFresh, casterTeamIndex, casterPetIndex, power);
 }
 
 //Checks to see if there is a bonus to be gained from weather and applies it.
