@@ -69,7 +69,7 @@ Item
                         * petType.GetEffectiveness(attackType, petStage.GetTeam((teamIndex%2)+1).ActivePet.Type)
                         * petStage.GetTeam((teamIndex%2)+1).ActivePet.DefenseModifier
                         * (petStage.GetTeam(teamIndex).ActivePet.DamageModifier
-                           + CheckWeatherDamageBonus(petStage, attackType)));
+                           + petHelper.CheckWeatherDamageBonus(petStage, attackType)));
 
         //Used below.
         var randomNumHits = Math.floor((Math.random()*3)+1);
