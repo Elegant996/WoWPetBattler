@@ -66,7 +66,7 @@ void PetHelper::CheckDamage(PetStage *petStage, quint8 teamIndex, quint8 petInde
 			}
 		}
 		//Asleep.
-		else if (currentPet->GetAura(i)->GetAuraId() == 498 || currentPet->GetAura(i)->GetAuraId() == 926)
+		else if (currentPet->GetAura(i)->GetAuraId() == 498 || currentPet->GetAura(i)->GetAuraId() == 926 || currentPet->GetAura(i)->GetAuraId() == 496)
 		{
 			currentPet->RemoveStatus(Pet::Asleep);
 			currentPet->RemoveAura(i);

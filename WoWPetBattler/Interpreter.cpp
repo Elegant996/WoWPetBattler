@@ -158,7 +158,7 @@ void Interpreter::run()
 
 			//Constantly update if the opponent's pet is dead.
 			while (this->petStage->GetTeam(2)->GetActivePet()->IsDead()	&& !this->petStage->GetTeam(2)->IsTeamDead()
-					&& !this->petStage->GetTeam(1)->GetActivePet()->IsDead())
+					&& this->petStage->GetTeam(2)->GetNumPets() > 0 && !this->petStage->GetTeam(1)->GetActivePet()->IsDead())
 				this->UpdateAbilities();
 
 			//Call AI and have it determine our next move.
