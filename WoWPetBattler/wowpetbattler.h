@@ -3,7 +3,6 @@
 
 #include <QtWidgets/QMainWindow>
 #include <QThread>
-#include <QDebug> //To be removed.
 #include <QtQml>
 
 #include <Process.h>
@@ -45,7 +44,6 @@ private:
 	Ui::WoWPetBattlerMainWindow ui;
 	Preferences *preferences;
 
-	Robot::Taskbar taskbar;
 	Robot::Window GUIWindow, WoWWindow;
 	Robot::Process process;
 

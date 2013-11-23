@@ -4,12 +4,12 @@
 #include <QObject>
 #include <QThread>
 #include <QElapsedTimer>
-#include <QDebug>
 
 #include <Bounds.h>
 #include <Color.h>
 #include <Image.h>
 #include <Point.h>
+#include <Screen.h>
 #include <Window.h>
 
 #include "AI.h"

@@ -6,11 +6,11 @@
 #include <Windows.h>
 
 #include <QObject>
-#include <QDebug>
 #include <QSettings>
 #include <QtQml>
 
-#include <Robot.h>
+#include <Keyboard.h>
+#include <Window.h>
 
 #include "Move.h"
 #include "PetHelper.h"
@@ -53,7 +53,6 @@ private:
 
 	PetStage *petStage;
 	Robot::Window *window;
-	Robot::Keyboard keyboard;
 
 	QQmlEngine *engine;
 	QQmlContext *objectContext;
