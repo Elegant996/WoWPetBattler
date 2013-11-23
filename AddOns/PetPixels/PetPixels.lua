@@ -176,7 +176,8 @@ function events:PET_BATTLE_PET_ROUND_PLAYBACK_COMPLETE(...)
 		if (roundLockoutCount[enemyTeam] == 0) then enemyCurrentMove = 0; end
 
 		selectPet = C_PetBattles.ShouldShowPetSelect();
-		selectAbility = (roundLockoutCount[myTeam] <= 0) and true or false;
+		selectAbility = (roundLockoutCount[myTeam] <= 0) and petsCurrentHP[myTeam][teamsActivePet[myTeam]] ~= 0 
+						and petsCurrentHP[enemyTeam][teamsActivePet[enemyTeam]] ~= 0  and true or false;
 	else		
 		for i=0, teams do
 			teamSize[i], teamsActivePet[i] = C_PetBattles.GetNumPets(i), C_PetBattles.GetActivePet(i);

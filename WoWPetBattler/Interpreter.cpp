@@ -11,6 +11,7 @@ Interpreter::Interpreter(PetStage* petStage, AI* ai, Robot::Window *window) :
 	this->points = new Robot::Point[40];
 	this->pixels = new Robot::Color[40];
 	this->timeoutCount = 0;
+	this->signalEmitted = false;
 	this->threadLocked = false;
 
 	//Load preferences.
@@ -29,8 +30,9 @@ Interpreter::~Interpreter(void)
 void Interpreter::Exit()
 {
 	//Unlock the thread.
-	if (this->readSuccess && !this->oneTimeNotifier)
+	if ((this->readSuccess && !this->oneTimeNotifier) || !this->petStage->TeamIsAlive())
 		this->mutex.unlock();
+
 	this->running = false;
 	this->timeoutCount = 0;
 	if (!wait(2000))
@@ -55,6 +57,8 @@ void Interpreter::run()
 	this->running = true;
 	this->readSuccess = false;
 	this->oneTimeNotifier = false;
+	this->signalEmitted = false;
+	this->threadLocked = false;
 
 	while (this->running)
 	{
@@ -137,6 +141,9 @@ void Interpreter::run()
 		//Update the stage info if we need to make a move.
 		if ((!this->petStage->SelectAbility() && (this->pixels[0].G & 16) != 0) || (!this->petStage->SelectPet() && (this->pixels[0].G & 32) != 0))
 		{
+			//Temporary delay to try and allow everything to catch up.
+			//msleep(2000);
+
 			//Update health pools.
 			this->UpdateHealthPools();
 
@@ -146,23 +153,8 @@ void Interpreter::run()
 			//Update auras on pets.
 			this->UpdateAuras();
 
-			//Prevent an issue from arising where we make a move based on having a dead pet out.
-			if (this->petStage->GetTeam(1)->GetDeathToll() == this->petStage->GetTeam(1)->GetNumPets()-1
-					&& this->petStage->GetTeam(1)->GetActivePet()->IsDead())
-				for (quint8 i=1; i < this->petStage->GetTeam(1)->GetNumPets()+1; i+=1)
-					if (!this->petStage->GetTeam(1)->GetPet(i)->IsDead())
-					{
-						this->petStage->GetTeam(1)->SetActivePet(i);
-						break;
-					}
-
-			//Constantly update if the opponent's pet is dead.
-			while (this->petStage->GetTeam(2)->GetActivePet()->IsDead()	&& !this->petStage->GetTeam(2)->IsTeamDead()
-					&& this->petStage->GetTeam(2)->GetNumPets() > 0 && !this->petStage->GetTeam(1)->GetActivePet()->IsDead())
-				this->UpdateAbilities();
-
 			//Call AI and have it determine our next move.
-			this->ai->Run(this->petStage->Initialized() || (this->pixels[0].G & 64) != 0);
+			//this->ai->Run(this->petStage->Initialized() || (this->pixels[0].G & 64) != 0);
 
 			//Delete all auras.
 			for (quint8 i=0; i < 3; i+=1)
@@ -202,11 +194,11 @@ void Interpreter::run()
 		//Stop if conditions are met.
 		if (!this->petStage->InPetBattle())
 		{
-			if (!this->petStage->TeamIsAlive()) { emit Stop("A pet on your team has fainted. Stopping..."); continue; }
-			if (this->petStage->PlayerIsGhost()) { emit Stop("Cannot queue while a ghost. Stopping..."); continue; }
-			if (this->petStage->PlayerIsDead()) { emit Stop("Cannot queue while dead. Stopping..."); continue; }
-			if (this->petStage->PlayerAffectingCombat()) { emit Stop("Cannot queue while in combat. Stopping..."); continue; }
-			if (!this->petStage->QueueEnabled()) { emit Stop("Queue system not enabled. Stopping..."); continue; }
+			if (!this->petStage->TeamIsAlive() && !signalEmitted) { emit Stop("A pet on your team has fainted. Stopping..."); signalEmitted = true; continue; }
+			if (this->petStage->PlayerIsGhost() && !signalEmitted) { emit Stop("Cannot queue while a ghost. Stopping..."); signalEmitted = true; continue; }
+			if (this->petStage->PlayerIsDead() && !signalEmitted) { emit Stop("Cannot queue while dead. Stopping..."); signalEmitted = true; continue; }
+			if (this->petStage->PlayerAffectingCombat() && !signalEmitted) { emit Stop("Cannot queue while in combat. Stopping..."); signalEmitted = true; continue; }
+			if (!this->petStage->QueueEnabled() && !signalEmitted) { emit Stop("Queue system not enabled. Stopping..."); signalEmitted = true; continue; }
 		}
 
 		//Stop timer, sleep if needed and then reset the timer.

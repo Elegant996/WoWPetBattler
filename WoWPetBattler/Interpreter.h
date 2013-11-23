@@ -62,7 +62,7 @@ private:
 
 	Robot::Bounds addonBar1, addonBar2;
 
-	bool readSuccess, oneTimeNotifier, threadLocked;
+	bool readSuccess, oneTimeNotifier, signalEmitted, threadLocked;
 	quint16 timeoutCount;
 };
 
