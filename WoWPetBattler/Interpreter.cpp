@@ -90,7 +90,7 @@ void Interpreter::run()
 				continue;
 			}
 
-			emit OutputToGUI("Running", "Addon located.");
+			emit OutputToGUI("Waiting For Battle", "Addon located.");
 			this->readSuccess = true;
 			this->timeoutCount = 0;
 		}
@@ -153,8 +153,14 @@ void Interpreter::run()
 			//Update auras on pets.
 			this->UpdateAuras();
 
+			//Inform the user we are now selecting a move.
+			emit this->OutputToGUI("Selecting Ability", "");
+
 			//Call AI and have it determine our next move.
-			//this->ai->Run(this->petStage->Initialized() || (this->pixels[0].G & 64) != 0);
+			this->ai->Run(this->petStage->Initialized() || (this->pixels[0].G & 64) != 0);
+
+			//Inform the user we are now selecting a move.
+			emit OutputToGUI("Round Playback", "");
 
 			//Delete all auras.
 			for (quint8 i=0; i < 3; i+=1)
@@ -173,7 +179,7 @@ void Interpreter::run()
 				emit OutputToGUI("You lose.");
 			
 			//Record data.
-			emit OutputToGUI("Recording data...");
+			emit OutputToGUI("Recording Results", "Recording data...");
 			QString outputRecord = Recorder::RecordBattle(this->petStage);
 			if (petStage->IsPvPBattle())
 				Recorder::RecordPets(this->petStage);
@@ -182,6 +188,8 @@ void Interpreter::run()
 			emit OutputToGUI("Recording complete.");
 
 			this->petStage->Reinitialize();			//We've just left a pet battle so let's reset the stage.
+
+			emit OutputToGUI("Waiting For Battle", "");
 		}
 		else if (queueEnabled && this->petStage->QueueState() != 3 && (this->pixels[0].R & 3) == 3)
 			this->ai->AcceptQueue();
@@ -199,6 +207,8 @@ void Interpreter::run()
 			if (this->petStage->PlayerIsDead() && !signalEmitted) { emit Stop("Cannot queue while dead. Stopping..."); signalEmitted = true; continue; }
 			if (this->petStage->PlayerAffectingCombat() && !signalEmitted) { emit Stop("Cannot queue while in combat. Stopping..."); signalEmitted = true; continue; }
 			if (!this->petStage->QueueEnabled() && !signalEmitted) { emit Stop("Queue system not enabled. Stopping..."); signalEmitted = true; continue; }
+
+			if (!queueEnabled) emit OutputToGUI("Waiting For Battle", "");
 		}
 
 		//Stop timer, sleep if needed and then reset the timer.

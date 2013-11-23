@@ -48,11 +48,11 @@ void Preferences::on_minAvoidanceSlider_valueChanged(int value)
 void Preferences::on_maxAvoidanceSlider_valueChanged(int value)
 {
 	//Do not allow maximum slider to reach a minimum value.
-	if (value == this->ui.maxAvoidanceSlider->minimum())
-		this->ui.maxAvoidanceSlider->setValue(value+1);
+	//if (value == this->ui.maxAvoidanceSlider->minimum())
+		//this->ui.maxAvoidanceSlider->setValue(value+1);
 
 	//Do not allow maximum slider to equal the minimum slider; bump the minimum down by 1.
-	if (value-1 < this->ui.minAvoidanceSlider->value())
+	if (value-1 < this->ui.minAvoidanceSlider->value() && this->ui.minAvoidanceSlider->value() != 0)
 		this->ui.minAvoidanceSlider->setValue(value-1);
 }
 
@@ -72,11 +72,11 @@ void Preferences::on_minHitSlider_valueChanged(int value)
 void Preferences::on_maxHitSlider_valueChanged(int value)
 {
 	//Do not allow maximum slider to reach a minimum value.
-	if (value == this->ui.maxHitSlider->minimum())
-		this->ui.maxHitSlider->setValue(value+1);
+	//if (value == this->ui.maxHitSlider->minimum())
+		//this->ui.maxHitSlider->setValue(value+1);
 
 	//Do not allow maximum slider to equal the minimum slider; bump the minimum down by 1.
-	if (value-1 < this->ui.minHitSlider->value())
+	if (value-1 < this->ui.minHitSlider->value() && this->ui.minHitSlider->value() != 0)
 		this->ui.minHitSlider->setValue(value-1);
 }
 
@@ -96,11 +96,11 @@ void Preferences::on_minCritSlider_valueChanged(int value)
 void Preferences::on_maxCritSlider_valueChanged(int value)
 {
 	//Do not allow maximum slider to reach a minimum value.
-	if (value == this->ui.maxCritSlider->minimum())
-		this->ui.maxCritSlider->setValue(value+1);
+	//if (value == this->ui.maxCritSlider->minimum())
+		//this->ui.maxCritSlider->setValue(value+1);
 
 	//Do not allow maximum slider to equal the minimum slider; bump the minimum down by 1.
-	if (value-1 < this->ui.minCritSlider->value())
+	if (value-1 < this->ui.minCritSlider->value() && this->ui.minCritSlider->value() != 0)
 		this->ui.minCritSlider->setValue(value-1);
 }
 
@@ -120,11 +120,11 @@ void Preferences::on_minChanceOnHitSlider_valueChanged(int value)
 void Preferences::on_maxChanceOnHitSlider_valueChanged(int value)
 {
 	//Do not allow maximum slider to reach a minimum value.
-	if (value == this->ui.maxChanceOnHitSlider->minimum())
-		this->ui.maxChanceOnHitSlider->setValue(value+1);
+	//if (value == this->ui.maxChanceOnHitSlider->minimum())
+		//this->ui.maxChanceOnHitSlider->setValue(value+1);
 
 	//Do not allow maximum slider to equal the minimum slider; bump the minimum down by 1.
-	if (value-1 < this->ui.minChanceOnHitSlider->value())
+	if (value-1 < this->ui.minChanceOnHitSlider->value() && this->ui.minChanceOnHitSlider->value() != 0)
 		this->ui.minChanceOnHitSlider->setValue(value-1);
 }
 
@@ -211,7 +211,7 @@ void Preferences::Load()
 
 	//Fetch hit rating.
 	this->ui.minHitSlider->setValue(setting.value("minHitThreshold", 0).toInt());
-	this->ui.maxHitSlider->setValue(setting.value("maxHitThreshold", 20).toInt());
+	this->ui.maxHitSlider->setValue(setting.value("maxHitThreshold", 16).toInt());
 
 	//Fetch crit rating.
 	this->ui.minCritSlider->setValue(setting.value("minCritThreshold", 1).toInt());
@@ -235,9 +235,9 @@ void Preferences::Load()
 	this->ui.depthSlider->setValue(setting.value("TurnDepth", 3).toInt());				//Store turn depth.
 	
 	//Fetch heuristic from radio buttons.
-	if (setting.value("Heuristic", AI::FixedHealth).toInt() == AI::CurrentHealth)
+	if (setting.value("Heuristic", AI::CurrentHealth).toInt() == AI::CurrentHealth)
 		this->ui.currentHealthRadioButton->setChecked(true);
-	else if (setting.value("Heuristic", AI::FixedHealth).toInt() == AI::FixedHealth)
+	else if (setting.value("Heuristic", AI::CurrentHealth).toInt() == AI::FixedHealth)
 		this->ui.fixedHealthRadioButton->setChecked(true);
 
 	//Close Options group.

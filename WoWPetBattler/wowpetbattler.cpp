@@ -83,7 +83,8 @@ void WoWPetBattler::Output(QString caption, QString info)
 {
 	if (!caption.isEmpty())
 		this->ui.statusLabel->setText(caption);
-	this->ui.outputBrowser->append(info);
+	if (!info.isEmpty())
+		this->ui.outputBrowser->append(info);
 }
 
 //Output to browser without caption.

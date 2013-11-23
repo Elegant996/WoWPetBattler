@@ -33,19 +33,19 @@ void AI::LoadPreferences()
 
 	//Fetch avoidance rating.
 	this->minAvoidanceThreshold = setting.value("minAvoidanceThreshold", 0).toFloat() * 0.05;
-	this->maxAvoidanceThreshold = setting.value("maxAvoidanceThreshold", 0).toFloat() * 0.05;
+	this->maxAvoidanceThreshold = setting.value("maxAvoidanceThreshold", 20).toFloat() * 0.05;
 
 	//Fetch hit rating.
 	this->minHitThreshold = setting.value("minHitThreshold", 0).toFloat() * 0.05;
-	this->maxHitThreshold = setting.value("maxHitThreshold", 0).toFloat() * 0.05;
+	this->maxHitThreshold = setting.value("maxHitThreshold", 16).toFloat() * 0.05;
 
 	//Fetch crit rating.
 	this->minCritThreshold = setting.value("minCritThreshold", 1).toFloat() * 0.05;
-	this->maxCritThreshold = setting.value("maxCritThreshold", 1).toFloat() * 0.05;
+	this->maxCritThreshold = setting.value("maxCritThreshold", 20).toFloat() * 0.05;
 
 	//Fetch chance on hit rating.
 	this->minChanceOnHitThreshold = setting.value("minChanceOnHitThreshold", 0).toFloat() * 0.05;
-	this->maxChanceOnHitThreshold = setting.value("maxChanceOnHitThreshold", 0).toFloat() * 0.05;
+	this->maxChanceOnHitThreshold = setting.value("maxChanceOnHitThreshold", 20).toFloat() * 0.05;
 
 	//Close the group.
 	setting.endGroup();
@@ -61,7 +61,7 @@ void AI::LoadPreferences()
 	this->depth = setting.value("TurnDepth", 3).toInt();
 
 	//Fetch heuristic from radio buttons.
-	this->heuristicType = (HeuristicType)setting.value("Heuristic", AI::FixedHealth).toInt();
+	this->heuristicType = (HeuristicType)setting.value("Heuristic", AI::CurrentHealth).toInt();
 
 	//Close Options group.
 	setting.endGroup();
