@@ -61,7 +61,7 @@ Item
                         * petType.GetEffectiveness(attackType, petStage.GetTeam(teamIndex).ActivePet.Type)
                         * petStage.GetTeam(teamIndex).ActivePet.DefenseModifier);
 
-        petHelper.CheckDamage(petStage, teamIndex, petIndex, 2*damage, false, false);
+        petHelper.CheckDamage(petStage, teamIndex, petIndex, 1.5*damage, false, false);
     }
 
     //Grants the pet any special statuses the ability has.

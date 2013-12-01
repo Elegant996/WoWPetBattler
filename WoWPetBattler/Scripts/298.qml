@@ -75,7 +75,7 @@ Item
             var healing = Math.round(normalHealing * petStage.GetTeam(teamIndex).GetPet(i).HealingModifier);
 
             if (isCritting && i == randomPetIndex)
-                petHelper.CheckHealing(petStage, teamIndex, i, 2*healing, true);
+                petHelper.CheckHealing(petStage, teamIndex, i, 1.5*healing, true);
             else
                 petHelper.CheckHealing(petStage, teamIndex, i, healing, true);
         }

@@ -85,7 +85,7 @@ Item
             {
                 numHits += 1;
                 if (isCritting && critHit == i+1 && hitHit != i+1)
-                    petHelper.CheckDamage(petStage, (teamIndex%2)+1, petStage.GetTeam((teamIndex%2)+1).ActivePetIndex, 2*damage, true, true);
+                    petHelper.CheckDamage(petStage, (teamIndex%2)+1, petStage.GetTeam((teamIndex%2)+1).ActivePetIndex, 1.5*damage, true, true);
                 else if (hitHit != i+1)
                     petHelper.CheckDamage(petStage, (teamIndex%2)+1, petStage.GetTeam((teamIndex%2)+1).ActivePetIndex, damage, true, true);
             }

@@ -60,7 +60,7 @@ Item
                         * petType.GetEffectiveness(attackType, petStage.GetTeam(teamIndex).ActivePet.Type)
                         * petStage.GetTeam(teamIndex).ActivePet.DefenseModifier);
 
-        petHelper.CheckDamage(petStage, teamIndex, petIndex, 2*damage, false, false);
+        petHelper.CheckDamage(petStage, teamIndex, petIndex, 1.5*damage, false, false);
 
         if (petStage.GetTeam(teamIndex).GetPet(petIndex).Type != PetType.Critter
                 && !petStage.GetTeam(0).GetPet(0).HasAura(590))

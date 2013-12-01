@@ -78,7 +78,7 @@ Item
 
                 numHits += 1;
                 if (isCritting && i == randomPetIndex)
-                    petHelper.CheckDamage(petStage, (teamIndex%2)+1, i, 2*damage, true, false);
+                    petHelper.CheckDamage(petStage, (teamIndex%2)+1, i, 1.5*damage, true, false);
                 else
                     petHelper.CheckDamage(petStage, (teamIndex%2)+1, i, damage, true, false);
             }
@@ -93,7 +93,7 @@ Item
 
                 numHits += 1;
                 if (isCritting && i == randomPetIndex)
-                    petHelper.CheckDamage(petStage, (teamIndex%2)+1, i, 2*damage, true, false);
+                    petHelper.CheckDamage(petStage, (teamIndex%2)+1, i, 1.5*damage, true, false);
                 else
                     petHelper.CheckDamage(petStage, (teamIndex%2)+1, i, damage, true, false);
             }
