@@ -64,6 +64,7 @@ Item
         if (curRound == 1)
         {
             petStage.GetTeam(teamIndex).ActivePet.AddAura(830, -1, false);
+            petStage.GetTeam(teamIndex).ActivePet.AvoidanceRating += 2;
             return 0;
         }
 
@@ -93,7 +94,7 @@ Item
 
         //Regardless of if we hit the pet must surface.
         petStage.GetTeam(teamIndex).ActivePet.RemoveStatus(PetStatus.Underwater);
-        petStage.GetTeam(teamIndex).ActivePet.AvoidanceRating -= 5;
+        petStage.GetTeam(teamIndex).ActivePet.AvoidanceRating -= 2;
         petStage.GetTeam(teamIndex).ActivePet.RemoveAuraId(830);
 
         return numHits;

@@ -36,7 +36,7 @@ Item
     function applyAuraStart(teamIndex, petIndex, auraIndex, duration)
     {
         //Overkill avoidance.
-        petStage.GetTeam(teamIndex).GetPet(petIndex).AvoidanceRating += 5;
+        petStage.GetTeam(teamIndex).GetPet(petIndex).AvoidanceRating += 2;
     }
 
     //Applies the aura effect to the active pet.
