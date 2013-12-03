@@ -117,7 +117,7 @@ QString Recorder::CreateBattleRecord(PetStage *petStage, quint8 teamIndex, QStri
 	battleRecord.close();										//Close the record.
 
 	//Return the output.
-	return QString("This team has %1 wins and %2 losses.").arg(QString::number((petStage->WonLastBattle()) ? 1 : 0), QString::number((petStage->WonLastBattle()) ? 1 : 0));
+	return QString("This team has %1 wins and %2 losses.").arg(QString::number((petStage->WonLastBattle()) ? 1 : 0), QString::number((!petStage->WonLastBattle()) ? 1 : 0));
 }
 
 
