@@ -42,7 +42,7 @@ Item
         //Apply Scorched Earth effects.
         for (var i=1; i < 3; i++)
             for (var j=1; j < petStage.GetTeam(i).NumPets+1; j++)
-                if (petStage.GetTeam(i).GetPet(j).Type != PetType.Elemetal)
+                if (petStage.GetTeam(i).GetPet(j).Type != PetType.Elemental)
                     petStage.GetTeam(i).GetPet(j).AddStatus(PetStatus.Burning);
     }
 
@@ -67,7 +67,7 @@ Item
                                     * petType.GetEffectiveness(attackType, petStage.GetTeam(i).Type)
                                     * petStage.GetTeam(i).ActivePet.DefenseModifier);
 
-            if (petStage.GetTeam(i).ActivePet.Type != PetType.Elemetal)
+            if (petStage.GetTeam(i).ActivePet.Type != PetType.Elemental)
                 petHelper.CheckDamage(petStage, i, petStage.GetTeam(i).ActivePetIndex, damage, false, false);
         }
     }

@@ -38,7 +38,7 @@ Item
         //Add Chilled status to all pets.
         for (var i=1; i < 3; i++)
             for (var j=1; j < petTeam.GetTeam(i).NumPets+1; j++)
-                if (petStage.GetTeam(i).GetPet(j).Type != PetType.Elemetal)
+                if (petStage.GetTeam(i).GetPet(j).Type != PetType.Elemental)
                     petStage.GetTeam(i).GetPet(j).AddStatus(PetStatus.Chilled);
     }
 

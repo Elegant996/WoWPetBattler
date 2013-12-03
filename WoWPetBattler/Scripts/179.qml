@@ -83,7 +83,7 @@ Item
             //If the other team's active pet is burning deal extra damage.
             if (petStage.GetTeam((teamIndex%2)+1).ActivePet.HasStatus(PetStatus.Burning))
             {
-                numHits +=1;
+                numHits += 1;
                 scaleFactor = 0.5;
                 baseDamage = 10;
                 normalDamage = Math.round(baseDamage + petStage.GetTeam(teamIndex).ActivePet.Power * scaleFactor);

@@ -138,11 +138,12 @@ Item
         //Apply Darkness effects.
         for (var i=1; i < 3; i++)
             for (var j=1; j < petStage.GetTeam(teamIndex).NumPets+1; j++)
-            {
-                petStage.GetTeam(i).GetPet(j).AddStatus(PetStatus.Blinded);
-                petStage.GetTeam(i).GetPet(j).AccuracyOffset -= 0.10;
-                petStage.GetTeam(i).GetPet(j).HealingModifier -= 0.50;
-            }
+				if (petStage.GetTeam(i).GetPet(j).Type != PetType.Elemental)
+				{
+					petStage.GetTeam(i).GetPet(j).AddStatus(PetStatus.Blinded);
+					petStage.GetTeam(i).GetPet(j).AccuracyOffset -= 0.10;
+					petStage.GetTeam(i).GetPet(j).HealingModifier -= 0.50;
+				}
 
         petStage.GetTeam(0).GetPet(0).AddAura(257, 5, true, teamIndex, petStage.GetTeam(teamIndex).ActivePetIndex, petStage.GetTeam(teamIndex).ActivePet.Power);
 

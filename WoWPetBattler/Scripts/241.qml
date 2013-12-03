@@ -1,4 +1,4 @@
-// Elemetal - Racial
+// Elemental - Racial
 import QtQuick 2.0
 
 import PetAction 1.0

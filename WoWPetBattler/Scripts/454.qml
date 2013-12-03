@@ -43,7 +43,7 @@ Item
         for (var i=1; i < 3; i++)
             for (var j=1; j < petStage.GetTeam(i).NumPets+1; j++)
             {
-                if (petStage.GetTeam(i).GetPet(j).Type != PetType.Elemetal)
+                if (petStage.GetTeam(i).GetPet(j).Type != PetType.Elemental)
                     petStage.GetTeam(i).GetPet(j).AccuracyOffset -= 0.10;
                 petStage.GetTeam(i).GetPet(j).DamageOffset += 5 + petStage.GetTeam(teamIndex).ActivePet.Power * 0.25;
             }

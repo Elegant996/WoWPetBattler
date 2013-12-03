@@ -137,7 +137,8 @@ Item
         //Apply Scorched Earth effects.
         for (var i=1; i < 3; i++)
             for (var j=1; j < petStage.GetTeam(teamIndex).NumPets+1; j++)
-                petStage.GetTeam(i).GetPet(j).AddStatus(PetStatus.Burning);
+                if (petStage.GetTeam(i).GetPet(j).Type != PetType.Elemental)
+                    petStage.GetTeam(i).GetPet(j).AddStatus(PetStatus.Burning);
 
         petStage.GetTeam(0).GetPet(0).AddAura(171, 9, true, teamIndex, petStage.GetTeam(teamIndex).ActivePetIndex, petStage.GetTeam(teamIndex).ActivePet.Power);
 

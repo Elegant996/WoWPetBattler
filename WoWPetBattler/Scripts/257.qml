@@ -38,7 +38,7 @@ Item
         //Apply Darkness effects.
         for (var i=1; i < 3; i++)
             for (var j=1; j < petStage.GetTeam(i).NumPets+1; j++)
-                if (petStage.GetTeam(i).GetPet(j).Type != PetType.Elemetal)
+                if (petStage.GetTeam(i).GetPet(j).Type != PetType.Elemental)
                 {
                     petStage.GetTeam(i).GetPet(j).AddStatus(PetStatus.Blinded);
                     petStage.GetTeam(i).GetPet(j).AccuracyOffset -= 0.10;
