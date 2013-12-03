@@ -30,7 +30,7 @@ Interpreter::~Interpreter(void)
 void Interpreter::Exit()
 {
 	//Unlock the thread.
-	if ((this->readSuccess && !this->oneTimeNotifier) || !this->petStage->TeamIsAlive())
+	if ((this->readSuccess && !this->oneTimeNotifier) || (!this->petStage->TeamIsAlive() && this->readSuccess))
 		this->mutex.unlock();
 
 	this->running = false;
