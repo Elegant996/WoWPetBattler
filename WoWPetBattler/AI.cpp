@@ -92,7 +92,7 @@ void AI::LoadQMLResources()
 void AI::QueueUp()
 {
 	PostMessage((HWND)this->window->GetHandle(), WM_KEYDOWN, Robot::KeyGrave, NULL);
-	QThread::msleep(33);
+	QThread::msleep(66);
 	PostMessage((HWND)this->window->GetHandle(), WM_KEYUP, Robot::KeyGrave, NULL);
 }
 
@@ -100,7 +100,7 @@ void AI::QueueUp()
 void AI::AcceptQueue()
 {
 	PostMessage((HWND)this->window->GetHandle(), WM_KEYDOWN, Robot::KeyGrave, NULL);
-	QThread::msleep(33);
+	QThread::msleep(66);
 	PostMessage((HWND)this->window->GetHandle(), WM_KEYUP, Robot::KeyGrave, NULL);
 }
 
@@ -116,7 +116,7 @@ void AI::Run(bool initialized)
 	else
 	{
 		PostMessage((HWND)this->window->GetHandle(), WM_KEYDOWN, Robot::KeyF1, NULL);
-		QThread::msleep(33);
+		QThread::msleep(66);
 		PostMessage((HWND)this->window->GetHandle(), WM_KEYUP, Robot::KeyF1, NULL);
 		return;		//Avoid the content below.
 	}
@@ -125,42 +125,42 @@ void AI::Run(bool initialized)
 	if (nextMove.GetAction() == PetAction::Ability1)
 	{
 		PostMessage((HWND)this->window->GetHandle(), WM_KEYDOWN, Robot::Key1, NULL);
-		QThread::msleep(33);
+		QThread::msleep(66);
 		PostMessage((HWND)this->window->GetHandle(), WM_KEYUP, Robot::Key1, NULL);
 	}
 	//If next move is to use ability 2 press '2'.
 	else if (nextMove.GetAction() == PetAction::Ability2)
 	{
 		PostMessage((HWND)this->window->GetHandle(), WM_KEYDOWN, Robot::Key2, NULL);
-		QThread::msleep(33);
+		QThread::msleep(66);
 		PostMessage((HWND)this->window->GetHandle(), WM_KEYUP, Robot::Key2, NULL);
 	}
 	//If next move is to use ability 3 press '3'.
 	else if (nextMove.GetAction() == PetAction::Ability3)
 	{
 		PostMessage((HWND)this->window->GetHandle(), WM_KEYDOWN, Robot::Key3, NULL);
-		QThread::msleep(33);
+		QThread::msleep(66);
 		PostMessage((HWND)this->window->GetHandle(), WM_KEYUP, Robot::Key3, NULL);
 	}
 	//If next move is to swap to pet 1 press 'F1'.
 	else if (nextMove.GetAction() == PetAction::Pet1)
 	{
 		PostMessage((HWND)this->window->GetHandle(), WM_KEYDOWN, Robot::KeyF1, NULL);
-		QThread::msleep(33);
+		QThread::msleep(66);
 		PostMessage((HWND)this->window->GetHandle(), WM_KEYUP, Robot::KeyF1, NULL);
 	}
 	//If next move is to swap to pet 2 press 'F2'.
 	else if (nextMove.GetAction() == PetAction::Pet2)
 	{
 		PostMessage((HWND)this->window->GetHandle(), WM_KEYDOWN, Robot::KeyF2, NULL);
-		QThread::msleep(33);
+		QThread::msleep(66);
 		PostMessage((HWND)this->window->GetHandle(), WM_KEYUP, Robot::KeyF2, NULL);
 	}
 	//If next move is to swap to pet 3 press 'F3'.
 	else if (nextMove.GetAction() == PetAction::Pet3)
 	{
 		PostMessage((HWND)this->window->GetHandle(), WM_KEYDOWN, Robot::KeyF3, NULL);
-		QThread::msleep(33);
+		QThread::msleep(66);
 		PostMessage((HWND)this->window->GetHandle(), WM_KEYUP, Robot::KeyF3, NULL);
 	}
 	//We are passing, so press 'T'.
@@ -171,7 +171,7 @@ void AI::Run(bool initialized)
 			return;
 
 		PostMessage((HWND)this->window->GetHandle(), WM_KEYDOWN, Robot::KeyT, NULL);
-		QThread::msleep(33);
+		QThread::msleep(66);
 		PostMessage((HWND)this->window->GetHandle(), WM_KEYUP, Robot::KeyT, NULL);
 	}
 }
