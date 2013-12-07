@@ -111,7 +111,7 @@ void AI::Run(bool initialized)
 
 	//Run Expectiminimax if select ability or select pet is present.
 	if (initialized)
-		nextMove = this->Expectiminimax(this->petStage, this->depth, -4500, 4500, 1);
+		nextMove = this->Expectiminimax(this->petStage, this->depth, -30000, 30000, 1);
 	//If we are not initialized select the first pet.
 	else
 	{
