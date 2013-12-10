@@ -360,6 +360,13 @@ function events:GOSSIP_CLOSED(...)
 			(C_PetJournal.GetPetStats(C_PetJournal.GetPetLoadOutInfo(3))) > 0 and true or false);
 end
 
+function events:PET_JOURNAL_PETS_HEALED(...)
+	--print("PET_JOURNAL_PETS_HEALED");
+	teamIsAlive = ((C_PetJournal.GetPetStats(C_PetJournal.GetPetLoadOutInfo(1))) > 0 and
+			(C_PetJournal.GetPetStats(C_PetJournal.GetPetLoadOutInfo(2))) > 0 and
+			(C_PetJournal.GetPetStats(C_PetJournal.GetPetLoadOutInfo(3))) > 0 and true or false);
+end
+
 function events:PLAYER_LOGIN(...)
 	--print("PLAYER_LOGIN");
 	inPetBattle = C_PetBattles.IsInBattle();
@@ -635,6 +642,7 @@ PetPixels:RegisterEvent("PLAYER_LOGIN")
 --PetPixels:RegisterEvent("PLAYER_ENTERING_WORLD")
 PetPixels:RegisterEvent("SPELL_UPDATE_COOLDOWN")
 PetPixels:RegisterEvent("GOSSIP_CLOSED")
+PetPixels:RegisterEvent("PET_JOURNAL_PETS_HEALED")
 --PetPixels:RegisterEvent("PET_BATTLE_ABILITY_CHANGED")
 PetPixels:RegisterEvent("PET_BATTLE_ACTION_SELECTED")
 PetPixels:RegisterEvent("PET_BATTLE_AURA_APPLIED")
