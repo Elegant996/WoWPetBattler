@@ -67,6 +67,6 @@ Item
 			petHelper.CheckCleansingRain(petStage, (teamIndex%2)+1, petStage.GetTeam((teamIndex%2)+1).ActivePetIndex, 231, 5, true, teamIndex, petStage.GetTeam(teamIndex).ActivePetIndex, petStage.GetTeam(teamIndex).ActivePet.Power);
         }
 
-        return numHits;
+        return 0;
     }
 }
