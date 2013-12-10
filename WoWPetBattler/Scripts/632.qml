@@ -68,6 +68,6 @@ Item
 			petStage.GetTeam((teamIndex%2)+1).ActivePet.AddStatus(PetStatus.Poisoned);
         }
 
-        return numHits;
+        return 0;
     }
 }
