@@ -849,9 +849,9 @@ float AI::UseAction(PetStage* stageNode, quint8 depth, float alpha, float beta, 
 		//If it is the first time this function was called we must still process the other team's action.
 		if (firstCall)
 			//If there is more than one option divide by the size.
-			heuristic += avoidanceRating * hitRating * critRating * ActionOutcomes(curPossibleStage, depth, alpha, beta, (teamIndex%2)+1, false) / possibleStagesSize;
+			heuristic += avoidanceRating * hitRating * critRating * chanceOnHitRating * ActionOutcomes(curPossibleStage, depth, alpha, beta, (teamIndex%2)+1, false) / possibleStagesSize;
 		else
-			heuristic += avoidanceRating * hitRating * critRating * EndTurn(curPossibleStage, depth, alpha, beta) / possibleStagesSize;
+			heuristic += avoidanceRating * hitRating * critRating * chanceOnHitRating * EndTurn(curPossibleStage, depth, alpha, beta) / possibleStagesSize;
 
 		//Delete the stage after it's been used.
 		delete curPossibleStage;
