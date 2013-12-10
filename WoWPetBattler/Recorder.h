@@ -18,7 +18,7 @@ public:
 private:
 	static QString GetTeamId(PetStage*, quint8);
 
-	static QString CreateBattleRecord(PetStage*, quint8, QString);
+	static void CreateBattleRecord(PetStage*, quint8, QString);
 	static QString UpdateBattleRecord(PetStage*, quint8, QString);
 
 	static void CreatePetRecord(PetStage*, quint8);

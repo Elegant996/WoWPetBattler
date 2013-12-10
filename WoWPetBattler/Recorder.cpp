@@ -25,15 +25,12 @@ QString Recorder::RecordBattle(PetStage *petStage)
 
 	//Create the record if it doesn't exist.
 	if (!QFile::exists(opponentTeamId + ".json"))
-	{
-		output = CreateBattleRecord(petStage, 2, opponentTeamId);	//Create a new json for the opponent's team.
-		QDir::setCurrent("../../");									//Reset directory path.
-		return output;												//Nothing more to do since we've added a new team id.
-	}
+		CreateBattleRecord(petStage, 2, opponentTeamId);			//Create a new json for the opponent's team.
+	else
+		UpdateBattleRecord(petStage, 2, opponentTeamId);			//Update the current json for the opponent's team.
 
-	//Update the battle record for the teams.
+	//Update the battle record for our team.
 	output = UpdateBattleRecord(petStage, 1, QString("%1").arg(QString::number(0), 15, '0'));
-	UpdateBattleRecord(petStage, 2, opponentTeamId);
 	
 	//Reset directory path.
 	QDir::setCurrent("../../");
@@ -81,7 +78,7 @@ QString Recorder::GetTeamId(PetStage *petStage, quint8 teamIndex)
 }
 
 //Creates a battle record.
-QString Recorder::CreateBattleRecord(PetStage *petStage, quint8 teamIndex, QString teamId)
+void Recorder::CreateBattleRecord(PetStage *petStage, quint8 teamIndex, QString teamId)
 {
 	//Object that holds all info.
 	QJsonObject currentTeam;
@@ -103,8 +100,8 @@ QString Recorder::CreateBattleRecord(PetStage *petStage, quint8 teamIndex, QStri
 	currentTeam.insert("pets", pets);
 
 	//Insert wins and losses into the object.
-	currentTeam.insert("wins", QJsonValue((petStage->WonLastBattle()) ? 1 : 0));
-	currentTeam.insert("losses", QJsonValue((!petStage->WonLastBattle()) ? 1 : 0));
+	currentTeam.insert("wins", QJsonValue((petStage->WonLastBattle() && teamIndex == 2) ? 1 : 0));
+	currentTeam.insert("losses", QJsonValue((!petStage->WonLastBattle() && teamIndex == 2) ? 1 : 0));
 	
 	//Add object to document.
 	QJsonDocument battleRecordDocument;
@@ -115,9 +112,6 @@ QString Recorder::CreateBattleRecord(PetStage *petStage, quint8 teamIndex, QStri
 	battleRecord.open(QIODevice::WriteOnly | QIODevice::Text);	//Open the battle record for reading and writing; create if it doesn't exist.
 	battleRecord.write(battleRecordDocument.toJson());			//Write the battle record.
 	battleRecord.close();										//Close the record.
-
-	//Return the output.
-	return QString("This team has %1 wins and %2 losses.").arg(QString::number((petStage->WonLastBattle()) ? 1 : 0), QString::number((!petStage->WonLastBattle()) ? 1 : 0));
 }
 
 
@@ -142,13 +136,15 @@ QString Recorder::UpdateBattleRecord(PetStage *petStage, quint8 teamIndex, QStri
 	//Update the wins/losses based on who won the battle.
 	if (petStage->WonLastBattle())
 	{
+		wins += 1;
 		battleRecordObject.remove(QString("wins"));
-		battleRecordObject.insert(QString("wins"), QJsonValue(wins+1));
+		battleRecordObject.insert(QString("wins"), QJsonValue(wins));
 	}
 	else
 	{
+		losses += 1;
 		battleRecordObject.remove(QString("losses"));
-		battleRecordObject.insert(QString("losses"), QJsonValue(losses+1));
+		battleRecordObject.insert(QString("losses"), QJsonValue(losses));
 	}
 
 	battleRecordDocument.setObject(battleRecordObject);			//Add object to document.
